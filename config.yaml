@@ -1,0 +1,17 @@
+vna:
+  device: "USB0::0x0AAD::0x0240::101285::0::INSTR"
+  freq_start_ghz: 110
+  freq_stop_ghz:  170
+  n_points:       2001
+  if_bw_hz:       3000
+  cal_file:       ""        # rellenado automáticamente tras calibrar (WG_CalSetup.py)
+
+measurement:
+  n_repeats:        10      # medidas por prototipo en el time-sweep
+  sweep_interval_s:  3.5    # espera adicional entre medidas (s), aparte del tiempo de sweep
+  # Período real entre muestras ≈ sweep_interval_s + (n_points / if_bw_hz * n_canales * 1.3)
+  # Con 2001pts / 3kHz / 4CH → ~3.5 s de sweep + 3.5 s extra ≈ 7 s por muestra
+  n_thru_averages:   5      # sweeps para la referencia thru (before / after)
+
+output:
+  directory: "data/Session_2026-09-08"  # subcarpetas por prototipo creadas automáticamente
