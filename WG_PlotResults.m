@@ -5,10 +5,10 @@
 %   Fig. 2 — Reflexión    |S11| (dB)
 %
 % Estilos:
-%   Thru before  → gris,         línea continua
-%   Thru after   → negro,        línea continua
-%   Rep 1–3      → rojo/azul/verde, línea continua
-%   Rep 4+       → morado oscuro, línea discontinua (una entrada en leyenda)
+%   Thru before  → gris,  línea continua, LW 2.0
+%   Thru after   → negro, línea continua, LW 2.0
+%   Rep 1–N      → color diferente por repetición (lines colormap),
+%                  línea discontinua '--', LW 1.5
 %
 % Uso: ejecuta el script, selecciona la carpeta del prototipo cuando se abra
 %      el explorador de Windows.
@@ -61,16 +61,15 @@ else
 end
 
 %% ── 5 · Paleta y estilos ─────────────────────────────────────────────────
-COL_TB   = [0.60 0.60 0.60];   % gris        — thru before
-COL_TA   = [0.00 0.00 0.00];   % negro        — thru after
-COL_P    = [0.85 0.15 0.10;    % rojo         — Rep 1
-            0.00 0.45 0.80;    % azul          — Rep 2
-            0.10 0.70 0.30];   % verde         — Rep 3
-COL_REST = [0.28 0.08 0.48];   % morado oscuro — Rep 4+
+COL_TB = [0.60 0.60 0.60];   % gris  — thru before
+COL_TA = [0.00 0.00 0.00];   % negro — thru after
 
-LW_REF  = 2.0;
-LW_MAIN = 1.7;
-LW_REST = 1.0;
+% Un color distinto por repetición, generado con el colormap 'lines'
+% (cicla cada 7 colores; para N > 7 sigue distinguiéndose por posición)
+COL_PROTO = lines(max(N, 1));
+
+LW_REF   = 2.0;   % thru
+LW_PROTO = 1.5;   % todas las repeticiones del prototipo
 
 to_dB = @(S) 20 * log10(max(abs(S(:).'), 1e-12));  % fila → para plot
 
@@ -84,7 +83,7 @@ ax1 = axes(fig1);
 hold(ax1, 'on');
 
 wg_plot_curves(ax1, freq, thru_before, thru_after, proto, 'S31', ...
-    COL_TB, COL_TA, COL_P, COL_REST, LW_REF, LW_MAIN, LW_REST, to_dB);
+    COL_TB, COL_TA, COL_PROTO, LW_REF, LW_PROTO, to_dB);
 
 title(ax1, ['Transmisión  |S_{31}|  —  ' strrep(proto_name, '_', '\_')], ...
     'Interpreter', 'tex', 'FontSize', 13, 'FontWeight', 'bold');
@@ -106,7 +105,7 @@ ax2 = axes(fig2);
 hold(ax2, 'on');
 
 wg_plot_curves(ax2, freq, thru_before, thru_after, proto, 'S11', ...
-    COL_TB, COL_TA, COL_P, COL_REST, LW_REF, LW_MAIN, LW_REST, to_dB);
+    COL_TB, COL_TA, COL_PROTO, LW_REF, LW_PROTO, to_dB);
 
 title(ax2, ['Reflexión  |S_{11}|  —  ' strrep(proto_name, '_', '\_')], ...
     'Interpreter', 'tex', 'FontSize', 13, 'FontWeight', 'bold');
@@ -136,9 +135,11 @@ end
 
 
 function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
-                         col_tb, col_ta, col_p, col_rest, ...
-                         lw_ref, lw_main, lw_rest, to_dB)
+                         col_tb, col_ta, col_proto, lw_ref, lw_proto, to_dB)
 % Añade todas las curvas al eje ax para el parámetro S indicado.
+%
+%   Thru before/after → sólido, más grueso, gris/negro
+%   Repeticiones 1–N  → discontinuo '--', LW lw_proto, color diferente c/u
 
     % ── Thru before (gris, continua) ──────────────────────────────────────
     if ~isempty(thru_before) && isfield(thru_before, param)
@@ -154,32 +155,12 @@ function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
             'DisplayName', 'Thru after');
     end
 
-    % ── Primeras 3 medidas (colores, continua) ────────────────────────────
-    n_col = min(3, numel(proto));
-    for k = 1:n_col
+    % ── Todas las repeticiones (discontinuo, color propio) ─────────────────
+    for k = 1:numel(proto)
         if isfield(proto{k}, param)
-            plot(ax, freq, to_dB(proto{k}.(param)), ...
-                'Color', col_p(k, :), 'LineWidth', lw_main, ...
+            plot(ax, freq, to_dB(proto{k}.(param)), '--', ...
+                'Color', col_proto(k, :), 'LineWidth', lw_proto, ...
                 'DisplayName', sprintf('Rep %d', k));
-        end
-    end
-
-    % ── Resto de medidas (morado discontinuo, una entrada en leyenda) ──────
-    first_rest = true;
-    for k = (n_col + 1):numel(proto)
-        if isfield(proto{k}, param)
-            if first_rest
-                lbl = sprintf('Rep %d–%d', n_col + 1, numel(proto));
-                first_rest = false;
-            else
-                lbl = '';
-            end
-            h = plot(ax, freq, to_dB(proto{k}.(param)), '--', ...
-                'Color', col_rest, 'LineWidth', lw_rest, ...
-                'DisplayName', lbl);
-            if isempty(lbl)
-                h.Annotation.LegendInformation.IconDisplayStyle = 'off';
-            end
         end
     end
 end
