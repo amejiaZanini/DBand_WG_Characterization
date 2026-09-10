@@ -1,0 +1,185 @@
+% WG_PlotResults.m
+% ─────────────────────────────────────────────────────────────────────────
+% Lee medidas de guías de onda en banda D y genera dos figuras:
+%   Fig. 1 — Transmisión  |S31| (dB)
+%   Fig. 2 — Reflexión    |S11| (dB)
+%
+% Estilos:
+%   Thru before  → gris,         línea continua
+%   Thru after   → negro,        línea continua
+%   Rep 1–3      → rojo/azul/verde, línea continua
+%   Rep 4+       → morado oscuro, línea discontinua (una entrada en leyenda)
+%
+% Uso: ejecuta el script, selecciona la carpeta del prototipo cuando se abra
+%      el explorador de Windows.
+%      Los archivos thru_before/after se buscan automáticamente en la carpeta
+%      padre (sesión).
+% ─────────────────────────────────────────────────────────────────────────
+
+clear; clc; close all;
+
+%% ── 1 · Seleccionar carpeta del prototipo ────────────────────────────────
+proto_dir = uigetdir('', 'Selecciona la carpeta del prototipo');
+if isequal(proto_dir, 0)
+    disp('[Cancelado]');
+    return;
+end
+
+[session_dir, proto_name] = fileparts(proto_dir);
+fprintf('Prototipo  : %s\n', proto_name);
+fprintf('Sesión     : %s\n\n', session_dir);
+
+%% ── 2 · Cargar referencias THRU ──────────────────────────────────────────
+thru_before = wg_load_latest(session_dir, 'thru_before_*.mat');
+thru_after  = wg_load_latest(session_dir, 'thru_after_*.mat');
+
+if isempty(thru_before); warning('No se encontró thru_before en la carpeta sesión.'); end
+if isempty(thru_after);  warning('No se encontró thru_after en la carpeta sesión.');  end
+
+%% ── 3 · Cargar medidas del prototipo (orden cronológico por nombre) ───────
+mat_files = dir(fullfile(proto_dir, '*.mat'));
+if isempty(mat_files)
+    error('No se encontraron archivos .mat en:\n  %s', proto_dir);
+end
+[~, ord] = sort({mat_files.name});
+mat_files = mat_files(ord);
+N = numel(mat_files);
+fprintf('Medidas cargadas : %d\n\n', N);
+
+proto = cell(N, 1);
+for k = 1:N
+    proto{k} = load(fullfile(proto_dir, mat_files(k).name));
+end
+
+%% ── 4 · Eje de frecuencias ───────────────────────────────────────────────
+if ~isempty(thru_before) && isfield(thru_before, 'freq_ghz')
+    freq = thru_before.freq_ghz;
+elseif N > 0 && isfield(proto{1}, 'freq_ghz')
+    freq = proto{1}.freq_ghz;
+else
+    error('No se pudo obtener el eje de frecuencias.');
+end
+
+%% ── 5 · Paleta y estilos ─────────────────────────────────────────────────
+COL_TB   = [0.60 0.60 0.60];   % gris        — thru before
+COL_TA   = [0.00 0.00 0.00];   % negro        — thru after
+COL_P    = [0.85 0.15 0.10;    % rojo         — Rep 1
+            0.00 0.45 0.80;    % azul          — Rep 2
+            0.10 0.70 0.30];   % verde         — Rep 3
+COL_REST = [0.28 0.08 0.48];   % morado oscuro — Rep 4+
+
+LW_REF  = 2.0;
+LW_MAIN = 1.7;
+LW_REST = 1.0;
+
+to_dB = @(S) 20 * log10(max(abs(S(:).'), 1e-12));  % fila → para plot
+
+%% ── 6 · Figura 1 — Transmisión |S31| ─────────────────────────────────────
+fig1 = figure( ...
+    'Name',        ['Transmisión — ' proto_name], ...
+    'NumberTitle', 'off', ...
+    'Position',    [80 280 980 540]);
+
+ax1 = axes(fig1);
+hold(ax1, 'on');
+
+wg_plot_curves(ax1, freq, thru_before, thru_after, proto, 'S31', ...
+    COL_TB, COL_TA, COL_P, COL_REST, LW_REF, LW_MAIN, LW_REST, to_dB);
+
+title(ax1, ['Transmisión  |S_{31}|  —  ' strrep(proto_name, '_', '\_')], ...
+    'Interpreter', 'tex', 'FontSize', 13, 'FontWeight', 'bold');
+xlabel(ax1, 'Frecuencia (GHz)', 'FontSize', 11);
+ylabel(ax1, '|S_{31}| (dB)',    'Interpreter', 'tex', 'FontSize', 11);
+xlim(ax1, [min(freq) max(freq)]);
+grid(ax1, 'on');
+box(ax1, 'on');
+legend(ax1, 'Location', 'best', 'FontSize', 9);
+hold(ax1, 'off');
+
+%% ── 7 · Figura 2 — Reflexión |S11| ──────────────────────────────────────
+fig2 = figure( ...
+    'Name',        ['Reflexión — ' proto_name], ...
+    'NumberTitle', 'off', ...
+    'Position',    [1080 280 980 540]);
+
+ax2 = axes(fig2);
+hold(ax2, 'on');
+
+wg_plot_curves(ax2, freq, thru_before, thru_after, proto, 'S11', ...
+    COL_TB, COL_TA, COL_P, COL_REST, LW_REF, LW_MAIN, LW_REST, to_dB);
+
+title(ax2, ['Reflexión  |S_{11}|  —  ' strrep(proto_name, '_', '\_')], ...
+    'Interpreter', 'tex', 'FontSize', 13, 'FontWeight', 'bold');
+xlabel(ax2, 'Frecuencia (GHz)', 'FontSize', 11);
+ylabel(ax2, '|S_{11}| (dB)',    'Interpreter', 'tex', 'FontSize', 11);
+xlim(ax2, [min(freq) max(freq)]);
+grid(ax2, 'on');
+box(ax2, 'on');
+legend(ax2, 'Location', 'best', 'FontSize', 9);
+hold(ax2, 'off');
+
+%% ═══════════════════════════════════════════════════════════════════════════
+%  Funciones locales  (requiere MATLAB R2016b o posterior)
+%% ═══════════════════════════════════════════════════════════════════════════
+
+function data = wg_load_latest(folder, pattern)
+% Carga el archivo más reciente (alfabéticamente) que coincide con pattern.
+% Devuelve [] si no existe ninguno.
+    files = dir(fullfile(folder, pattern));
+    if isempty(files)
+        data = [];
+        return;
+    end
+    [~, idx] = sort({files.name});
+    data = load(fullfile(folder, files(idx(end)).name));
+end
+
+
+function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
+                         col_tb, col_ta, col_p, col_rest, ...
+                         lw_ref, lw_main, lw_rest, to_dB)
+% Añade todas las curvas al eje ax para el parámetro S indicado.
+
+    % ── Thru before (gris, continua) ──────────────────────────────────────
+    if ~isempty(thru_before) && isfield(thru_before, param)
+        plot(ax, freq, to_dB(thru_before.(param)), ...
+            'Color', col_tb, 'LineWidth', lw_ref, ...
+            'DisplayName', 'Thru before');
+    end
+
+    % ── Thru after (negro, continua) ──────────────────────────────────────
+    if ~isempty(thru_after) && isfield(thru_after, param)
+        plot(ax, freq, to_dB(thru_after.(param)), ...
+            'Color', col_ta, 'LineWidth', lw_ref, ...
+            'DisplayName', 'Thru after');
+    end
+
+    % ── Primeras 3 medidas (colores, continua) ────────────────────────────
+    n_col = min(3, numel(proto));
+    for k = 1:n_col
+        if isfield(proto{k}, param)
+            plot(ax, freq, to_dB(proto{k}.(param)), ...
+                'Color', col_p(k, :), 'LineWidth', lw_main, ...
+                'DisplayName', sprintf('Rep %d', k));
+        end
+    end
+
+    % ── Resto de medidas (morado discontinuo, una entrada en leyenda) ──────
+    first_rest = true;
+    for k = (n_col + 1):numel(proto)
+        if isfield(proto{k}, param)
+            if first_rest
+                lbl = sprintf('Rep %d–%d', n_col + 1, numel(proto));
+                first_rest = false;
+            else
+                lbl = '';
+            end
+            h = plot(ax, freq, to_dB(proto{k}.(param)), '--', ...
+                'Color', col_rest, 'LineWidth', lw_rest, ...
+                'DisplayName', lbl);
+            if isempty(lbl)
+                h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+            end
+        end
+    end
+end
