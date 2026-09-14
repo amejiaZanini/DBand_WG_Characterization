@@ -2,9 +2,9 @@ vna:
   device: "USB0::0x0AAD::0x0240::101285::0::INSTR"
   freq_start_ghz: 110
   freq_stop_ghz:  170
-  n_points:       2001
-  if_bw_hz:       3000
-  cal_file:       ""        # rellenado automáticamente tras calibrar (WG_CalSetup.py)
+  n_points:       4001
+  if_bw_hz:       1000
+  cal_file: "TLR_110_170GHz_WG.cal"
 
 measurement:
   n_repeats:        10      # medidas por prototipo en el time-sweep
