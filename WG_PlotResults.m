@@ -29,12 +29,31 @@ end
 fprintf('Prototipo  : %s\n', proto_name);
 fprintf('Sesión     : %s\n\n', session_dir);
 
-%% ── 2 · Cargar referencias THRU ──────────────────────────────────────────
-thru_before = wg_load_latest(session_dir, 'thru_before_*.mat');
-thru_after  = wg_load_latest(session_dir, 'thru_after_*.mat');
+%% ── 2 · Seleccionar referencias THRU (ventana de selección de archivo) ───
+% El explorador abre directamente en la carpeta de sesión y filtra por
+% thru_before_*.mat / thru_after_*.mat para que sea inmediato de elegir.
 
-if isempty(thru_before); warning('No se encontró thru_before en la carpeta sesión.'); end
-if isempty(thru_after);  warning('No se encontró thru_after en la carpeta sesión.');  end
+[f_tb, p_tb] = uigetfile( ...
+    fullfile(session_dir, 'thru_before_*.mat'), ...
+    'Selecciona THRU BEFORE (.mat)');
+if isequal(f_tb, 0)
+    warning('No se seleccionó Thru before — las curvas de referencia no aparecerán.');
+    thru_before = [];
+else
+    thru_before = load(fullfile(p_tb, f_tb));
+    fprintf('Thru before : %s\n', f_tb);
+end
+
+[f_ta, p_ta] = uigetfile( ...
+    fullfile(session_dir, 'thru_after_*.mat'), ...
+    'Selecciona THRU AFTER (.mat)');
+if isequal(f_ta, 0)
+    warning('No se seleccionó Thru after — las curvas de referencia no aparecerán.');
+    thru_after = [];
+else
+    thru_after = load(fullfile(p_ta, f_ta));
+    fprintf('Thru after  : %s\n\n', f_ta);
+end
 
 %% ── 3 · Cargar medidas del prototipo (orden cronológico por nombre) ───────
 mat_files = dir(fullfile(proto_dir, '*.mat'));
@@ -183,19 +202,6 @@ hold(ax3, 'off');
 %% ═══════════════════════════════════════════════════════════════════════════
 %  Funciones locales  (requiere MATLAB R2016b o posterior)
 %% ═══════════════════════════════════════════════════════════════════════════
-
-function data = wg_load_latest(folder, pattern)
-% Carga el archivo más reciente (alfabéticamente) que coincide con pattern.
-% Devuelve [] si no existe ninguno.
-    files = dir(fullfile(folder, pattern));
-    if isempty(files)
-        data = [];
-        return;
-    end
-    [~, idx] = sort({files.name});
-    data = load(fullfile(folder, files(idx(end)).name));
-end
-
 
 function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
                          col_tb, col_ta, col_proto, lw_ref, lw_proto, to_dB)
