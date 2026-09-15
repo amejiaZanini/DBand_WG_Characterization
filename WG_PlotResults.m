@@ -61,8 +61,8 @@ else
 end
 
 %% ── 5 · Paleta y estilos ─────────────────────────────────────────────────
-COL_TB = [0.60 0.60 0.60];   % gris  — thru before
-COL_TA = [0.00 0.00 0.00];   % negro — thru after
+COL_TB = [0.00 0.35 0.80];   % azul  — thru before
+COL_TA = [0.85 0.10 0.10];   % rojo  — thru after
 
 % Un color distinto por repetición, generado con el colormap 'lines'
 % (cicla cada 7 colores; para N > 7 sigue distinguiéndose por posición)
