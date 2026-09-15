@@ -117,6 +117,69 @@ box(ax2, 'on');
 legend(ax2, 'Location', 'best', 'FontSize', 9);
 hold(ax2, 'off');
 
+%% ── 8 · Figura 3 — Transmisión + Reflexión (rango fijo 0 a −30 dB) ────────
+fig3 = figure( ...
+    'Name',        ['S31 + S11 — ' proto_name], ...
+    'NumberTitle', 'off', ...
+    'Position',    [560 730 980 560]);
+
+ax3 = axes(fig3);
+hold(ax3, 'on');
+
+% ── Thru before: S31 (gris, continua) y S11 (gris discontinua más fina) ──
+if ~isempty(thru_before)
+    if isfield(thru_before, 'S31')
+        plot(ax3, freq, to_dB(thru_before.S31), ...
+            'Color', COL_TB, 'LineWidth', LW_REF, ...
+            'DisplayName', 'S31  Thru before');
+    end
+    if isfield(thru_before, 'S11')
+        plot(ax3, freq, to_dB(thru_before.S11), ':', ...
+            'Color', COL_TB, 'LineWidth', LW_REF, ...
+            'DisplayName', 'S11  Thru before');
+    end
+end
+
+% ── Thru after: S31 (negro, continua) y S11 (negro discontinua más fina) ─
+if ~isempty(thru_after)
+    if isfield(thru_after, 'S31')
+        plot(ax3, freq, to_dB(thru_after.S31), ...
+            'Color', COL_TA, 'LineWidth', LW_REF, ...
+            'DisplayName', 'S31  Thru after');
+    end
+    if isfield(thru_after, 'S11')
+        plot(ax3, freq, to_dB(thru_after.S11), ':', ...
+            'Color', COL_TA, 'LineWidth', LW_REF, ...
+            'DisplayName', 'S11  Thru after');
+    end
+end
+
+% ── Repeticiones del prototipo: S31 sólido, S11 punteado, mismo color ─────
+for k = 1:N
+    c = COL_PROTO(k, :);
+    if isfield(proto{k}, 'S31')
+        plot(ax3, freq, to_dB(proto{k}.S31), '--', ...
+            'Color', c, 'LineWidth', LW_PROTO, ...
+            'DisplayName', sprintf('S31  Rep %d', k));
+    end
+    if isfield(proto{k}, 'S11')
+        plot(ax3, freq, to_dB(proto{k}.S11), ':', ...
+            'Color', c, 'LineWidth', LW_PROTO, ...
+            'DisplayName', sprintf('S11  Rep %d', k));
+    end
+end
+
+title(ax3, ['S31 (––)  &  S11 (···)  —  ' strrep(proto_name, '_', '\_')], ...
+    'Interpreter', 'tex', 'FontSize', 13, 'FontWeight', 'bold');
+xlabel(ax3, 'Frecuencia (GHz)', 'FontSize', 11);
+ylabel(ax3, 'Nivel (dB)',        'FontSize', 11);
+xlim(ax3, [min(freq) max(freq)]);
+ylim(ax3, [-30 0]);
+grid(ax3, 'on');
+box(ax3, 'on');
+legend(ax3, 'Location', 'eastoutside', 'FontSize', 8);
+hold(ax3, 'off');
+
 %% ═══════════════════════════════════════════════════════════════════════════
 %  Funciones locales  (requiere MATLAB R2016b o posterior)
 %% ═══════════════════════════════════════════════════════════════════════════
