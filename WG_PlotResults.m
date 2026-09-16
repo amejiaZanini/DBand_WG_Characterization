@@ -579,34 +579,45 @@ function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
 end
 
 
-function [freq_ghz, val_lin] = wg_read_txt_dB(filepath)
-% Lee archivo .txt de 2 columnas: freq[GHz]  valor[dB].
+function [freq_ghz, val] = wg_read_txt_dB(filepath)
+% Lee un archivo .txt de simulación y devuelve el valor complejo/lineal.
+% Detecta automáticamente el formato por el nº de columnas de datos:
+%   3 columnas: freq | Parte Real | Parte Imaginaria  → S = Re + jIm
+%   2 columnas: freq | Magnitud [dB]                  → S = 10^(dB/20)
 % Líneas que empiezan con # se ignoran (comentarios/cabeceras).
-% Devuelve val_lin = magnitud lineal (compatible con to_dB = 20*log10(abs(x))).
+% El resultado es compatible con to_dB = 20*log10(abs(x)).
     fid = fopen(filepath, 'r');
     if fid < 0; error('No se pudo abrir: %s', filepath); end
-    freq_ghz = []; val_db = [];
+    rows = {};
     while ~feof(fid)
         raw = fgetl(fid);
         if ~ischar(raw); break; end
         line = strtrim(raw);
         if isempty(line) || line(1) == '#'; continue; end
-        nums = sscanf(line, '%f');
-        if numel(nums) >= 2
-            freq_ghz(end+1) = nums(1); %#ok
-            val_db(end+1)   = nums(2); %#ok
-        end
+        nums = sscanf(line, '%f').';
+        if numel(nums) >= 2; rows{end+1} = nums; end %#ok
     end
     fclose(fid);
-    if isempty(freq_ghz); error('Sin datos numericos en: %s', filepath); end
-    freq_ghz = freq_ghz(:).';
+    if isempty(rows); error('Sin datos numericos en: %s', filepath); end
+
+    ncol = min(cellfun(@numel, rows));
+    nr   = numel(rows);
+    M = nan(nr, ncol);
+    for r = 1:nr; M(r,1:ncol) = rows{r}(1:ncol); end
+
+    freq_ghz = M(:,1).';
+    if ncol >= 3
+        val = (M(:,2) + 1j*M(:,3)).';          % Re/Im → complejo
+    else
+        val = 10.^(M(:,2).' / 20);             % dB → lineal (real positivo)
+    end
+
     % Detección automática de unidad de frecuencia
     if max(freq_ghz) > 1e6
         freq_ghz = freq_ghz / 1e9;   % Hz → GHz
     elseif max(freq_ghz) > 1e3
         freq_ghz = freq_ghz / 1e3;   % MHz → GHz
     end
-    val_lin = 10.^(val_db(:).' / 20);   % dB → lineal (real positivo)
 end
 
 
