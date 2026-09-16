@@ -1,14 +1,20 @@
 % WG_PlotResults.m
 % ─────────────────────────────────────────────────────────────────────────
-% Visualización de medidas de guías de onda en banda D (110–170 GHz).
+% Dos modos de operación (se pregunta al inicio):
 %
-%   Fig. 1 — Transmisión  |S31|        — todas las repeticiones
-%   Fig. 2 — Reflexión    |S11|        — todas las repeticiones
-%   Fig. 3 — S31 + S11 combinados      — 5 primeras reps, ylim a medida
-%   Fig. 4 — TX medida vs simulación   — 5 primeras reps + .txt/.s2p
-%   Fig. 5 — RX medida vs simulación   — 5 primeras reps + .txt/.s2p
+%  [Visualizar]  — Un prototipo con todas sus repeticiones.
+%    Fig 1: Transmisión |S31| — todas las reps
+%    Fig 2: Reflexión   |S11| — todas las reps
+%    Fig 3: S31 + S11 combinados — 5 primeras reps, ylim a medida
+%    Fig 4/5: TX / RX medida vs simulación (opcional)
 %
-% Las figuras se guardan como PNG en la carpeta del prototipo.
+%  [Comparar]   — Varias carpetas de prototipo, una curva promedio c/u.
+%    Selección múltiple de subcarpetas desde una carpeta maestra.
+%    Media de las 5 primeras medidas por prototipo → curva representativa.
+%    Fig C1: Transmisión — comparación sin límite
+%    Fig C2: Reflexión   — comparación sin límite
+%    Fig C3/C4: idem con ylim y simulación opcionales
+%
 % Requiere MATLAB R2016b o posterior.
 % ─────────────────────────────────────────────────────────────────────────
 
@@ -21,455 +27,587 @@ set(groot, 'defaultAxesTickLabelInterpreter', 'latex');
 set(groot, 'defaultAxesFontSize',   14);
 set(groot, 'defaultAxesFontName',   'Times New Roman');
 
-%% ── 1 · Seleccionar carpeta del prototipo ────────────────────────────────
-proto_dir = uigetdir('', 'Selecciona la carpeta del prototipo');
-if isequal(proto_dir, 0); disp('[Cancelado]'); return; end
+%% ── 1 · Modo de operación ────────────────────────────────────────────────
+mode_sel = questdlg('Selecciona el modo de operacion:', ...
+    'WG Plot Results', 'Visualizar', 'Comparar', 'Visualizar');
+if isempty(mode_sel); disp('[Cancelado]'); return; end
 
-[session_dir, proto_name] = fileparts(proto_dir);
-proto_lbl = strrep(proto_name, '_', '\_');   % escapado para LaTeX
-fprintf('Prototipo  : %s\n', proto_name);
-fprintf('Sesion     : %s\n\n', session_dir);
+%% ═══════════════════════════════════════════════════════════════════════════
+%  MODO VISUALIZAR
+%% ═══════════════════════════════════════════════════════════════════════════
+if strcmp(mode_sel, 'Visualizar')
 
-%% ── 2 · Seleccionar referencias THRU ─────────────────────────────────────
-[f_tb, p_tb] = uigetfile( ...
-    fullfile(session_dir, 'thru_before_*.mat'), ...
-    'Selecciona THRU BEFORE (.mat)');
-if isequal(f_tb, 0)
-    warning('Sin Thru before.');
-    thru_before = [];
-else
-    thru_before = load(fullfile(p_tb, f_tb));
-    fprintf('Thru before : %s\n', f_tb);
-end
+    % ── V1 · Carpeta del prototipo ─────────────────────────────────────────
+    proto_dir = uigetdir('', 'Selecciona la carpeta del prototipo');
+    if isequal(proto_dir, 0); disp('[Cancelado]'); return; end
 
-[f_ta, p_ta] = uigetfile( ...
-    fullfile(session_dir, 'thru_after_*.mat'), ...
-    'Selecciona THRU AFTER (.mat)');
-if isequal(f_ta, 0)
-    warning('Sin Thru after.');
-    thru_after = [];
-else
-    thru_after = load(fullfile(p_ta, f_ta));
-    fprintf('Thru after  : %s\n\n', f_ta);
-end
+    [session_dir, proto_name] = fileparts(proto_dir);
+    proto_lbl = strrep(proto_name, '_', '\_');
+    fprintf('Prototipo  : %s\n', proto_name);
+    fprintf('Sesion     : %s\n\n', session_dir);
 
-%% ── 3 · Cargar medidas del prototipo (orden cronológico) ─────────────────
-mat_files = dir(fullfile(proto_dir, '*.mat'));
-if isempty(mat_files)
-    error('No se encontraron archivos .mat en:\n  %s', proto_dir);
-end
-[~, ord] = sort({mat_files.name});
-mat_files = mat_files(ord);
-N = numel(mat_files);
-fprintf('Medidas cargadas : %d\n\n', N);
+    % ── V2 · Thru before / after ──────────────────────────────────────────
+    [thru_before, thru_after] = wg_load_thru(session_dir);
 
-proto = cell(N, 1);
-for k = 1:N
-    proto{k} = load(fullfile(proto_dir, mat_files(k).name));
-end
+    % ── V3 · Medidas del prototipo ─────────────────────────────────────────
+    [proto, N, freq] = wg_load_proto(proto_dir, thru_before);
 
-%% ── 4 · Eje de frecuencias ───────────────────────────────────────────────
-if ~isempty(thru_before) && isfield(thru_before, 'freq_ghz')
-    freq = thru_before.freq_ghz(:).';
-elseif N > 0 && isfield(proto{1}, 'freq_ghz')
-    freq = proto{1}.freq_ghz(:).';
-else
-    error('No se pudo obtener el eje de frecuencias.');
-end
+    % ── V4 · Estilos ───────────────────────────────────────────────────────
+    [COL_TB, COL_TA, COL_SIM, COL_PROTO, LW, SM, K] = wg_style(N);
+    to_dB = @(S) 20 * log10(max(abs(S(:).'), 1e-12));
+    sm    = SM;
 
-%% ── 5 · Paleta, estilos y constantes ─────────────────────────────────────
-N_COMPARE  = min(5, N);    % reps en Figs. 3–5
-SMOOTH     = 5;            % ventana suavizado Gaussiano (muestras)
-F_KEY      = 140;          % GHz — frecuencia para anotación de valor
-THRESH_TX  = -3;           % dB — umbral inserción
-THRESH_RX  = -15;          % dB — umbral adaptación
+    THRESH_TX  = -3;
+    THRESH_RX  = -15;
+    F_KEY      = 140;
+    FIG_CM     = [2 2 20 14];
+    save_dir   = proto_dir;
 
-COL_TB  = [0.00 0.35 0.80];   % azul  — Thru before
-COL_TA  = [0.85 0.10 0.10];   % rojo  — Thru after
-COL_SIM = [0.10 0.10 0.10];   % negro — simulación
+    % ── V5 · Fig 1 — Transmisión |S31| ────────────────────────────────────
+    fig1 = wg_new_fig(['TX\_' proto_name], FIG_CM);
+    ax1 = gca; hold on;
+    wg_ref_lines(ax1, F_KEY, THRESH_TX);
+    wg_plot_curves(ax1, freq, thru_before, thru_after, proto, 'S31', ...
+        COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+    wg_annotate_all(ax1, freq, thru_before, thru_after, proto, K, [], ...
+        'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, [], to_dB, sm);
+    wg_format_ax(ax1, freq, ...
+        ['\textbf{Insertion Loss} --- ' proto_lbl], '$|S_{31}|$ (dB)', []);
+    saveas(fig1, fullfile(save_dir, [proto_name '_S31.png']));
 
-COL_PROTO = lines(max(N, 1)); % color distinto por repetición
+    % ── V6 · Fig 2 — Reflexión |S11| ──────────────────────────────────────
+    fig2 = wg_new_fig(['RX\_' proto_name], FIG_CM);
+    ax2 = gca; hold on;
+    wg_ref_lines(ax2, F_KEY, THRESH_RX);
+    wg_plot_curves(ax2, freq, thru_before, thru_after, proto, 'S11', ...
+        COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+    wg_annotate_all(ax2, freq, thru_before, thru_after, proto, K, [], ...
+        'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, [], to_dB, sm);
+    wg_format_ax(ax2, freq, ...
+        ['\textbf{Return Loss} --- ' proto_lbl], '$|S_{11}|$ (dB)', []);
+    saveas(fig2, fullfile(save_dir, [proto_name '_S11.png']));
 
-LW_REF   = 1.8;
-LW_PROTO = 1.3;
-LW_SIM   = 2.2;
-LW_THRESH = 1.4;
+    % ── V7 · Fig 3 — S31 + S11 combinados (5 primeras reps) ───────────────
+    ylim3 = wg_ask_ylim('Fig. 3 --- Escala eje Y', '-30', '0');
 
-FIG_CM = [2 2 20 14];   % posición y tamaño de figura [x y w h] en cm
-
-to_dB = @(S) 20 * log10(max(abs(S(:).'), 1e-12));
-sm    = @(v) smoothdata(v(:).', 'gaussian', SMOOTH);
-
-%% ── 6 · Figura 1 — Transmisión |S31| ─────────────────────────────────────
-fig1 = wg_new_fig(['TX\_' proto_name], FIG_CM);
-ax1  = gca; hold on;
-
-xline(F_KEY, '--', 'Color', [0.3 0.3 0.3], 'LineWidth', 1.0, 'HandleVisibility', 'off');
-yline(THRESH_TX, '--', 'Color', [0 0.5 0], 'LineWidth', LW_THRESH, ...
-    'DisplayName', ['Threshold (' num2str(THRESH_TX) ' dB)']);
-
-wg_plot_curves(ax1, freq, thru_before, thru_after, proto, 'S31', ...
-    COL_TB, COL_TA, COL_PROTO, LW_REF, LW_PROTO, to_dB, sm);
-
-wg_annotate(ax1, freq, thru_before, thru_after, [], ...
-    'S31', F_KEY, COL_TB, COL_TA, [], to_dB, sm);
-
-wg_format_ax(ax1, freq, ...
-    ['\textbf{Insertion Loss} --- ' proto_lbl], ...
-    '$|S_{31}|$ (dB)', [], 'southeast');
-
-saveas(fig1, fullfile(proto_dir, [proto_name '_S31.png']));
-
-%% ── 7 · Figura 2 — Reflexión |S11| ──────────────────────────────────────
-fig2 = wg_new_fig(['RX\_' proto_name], FIG_CM);
-ax2  = gca; hold on;
-
-xline(F_KEY, '--', 'Color', [0.3 0.3 0.3], 'LineWidth', 1.0, 'HandleVisibility', 'off');
-yline(THRESH_RX, '--', 'Color', [0 0.5 0], 'LineWidth', LW_THRESH, ...
-    'DisplayName', ['Threshold (' num2str(THRESH_RX) ' dB)']);
-
-wg_plot_curves(ax2, freq, thru_before, thru_after, proto, 'S11', ...
-    COL_TB, COL_TA, COL_PROTO, LW_REF, LW_PROTO, to_dB, sm);
-
-wg_annotate(ax2, freq, thru_before, thru_after, [], ...
-    'S11', F_KEY, COL_TB, COL_TA, [], to_dB, sm);
-
-wg_format_ax(ax2, freq, ...
-    ['\textbf{Return Loss} --- ' proto_lbl], ...
-    '$|S_{11}|$ (dB)', [], 'northeast');
-
-saveas(fig2, fullfile(proto_dir, [proto_name '_S11.png']));
-
-%% ── 8 · Figura 3 — S31 + S11 (5 primeras reps, ylim a medida) ───────────
-
-ylim_ans = inputdlg( ...
-    {'Limite inferior (dB):', 'Limite superior (dB):'}, ...
-    'Fig. 3 --- Escala eje Y', 1, {'-30', '0'});
-if isempty(ylim_ans)
-    ylim3 = [-30 0];
-else
-    ylim3 = [str2double(ylim_ans{1}), str2double(ylim_ans{2})];
-    if any(isnan(ylim3)) || ylim3(1) >= ylim3(2)
-        ylim3 = [-30 0];
-    end
-end
-
-fig3 = wg_new_fig(['Combined\_' proto_name], [2 2 22 15]);
-ax3  = gca; hold on;
-
-xline(F_KEY, '--', 'Color', [0.3 0.3 0.3], 'LineWidth', 1.0, 'HandleVisibility', 'off');
-
-% Thru before/after: S31 sólido, S11 punteado
-if ~isempty(thru_before)
-    if isfield(thru_before,'S31')
-        plot(ax3, freq, sm(to_dB(thru_before.S31)), '-', ...
-            'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', '$S_{31}$ Thru before');
-    end
-    if isfield(thru_before,'S11')
-        plot(ax3, freq, sm(to_dB(thru_before.S11)), ':', ...
-            'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', '$S_{11}$ Thru before');
-    end
-end
-if ~isempty(thru_after)
-    if isfield(thru_after,'S31')
-        plot(ax3, freq, sm(to_dB(thru_after.S31)), '-', ...
-            'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', '$S_{31}$ Thru after');
-    end
-    if isfield(thru_after,'S11')
-        plot(ax3, freq, sm(to_dB(thru_after.S11)), ':', ...
-            'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', '$S_{11}$ Thru after');
-    end
-end
-
-% Primeras N_COMPARE reps: S31 (--), S11 (:), mismo color
-for k = 1:N_COMPARE
-    c = COL_PROTO(k,:);
-    if isfield(proto{k},'S31')
-        plot(ax3, freq, sm(to_dB(proto{k}.S31)), '--', ...
-            'Color', c, 'LineWidth', LW_PROTO, ...
-            'DisplayName', ['$S_{31}$ Rep ' num2str(k)]);
-    end
-    if isfield(proto{k},'S11')
-        plot(ax3, freq, sm(to_dB(proto{k}.S11)), ':', ...
-            'Color', c, 'LineWidth', LW_PROTO, ...
-            'DisplayName', ['$S_{11}$ Rep ' num2str(k)]);
-    end
-end
-
-wg_format_ax(ax3, freq, ...
-    ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$)} --- ' proto_lbl], ...
-    'Level (dB)', ylim3, 'eastoutside');
-
-saveas(fig3, fullfile(proto_dir, [proto_name '_S31_S11.png']));
-
-%% ── 9 · Comparar medidas vs simulación (opcional) ────────────────────────
-resp = questdlg('Comparar las medidas con una simulacion?', ...
-    'Simulacion', 'Si', 'No', 'No');
-
-if strcmp(resp, 'Si')
-
-    [f_sim, p_sim] = uigetfile( ...
-        {'*.txt;*.s2p;*.dat', 'S-parametros (*.txt, *.s2p, *.dat)'; ...
-         '*.*', 'Todos los archivos'}, ...
-        'Selecciona el archivo de simulacion');
-
-    if isequal(f_sim, 0)
-        disp('[Simulacion cancelada]');
-    else
-        sim_path = fullfile(p_sim, f_sim);
-        [f_sim_lbl, ~] = strtok(f_sim, '.');
-        fprintf('Simulacion  : %s\n\n', f_sim);
-
-        [freq_sim, S11_sim, S21_sim] = wg_read_sparams(sim_path);
-
-        ylim_sim = inputdlg( ...
-            {'Limite inferior (dB):', 'Limite superior (dB):'}, ...
-            'Figs. 4 & 5 --- Escala eje Y', 1, {'-30', '0'});
-        if isempty(ylim_sim)
-            ylim45 = [-30 0];
-        else
-            ylim45 = [str2double(ylim_sim{1}), str2double(ylim_sim{2})];
-            if any(isnan(ylim45)) || ylim45(1) >= ylim45(2)
-                ylim45 = [-30 0];
-            end
+    fig3 = wg_new_fig(['Combined\_' proto_name], [2 2 22 15]);
+    ax3 = gca; hold on;
+    wg_ref_lines(ax3, F_KEY, []);
+    if ~isempty(thru_before)
+        if isfield(thru_before,'S31')
+            plot(ax3, freq, sm(to_dB(thru_before.S31)), '-', ...
+                'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{31}$ Thru before');
         end
+        if isfield(thru_before,'S11')
+            plot(ax3, freq, sm(to_dB(thru_before.S11)), ':', ...
+                'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{11}$ Thru before');
+        end
+    end
+    if ~isempty(thru_after)
+        if isfield(thru_after,'S31')
+            plot(ax3, freq, sm(to_dB(thru_after.S31)), '-', ...
+                'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{31}$ Thru after');
+        end
+        if isfield(thru_after,'S11')
+            plot(ax3, freq, sm(to_dB(thru_after.S11)), ':', ...
+                'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{11}$ Thru after');
+        end
+    end
+    for k = 1:K
+        c = COL_PROTO(k,:);
+        if isfield(proto{k},'S31')
+            plot(ax3, freq, sm(to_dB(proto{k}.S31)), '--', ...
+                'Color', c, 'LineWidth', LW.proto, ...
+                'DisplayName', ['$S_{31}$ Rep ' num2str(k)]);
+        end
+        if isfield(proto{k},'S11')
+            plot(ax3, freq, sm(to_dB(proto{k}.S11)), ':', ...
+                'Color', c, 'LineWidth', LW.proto, ...
+                'DisplayName', ['$S_{11}$ Rep ' num2str(k)]);
+        end
+    end
+    wg_format_ax(ax3, freq, ...
+        ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$)} --- ' proto_lbl], ...
+        'Level (dB)', ylim3);
+    set(legend(ax3), 'Location', 'eastoutside');
+    saveas(fig3, fullfile(save_dir, [proto_name '_S31_S11.png']));
 
-        % ── Fig. 4 — TX medida vs simulación ──────────────────────────────
-        fig4 = wg_new_fig(['TX\_sim\_' proto_name], FIG_CM);
-        ax4  = gca; hold on;
+    % ── V8 · Figs 4/5 — vs simulación (opcional) ──────────────────────────
+    resp = questdlg('Comparar con simulacion?', 'Simulacion', 'Si', 'No', 'No');
+    if strcmp(resp, 'Si')
+        [f_sim, p_sim] = uigetfile( ...
+            {'*.txt;*.s2p;*.dat','S-params (*.txt,*.s2p,*.dat)';'*.*','Todos'}, ...
+            'Selecciona archivo de simulacion');
+        if ~isequal(f_sim, 0)
+            [freq_sim, S11_sim, S21_sim] = wg_read_sparams(fullfile(p_sim, f_sim));
+            f_lbl = strrep(strtok(f_sim,'.'),'_','\_');
+            ylim45 = wg_ask_ylim('Figs. 4 & 5 --- Escala eje Y', '-30', '0');
 
-        xline(F_KEY, '--', 'Color', [0.3 0.3 0.3], 'LineWidth', 1.0, 'HandleVisibility', 'off');
-        yline(THRESH_TX, '--', 'Color', [0 0.5 0], 'LineWidth', LW_THRESH, ...
-            'DisplayName', ['Threshold (' num2str(THRESH_TX) ' dB)']);
+            % Fig 4 — TX vs sim
+            fig4 = wg_new_fig(['TX\_sim\_' proto_name], FIG_CM);
+            ax4 = gca; hold on;
+            wg_ref_lines(ax4, F_KEY, THRESH_TX);
+            wg_plot_curves(ax4, freq, thru_before, thru_after, proto(1:K), 'S31', ...
+                COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+            plot(ax4, freq_sim, sm(to_dB(S21_sim)), '-', ...
+                'Color', COL_SIM, 'LineWidth', LW.sim, ...
+                'DisplayName', ['Sim: ' f_lbl]);
+            wg_annotate_all(ax4, freq, thru_before, thru_after, proto, K, ...
+                struct('freq',freq_sim,'S31',S21_sim,'S11',S11_sim), ...
+                'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, COL_SIM, to_dB, sm);
+            wg_format_ax(ax4, freq, ...
+                ['\textbf{Insertion Loss: Measured vs Sim} --- ' proto_lbl], ...
+                '$|S_{31}|$ (dB)', ylim45);
+            saveas(fig4, fullfile(save_dir, [proto_name '_TX_vs_sim.png']));
 
-        if ~isempty(thru_before) && isfield(thru_before,'S31')
-            plot(ax4, freq, sm(to_dB(thru_before.S31)), '-', ...
+            % Fig 5 — RX vs sim
+            fig5 = wg_new_fig(['RX\_sim\_' proto_name], FIG_CM);
+            ax5 = gca; hold on;
+            wg_ref_lines(ax5, F_KEY, THRESH_RX);
+            wg_plot_curves(ax5, freq, thru_before, thru_after, proto(1:K), 'S11', ...
+                COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+            plot(ax5, freq_sim, sm(to_dB(S11_sim)), '-', ...
+                'Color', COL_SIM, 'LineWidth', LW.sim, ...
+                'DisplayName', ['Sim: ' f_lbl]);
+            wg_annotate_all(ax5, freq, thru_before, thru_after, proto, K, ...
+                struct('freq',freq_sim,'S31',S21_sim,'S11',S11_sim), ...
+                'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, COL_SIM, to_dB, sm);
+            wg_format_ax(ax5, freq, ...
+                ['\textbf{Return Loss: Measured vs Sim} --- ' proto_lbl], ...
+                '$|S_{11}|$ (dB)', ylim45);
+            saveas(fig5, fullfile(save_dir, [proto_name '_RX_vs_sim.png']));
+        end
+    end
+
+%% ═══════════════════════════════════════════════════════════════════════════
+%  MODO COMPARAR
+%% ═══════════════════════════════════════════════════════════════════════════
+else  % Comparar
+
+    % ── C1 · Carpeta maestra ───────────────────────────────────────────────
+    master_dir = uigetdir('', 'Selecciona la carpeta maestra (sesion)');
+    if isequal(master_dir, 0); disp('[Cancelado]'); return; end
+    [~, master_name] = fileparts(master_dir);
+    fprintf('Carpeta maestra : %s\n\n', master_dir);
+
+    % ── C2 · Thru before / after ──────────────────────────────────────────
+    [thru_before, thru_after] = wg_load_thru(master_dir);
+
+    % ── C3 · Selección de subcarpetas (listdlg) ────────────────────────────
+    items = dir(master_dir);
+    subdirs = {items([items.isdir] & ...
+        ~strcmp({items.name},'.') & ~strcmp({items.name},'..')).name};
+    if isempty(subdirs)
+        error('No se encontraron subcarpetas en:\n  %s', master_dir);
+    end
+    [sel_idx, ok] = listdlg( ...
+        'ListString',   subdirs, ...
+        'SelectionMode','multiple', ...
+        'Name',         'Selecciona los prototipos', ...
+        'PromptString', 'Carpetas a comparar (media de 5 primeras medidas):', ...
+        'ListSize',     [320 220]);
+    if ~ok; disp('[Cancelado]'); return; end
+    selected = subdirs(sel_idx);
+    M = numel(selected);
+    fprintf('Prototipos seleccionados : %d\n', M);
+
+    % ── C4 · Cargar y promediar ────────────────────────────────────────────
+    % Paleta de comparación (colores bien diferenciados)
+    COL_COMP = [
+        0.00 0.45 0.74;   % azul
+        0.85 0.33 0.10;   % naranja
+        0.13 0.70 0.28;   % verde
+        0.49 0.18 0.56;   % púrpura
+        0.90 0.62 0.00;   % amarillo oscuro
+        0.30 0.75 0.93;   % cyan
+        0.64 0.08 0.18;   % rojo oscuro
+        0.00 0.50 0.50;   % teal
+    ];
+    COL_TB  = [0.00 0.35 0.80];
+    COL_TA  = [0.85 0.10 0.10];
+    COL_SIM = [0.10 0.10 0.10];
+    LW_REF  = 1.8;
+    LW_COMP = 1.6;
+    LW_SIM  = 2.2;
+    SMOOTH  = 5;
+    F_KEY   = 140;
+    FIG_CM  = [2 2 20 14];
+
+    to_dB = @(S) 20 * log10(max(abs(S(:).'), 1e-12));
+    sm    = @(v) smoothdata(v(:).', 'gaussian', SMOOTH);
+
+    cases   = struct('name',{},'S11',{},'S31',{},'freq',{},'col',{},'n',{});
+    freq_c  = [];
+
+    for i = 1:M
+        folder = fullfile(master_dir, selected{i});
+        files  = dir(fullfile(folder, '*.mat'));
+        if isempty(files)
+            warning('Sin archivos .mat en: %s — omitido.', folder);
+            continue;
+        end
+        [~, ord] = sort({files.name});
+        files = files(ord);
+        n_avg = min(5, numel(files));
+
+        acc_S11 = 0;  acc_S31 = 0;
+        for k = 1:n_avg
+            d = load(fullfile(folder, files(k).name));
+            acc_S11 = acc_S11 + d.S11(:).';
+            acc_S31 = acc_S31 + d.S31(:).';
+        end
+        c_idx = mod(i-1, size(COL_COMP,1)) + 1;
+        cases(end+1) = struct( ...
+            'name', selected{i}, ...
+            'S11',  acc_S11 / n_avg, ...
+            'S31',  acc_S31 / n_avg, ...
+            'freq', d.freq_ghz(:).', ...
+            'col',  COL_COMP(c_idx,:), ...
+            'n',    n_avg);
+        if isempty(freq_c); freq_c = d.freq_ghz(:).'; end
+        fprintf('  %s : %d medidas promediadas\n', selected{i}, n_avg);
+    end
+    fprintf('\n');
+
+    if isempty(cases)
+        error('Ningun prototipo cargado correctamente.');
+    end
+
+    % ── C5 · Función de plot para modo comparar ────────────────────────────
+    function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
+                           param, F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, ...
+                           to_dB, sm)
+        if ~isempty(thru_before) && isfield(thru_before, param)
+            plot(ax, freq_ref, sm(to_dB(thru_before.(param))), '-', ...
                 'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before');
         end
-        if ~isempty(thru_after) && isfield(thru_after,'S31')
-            plot(ax4, freq, sm(to_dB(thru_after.S31)), '-', ...
+        if ~isempty(thru_after) && isfield(thru_after, param)
+            plot(ax, freq_ref, sm(to_dB(thru_after.(param))), '-', ...
                 'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after');
         end
-        for k = 1:N_COMPARE
-            if isfield(proto{k},'S31')
-                plot(ax4, freq, sm(to_dB(proto{k}.S31)), '--', ...
-                    'Color', COL_PROTO(k,:), 'LineWidth', LW_PROTO, ...
-                    'DisplayName', ['Rep ' num2str(k)]);
+        for j = 1:numel(cases)
+            c = cases(j);
+            if isfield(c, param)
+                lbl = [strrep(c.name,'_','\_') ' (n=' num2str(c.n) ')'];
+                plot(ax, c.freq, sm(to_dB(c.(param))), '-', ...
+                    'Color', c.col, 'LineWidth', LW_COMP, 'DisplayName', lbl);
             end
         end
-        plot(ax4, freq_sim, sm(to_dB(S21_sim)), '-', ...
-            'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-            'DisplayName', ['Sim: ' strrep(f_sim_lbl,'_','\_')]);
-
-        wg_annotate(ax4, freq, thru_before, thru_after, ...
-            struct('freq', freq_sim, 'S31', S21_sim), ...
-            'S31', F_KEY, COL_TB, COL_TA, COL_SIM, to_dB, sm);
-
-        wg_format_ax(ax4, freq, ...
-            ['\textbf{Insertion Loss: Measured vs Simulation} --- ' proto_lbl], ...
-            '$|S_{31}|$ (dB)', ylim45, 'southeast');
-
-        saveas(fig4, fullfile(proto_dir, [proto_name '_TX_vs_sim.png']));
-
-        % ── Fig. 5 — RX medida vs simulación ──────────────────────────────
-        fig5 = wg_new_fig(['RX\_sim\_' proto_name], FIG_CM);
-        ax5  = gca; hold on;
-
-        xline(F_KEY, '--', 'Color', [0.3 0.3 0.3], 'LineWidth', 1.0, 'HandleVisibility', 'off');
-        yline(THRESH_RX, '--', 'Color', [0 0.5 0], 'LineWidth', LW_THRESH, ...
-            'DisplayName', ['Threshold (' num2str(THRESH_RX) ' dB)']);
-
-        if ~isempty(thru_before) && isfield(thru_before,'S11')
-            plot(ax5, freq, sm(to_dB(thru_before.S11)), '-', ...
-                'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before');
+        % Anotaciones en F_KEY
+        entries = {};
+        if ~isempty(thru_before) && isfield(thru_before, param)
+            entries{end+1} = struct('freq', freq_ref, ...
+                'vals', sm(to_dB(thru_before.(param))), ...
+                'col', COL_TB, 'lbl', 'Thru before');
         end
-        if ~isempty(thru_after) && isfield(thru_after,'S11')
-            plot(ax5, freq, sm(to_dB(thru_after.S11)), '-', ...
-                'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after');
+        if ~isempty(thru_after) && isfield(thru_after, param)
+            entries{end+1} = struct('freq', freq_ref, ...
+                'vals', sm(to_dB(thru_after.(param))), ...
+                'col', COL_TA, 'lbl', 'Thru after');
         end
-        for k = 1:N_COMPARE
-            if isfield(proto{k},'S11')
-                plot(ax5, freq, sm(to_dB(proto{k}.S11)), '--', ...
-                    'Color', COL_PROTO(k,:), 'LineWidth', LW_PROTO, ...
-                    'DisplayName', ['Rep ' num2str(k)]);
+        for j = 1:numel(cases)
+            c = cases(j);
+            if isfield(c, param)
+                entries{end+1} = struct('freq', c.freq, ...
+                    'vals', sm(to_dB(c.(param))), ...
+                    'col', c.col, ...
+                    'lbl', strrep(c.name,'_',' '));
             end
         end
-        plot(ax5, freq_sim, sm(to_dB(S11_sim)), '-', ...
-            'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-            'DisplayName', ['Sim: ' strrep(f_sim_lbl,'_','\_')]);
-
-        wg_annotate(ax5, freq, thru_before, thru_after, ...
-            struct('freq', freq_sim, 'S11', S11_sim), ...
-            'S11', F_KEY, COL_TB, COL_TA, COL_SIM, to_dB, sm);
-
-        wg_format_ax(ax5, freq, ...
-            ['\textbf{Return Loss: Measured vs Simulation} --- ' proto_lbl], ...
-            '$|S_{11}|$ (dB)', ylim45, 'northeast');
-
-        saveas(fig5, fullfile(proto_dir, [proto_name '_RX_vs_sim.png']));
+        tx = 0.97; ty = 0.96; dy = 0.048;
+        for e = 1:numel(entries)
+            val = interp1(entries{e}.freq, entries{e}.vals, F_KEY, 'linear', NaN);
+            if isnan(val); continue; end
+            txt = [entries{e}.lbl ': ' num2str(val,'%.1f') ' dB @ ' num2str(F_KEY) ' GHz'];
+            text(ax, tx, ty-(e-1)*dy, txt, 'Units','normalized', ...
+                'Color', entries{e}.col, 'FontSize', 8.5, 'FontWeight','bold', ...
+                'HorizontalAlignment','right', 'BackgroundColor',[1 1 1 0.7], ...
+                'Interpreter','none');
+        end
     end
-end
+
+    % ── C6 · Fig C1 — Transmisión (sin límite) ─────────────────────────────
+    fig_c1 = wg_new_fig(['CompTX\_' master_name], FIG_CM);
+    ax_c1  = gca; hold on;
+    wg_ref_lines(ax_c1, F_KEY, []);
+    wg_comp_plot(ax_c1, freq_c, thru_before, thru_after, cases, 'S31', ...
+        F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+    wg_format_ax(ax_c1, freq_c, ...
+        ['\textbf{Insertion Loss Comparison} --- ' strrep(master_name,'_','\_')], ...
+        '$|S_{31}|$ (dB)', []);
+    saveas(fig_c1, fullfile(master_dir, [master_name '_Comp_TX.png']));
+
+    % ── C7 · Fig C2 — Reflexión (sin límite) ──────────────────────────────
+    fig_c2 = wg_new_fig(['CompRX\_' master_name], FIG_CM);
+    ax_c2  = gca; hold on;
+    wg_ref_lines(ax_c2, F_KEY, []);
+    wg_comp_plot(ax_c2, freq_c, thru_before, thru_after, cases, 'S11', ...
+        F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+    wg_format_ax(ax_c2, freq_c, ...
+        ['\textbf{Return Loss Comparison} --- ' strrep(master_name,'_','\_')], ...
+        '$|S_{11}|$ (dB)', []);
+    saveas(fig_c2, fullfile(master_dir, [master_name '_Comp_RX.png']));
+
+    % ── C8 · Figs C3/C4 — con escala y simulación opcionales ──────────────
+    resp2 = questdlg('Anadir escala fija y/o simulacion?', ...
+        'Comparacion avanzada', 'Si', 'No', 'No');
+    if strcmp(resp2, 'Si')
+        ylim_c = wg_ask_ylim('Figs. C3 & C4 --- Escala eje Y', '-30', '0');
+
+        % Simulación opcional
+        sim_data = [];
+        resp3 = questdlg('Anadir simulacion?', 'Simulacion', 'Si', 'No', 'No');
+        if strcmp(resp3, 'Si')
+            [f_sim, p_sim] = uigetfile( ...
+                {'*.txt;*.s2p;*.dat','S-params';'*.*','Todos'}, ...
+                'Selecciona archivo de simulacion');
+            if ~isequal(f_sim, 0)
+                [fs, S11s, S21s] = wg_read_sparams(fullfile(p_sim, f_sim));
+                f_lbl = strrep(strtok(f_sim,'.'),'_','\_');
+                sim_data = struct('freq',fs,'S11',S11s,'S31',S21s,'lbl',f_lbl);
+            end
+        end
+
+        % Fig C3 — TX con escala
+        fig_c3 = wg_new_fig(['CompTX\_lim\_' master_name], FIG_CM);
+        ax_c3  = gca; hold on;
+        wg_ref_lines(ax_c3, F_KEY, -3);
+        wg_comp_plot(ax_c3, freq_c, thru_before, thru_after, cases, 'S31', ...
+            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+        if ~isempty(sim_data)
+            plot(ax_c3, sim_data.freq, sm(to_dB(sim_data.S31)), '-', ...
+                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
+                'DisplayName', ['Sim: ' sim_data.lbl]);
+        end
+        wg_format_ax(ax_c3, freq_c, ...
+            ['\textbf{Insertion Loss Comparison}'], '$|S_{31}|$ (dB)', ylim_c);
+        saveas(fig_c3, fullfile(master_dir, [master_name '_Comp_TX_lim.png']));
+
+        % Fig C4 — RX con escala
+        fig_c4 = wg_new_fig(['CompRX\_lim\_' master_name], FIG_CM);
+        ax_c4  = gca; hold on;
+        wg_ref_lines(ax_c4, F_KEY, -15);
+        wg_comp_plot(ax_c4, freq_c, thru_before, thru_after, cases, 'S11', ...
+            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+        if ~isempty(sim_data)
+            plot(ax_c4, sim_data.freq, sm(to_dB(sim_data.S11)), '-', ...
+                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
+                'DisplayName', ['Sim: ' sim_data.lbl]);
+        end
+        wg_format_ax(ax_c4, freq_c, ...
+            ['\textbf{Return Loss Comparison}'], '$|S_{11}|$ (dB)', ylim_c);
+        saveas(fig_c4, fullfile(master_dir, [master_name '_Comp_RX_lim.png']));
+    end
+
+end  % fin modo comparar
 
 %% ═══════════════════════════════════════════════════════════════════════════
 %  Funciones locales
 %% ═══════════════════════════════════════════════════════════════════════════
 
-function fig = wg_new_fig(name, pos_cm)
-% Crea figura con tamaño en centímetros.
-    fig = figure('Name', name, 'NumberTitle', 'off');
-    set(fig, 'Units', 'centimeters', 'Position', pos_cm);
+function [thru_before, thru_after] = wg_load_thru(folder)
+% Abre ventanas de selección para thru_before y thru_after.
+    [f_tb, p_tb] = uigetfile(fullfile(folder,'thru_before_*.mat'), ...
+        'Selecciona THRU BEFORE (.mat)');
+    thru_before = [];
+    if ~isequal(f_tb,0)
+        thru_before = load(fullfile(p_tb,f_tb));
+        fprintf('Thru before : %s\n', f_tb);
+    else
+        warning('Sin Thru before.');
+    end
+    [f_ta, p_ta] = uigetfile(fullfile(folder,'thru_after_*.mat'), ...
+        'Selecciona THRU AFTER (.mat)');
+    thru_after = [];
+    if ~isequal(f_ta,0)
+        thru_after = load(fullfile(p_ta,f_ta));
+        fprintf('Thru after  : %s\n\n', f_ta);
+    else
+        warning('Sin Thru after.');
+    end
 end
 
 
-function wg_format_ax(ax, freq, ttl, ylbl, ylim_val, leg_loc)
-% Formato estándar: título LaTeX, ejes, grid, leyenda horizontal inferior.
-    title(ax, ttl, 'FontSize', 16);
-    xlabel(ax, 'Frequency (GHz)', 'FontSize', 14);
-    ylabel(ax, ylbl, 'FontSize', 14);
-    xlim(ax, [min(freq) max(freq)]);
-    if ~isempty(ylim_val)
-        ylim(ax, ylim_val);
+function [proto, N, freq] = wg_load_proto(proto_dir, thru_before)
+% Carga todos los .mat de la carpeta del prototipo en orden cronológico.
+    files = dir(fullfile(proto_dir,'*.mat'));
+    if isempty(files); error('Sin archivos .mat en: %s', proto_dir); end
+    [~, ord] = sort({files.name});
+    files = files(ord);
+    N = numel(files);
+    fprintf('Medidas cargadas : %d\n\n', N);
+    proto = cell(N,1);
+    for k = 1:N; proto{k} = load(fullfile(proto_dir,files(k).name)); end
+    if ~isempty(thru_before) && isfield(thru_before,'freq_ghz')
+        freq = thru_before.freq_ghz(:).';
+    else
+        freq = proto{1}.freq_ghz(:).';
     end
-    grid(ax, 'on'); box(ax, 'on');
-    lgd = legend(ax, 'Location', 'southoutside', ...
-        'Orientation', 'horizontal', 'FontSize', 10);
-    set(lgd, 'Box', 'off', 'NumColumns', 3);
-    if nargin >= 6 && ~strcmp(leg_loc, 'southoutside')
-        lgd.Location = leg_loc;
-        lgd.Orientation = 'vertical';
+end
+
+
+function [COL_TB, COL_TA, COL_SIM, COL_PROTO, LW, SM, K] = wg_style(N)
+% Devuelve paleta y estilos. K = min(5,N) reps mostradas en Figs 3-5.
+    COL_TB  = [0.00 0.35 0.80];
+    COL_TA  = [0.85 0.10 0.10];
+    COL_SIM = [0.10 0.10 0.10];
+    COL_PROTO = lines(max(N,1));
+    LW = struct('ref',1.8, 'proto',1.3, 'sim',2.2);
+    SM = @(v) smoothdata(v(:).','gaussian',5);
+    K  = min(5,N);
+end
+
+
+function fig = wg_new_fig(name, pos_cm)
+% Crea figura con tamaño en centímetros.
+    fig = figure('Name',name,'NumberTitle','off');
+    set(fig,'Units','centimeters','Position',pos_cm);
+end
+
+
+function wg_ref_lines(ax, f_key, thresh)
+% Añade línea vertical en f_key y, opcionalmente, horizontal en thresh.
+    xline(ax, f_key, '--', 'Color',[0.3 0.3 0.3], 'LineWidth',1.0, 'HandleVisibility','off');
+    if ~isempty(thresh)
+        yline(ax, thresh, '--', 'Color',[0 0.5 0], 'LineWidth',1.4, ...
+            'DisplayName', ['Threshold (' num2str(thresh) ' dB)']);
     end
-    hold(ax, 'off');
+end
+
+
+function wg_format_ax(ax, freq, ttl, ylbl, ylim_val)
+% Formato estándar: LaTeX, grid, leyenda en esquina inferior derecha.
+    title(ax, ttl, 'FontSize',16);
+    xlabel(ax,'Frequency (GHz)','FontSize',14);
+    ylabel(ax, ylbl,'FontSize',14);
+    xlim(ax,[min(freq) max(freq)]);
+    if ~isempty(ylim_val); ylim(ax, ylim_val); end
+    grid(ax,'on'); box(ax,'on');
+    lgd = legend(ax,'Location','southeast','FontSize',9);
+    set(lgd,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
+    try; lgd.BackgroundAlpha = 0.75; catch; end  % R2018a+
+    hold(ax,'off');
 end
 
 
 function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
                          col_tb, col_ta, col_proto, lw_ref, lw_proto, to_dB, sm)
-% Dibuja thru before/after + todas las repeticiones del prototipo.
-    if ~isempty(thru_before) && isfield(thru_before, param)
-        plot(ax, freq, sm(to_dB(thru_before.(param))), '-', ...
-            'Color', col_tb, 'LineWidth', lw_ref, 'DisplayName', 'Thru before');
+% Dibuja thru before/after + todas las reps del prototipo.
+    if ~isempty(thru_before) && isfield(thru_before,param)
+        plot(ax,freq,sm(to_dB(thru_before.(param))),'-', ...
+            'Color',col_tb,'LineWidth',lw_ref,'DisplayName','Thru before');
     end
-    if ~isempty(thru_after) && isfield(thru_after, param)
-        plot(ax, freq, sm(to_dB(thru_after.(param))), '-', ...
-            'Color', col_ta, 'LineWidth', lw_ref, 'DisplayName', 'Thru after');
+    if ~isempty(thru_after) && isfield(thru_after,param)
+        plot(ax,freq,sm(to_dB(thru_after.(param))),'-', ...
+            'Color',col_ta,'LineWidth',lw_ref,'DisplayName','Thru after');
     end
     for k = 1:numel(proto)
-        if isfield(proto{k}, param)
-            plot(ax, freq, sm(to_dB(proto{k}.(param))), '--', ...
-                'Color', col_proto(k,:), 'LineWidth', lw_proto, ...
-                'DisplayName', ['Rep ' num2str(k)]);
+        if isfield(proto{k},param)
+            plot(ax,freq,sm(to_dB(proto{k}.(param))),'--', ...
+                'Color',col_proto(k,:),'LineWidth',lw_proto, ...
+                'DisplayName',['Rep ' num2str(k)]);
         end
     end
 end
 
 
-function wg_annotate(ax, freq, thru_before, thru_after, sim_data, ...
-                     param, f_key, col_tb, col_ta, col_sim, to_dB, sm)
-% Añade etiquetas de valor puntual en f_key para Thru before, after y sim.
-    text_x = 0.97;
-    text_y = 0.96;
-    dy     = 0.055;
-
+function wg_annotate_all(ax, freq, thru_before, thru_after, proto, K, ...
+                          sim_data, param, F_KEY, ...
+                          col_tb, col_ta, col_proto, col_sim, to_dB, sm)
+% Anotaciones de valor en F_KEY: thru before, thru after, reps 1..K, sim.
     entries = {};
-    if ~isempty(thru_before) && isfield(thru_before, param)
-        entries{end+1} = struct('freq', freq, 'vals', sm(to_dB(thru_before.(param))), ...
-            'col', col_tb, 'lbl', 'Thru before');
+    if ~isempty(thru_before) && isfield(thru_before,param)
+        entries{end+1} = struct('f',freq,'v',sm(to_dB(thru_before.(param))), ...
+            'c',col_tb,'l','Thru before');
     end
-    if ~isempty(thru_after) && isfield(thru_after, param)
-        entries{end+1} = struct('freq', freq, 'vals', sm(to_dB(thru_after.(param))), ...
-            'col', col_ta, 'lbl', 'Thru after');
+    if ~isempty(thru_after) && isfield(thru_after,param)
+        entries{end+1} = struct('f',freq,'v',sm(to_dB(thru_after.(param))), ...
+            'c',col_ta,'l','Thru after');
     end
-    if ~isempty(sim_data) && isfield(sim_data, param)
-        entries{end+1} = struct('freq', sim_data.freq, ...
-            'vals', sm(to_dB(sim_data.(param))), ...
-            'col', col_sim, 'lbl', 'Sim');
+    for k = 1:K
+        if isfield(proto{k},param)
+            entries{end+1} = struct('f',freq,'v',sm(to_dB(proto{k}.(param))), ...
+                'c',col_proto(k,:),'l',['Rep ' num2str(k)]);
+        end
     end
-
+    if ~isempty(sim_data) && isfield(sim_data,param)
+        entries{end+1} = struct('f',sim_data.freq, ...
+            'v',sm(to_dB(sim_data.(param))), ...
+            'c',col_sim,'l','Sim');
+    end
+    tx = 0.97; ty = 0.96; dy = 0.048;
     for i = 1:numel(entries)
-        e   = entries{i};
-        val = interp1(e.freq, e.vals, f_key, 'linear', NaN);
+        val = interp1(entries{i}.f, entries{i}.v, F_KEY, 'linear', NaN);
         if isnan(val); continue; end
-        txt = [e.lbl ' @ ' num2str(f_key) ' GHz: ' num2str(val, '%.1f') ' dB'];
-        text(ax, text_x, text_y - (i-1)*dy, txt, ...
-            'Units', 'normalized', 'Color', e.col, ...
-            'FontSize', 9, 'FontWeight', 'bold', ...
-            'HorizontalAlignment', 'right', ...
-            'BackgroundColor', [1 1 1 0.7], ...
-            'Interpreter', 'none');
+        txt = [entries{i}.l ': ' num2str(val,'%.1f') ' dB @ ' num2str(F_KEY) ' GHz'];
+        text(ax, tx, ty-(i-1)*dy, txt, 'Units','normalized', ...
+            'Color',entries{i}.c,'FontSize',8.5,'FontWeight','bold', ...
+            'HorizontalAlignment','right','BackgroundColor',[1 1 1 0.7], ...
+            'Interpreter','none');
+    end
+end
+
+
+function ylim_val = wg_ask_ylim(title_str, def_lo, def_hi)
+% Abre inputdlg para pedir los límites del eje Y.
+    ans_ = inputdlg({'Limite inferior (dB):','Limite superior (dB):'}, ...
+        title_str, 1, {def_lo, def_hi});
+    if isempty(ans_)
+        ylim_val = [str2double(def_lo), str2double(def_hi)];
+    else
+        ylim_val = [str2double(ans_{1}), str2double(ans_{2})];
+        if any(isnan(ylim_val)) || ylim_val(1) >= ylim_val(2)
+            ylim_val = [str2double(def_lo), str2double(def_hi)];
+        end
     end
 end
 
 
 function [freq_ghz, S11, S21] = wg_read_sparams(filepath)
-% Lee S-parámetros desde archivo de texto (Touchstone RI/DB/MA o genérico).
-%
-% NOTA DE PUERTOS (archivo de simulación 2-port):
-%   S11_sim  ↔  S11_medido  (reflexión en entrada, puerto 1)
-%   S21_sim  ↔  S31_medido  (transmisión, puerto 1 → puerto 3 del VNA)
-
-    fid = fopen(filepath, 'r');
+% Lee S-params de archivo Touchstone (RI/DB/MA) o columnas genéricas.
+% S11_sim ↔ S11_meas;  S21_sim ↔ S31_meas  (puerto 2 sim = puerto 3 VNA)
+    fid = fopen(filepath,'r');
     if fid < 0; error('No se pudo abrir: %s', filepath); end
-
-    freq_unit  = 1e9;   % GHz por defecto
-    fmt        = 'RI';
-    data_lines = {};
-
+    freq_unit = 1e9; fmt = 'RI'; data_lines = {};
     while ~feof(fid)
         raw = fgetl(fid);
         if ~ischar(raw); break; end
         line = strtrim(raw);
         if isempty(line); continue; end
         switch line(1)
-            case {'!','%'}
-                continue;
+            case {'!','%'}; continue;
             case '#'
                 tok = strsplit(lower(line));
                 for t = tok
                     switch t{1}
-                        case 'hz';  freq_unit = 1;
-                        case 'khz'; freq_unit = 1e3;
-                        case 'mhz'; freq_unit = 1e6;
-                        case 'ghz'; freq_unit = 1e9;
-                        case 'db';  fmt = 'DB';
-                        case 'ma';  fmt = 'MA';
+                        case 'hz';  freq_unit=1;
+                        case 'khz'; freq_unit=1e3;
+                        case 'mhz'; freq_unit=1e6;
+                        case 'ghz'; freq_unit=1e9;
+                        case 'db';  fmt='DB';
+                        case 'ma';  fmt='MA';
                     end
                 end
             otherwise
-                nums = sscanf(line, '%f');
-                if numel(nums) >= 5
-                    data_lines{end+1} = nums(:).'; %#ok
-                end
+                nums = sscanf(line,'%f');
+                if numel(nums)>=5; data_lines{end+1}=nums(:).'; end %#ok
         end
     end
     fclose(fid);
-
-    if isempty(data_lines)
-        error('No se encontraron datos numericos en: %s', filepath);
-    end
-
-    maxcols = max(cellfun(@numel, data_lines));
-    data = nan(numel(data_lines), maxcols);
-    for r = 1:numel(data_lines)
-        data(r, 1:numel(data_lines{r})) = data_lines{r};
-    end
-
-    raw_freq = data(:, 1);
-    if max(raw_freq) > 1e6
-        freq_ghz = raw_freq / 1e9;
-    else
-        freq_ghz = raw_freq * (freq_unit / 1e9);
-    end
+    if isempty(data_lines); error('Sin datos en: %s', filepath); end
+    maxc = max(cellfun(@numel,data_lines));
+    data = nan(numel(data_lines),maxc);
+    for r=1:numel(data_lines); data(r,1:numel(data_lines{r}))=data_lines{r}; end
+    rf = data(:,1);
+    freq_ghz = (max(rf)>1e6) * (rf/1e9) + (max(rf)<=1e6) * (rf*freq_unit/1e9);
     freq_ghz = freq_ghz(:).';
-
     switch fmt
-        case 'RI'
-            S11 = (data(:,2) + 1j*data(:,3)).';
-            S21 = (data(:,4) + 1j*data(:,5)).';
+        case 'RI'; S11=(data(:,2)+1j*data(:,3)).'; S21=(data(:,4)+1j*data(:,5)).';
         case 'DB'
-            S11 = (10.^(data(:,2)/20) .* exp(1j*data(:,3)*pi/180)).';
-            S21 = (10.^(data(:,4)/20) .* exp(1j*data(:,5)*pi/180)).';
+            S11=(10.^(data(:,2)/20).*exp(1j*data(:,3)*pi/180)).';
+            S21=(10.^(data(:,4)/20).*exp(1j*data(:,5)*pi/180)).';
         case 'MA'
-            S11 = (data(:,2) .* exp(1j*data(:,3)*pi/180)).';
-            S21 = (data(:,4) .* exp(1j*data(:,5)*pi/180)).';
+            S11=(data(:,2).*exp(1j*data(:,3)*pi/180)).';
+            S21=(data(:,4).*exp(1j*data(:,5)*pi/180)).';
     end
 end
