@@ -273,59 +273,6 @@ else  % Comparar
         error('Ningun prototipo cargado correctamente.');
     end
 
-    % ── C5 · Función de plot para modo comparar ────────────────────────────
-    function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
-                           param, F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, ...
-                           to_dB, sm)
-        if ~isempty(thru_before) && isfield(thru_before, param)
-            plot(ax, freq_ref, sm(to_dB(thru_before.(param))), '-', ...
-                'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before');
-        end
-        if ~isempty(thru_after) && isfield(thru_after, param)
-            plot(ax, freq_ref, sm(to_dB(thru_after.(param))), '-', ...
-                'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after');
-        end
-        for j = 1:numel(cases)
-            c = cases(j);
-            if isfield(c, param)
-                lbl = [strrep(c.name,'_','\_') ' (n=' num2str(c.n) ')'];
-                plot(ax, c.freq, sm(to_dB(c.(param))), '-', ...
-                    'Color', c.col, 'LineWidth', LW_COMP, 'DisplayName', lbl);
-            end
-        end
-        % Anotaciones en F_KEY
-        entries = {};
-        if ~isempty(thru_before) && isfield(thru_before, param)
-            entries{end+1} = struct('freq', freq_ref, ...
-                'vals', sm(to_dB(thru_before.(param))), ...
-                'col', COL_TB, 'lbl', 'Thru before');
-        end
-        if ~isempty(thru_after) && isfield(thru_after, param)
-            entries{end+1} = struct('freq', freq_ref, ...
-                'vals', sm(to_dB(thru_after.(param))), ...
-                'col', COL_TA, 'lbl', 'Thru after');
-        end
-        for j = 1:numel(cases)
-            c = cases(j);
-            if isfield(c, param)
-                entries{end+1} = struct('freq', c.freq, ...
-                    'vals', sm(to_dB(c.(param))), ...
-                    'col', c.col, ...
-                    'lbl', strrep(c.name,'_',' '));
-            end
-        end
-        tx = 0.97; ty = 0.96; dy = 0.048;
-        for e = 1:numel(entries)
-            val = interp1(entries{e}.freq, entries{e}.vals, F_KEY, 'linear', NaN);
-            if isnan(val); continue; end
-            txt = [entries{e}.lbl ': ' num2str(val,'%.1f') ' dB @ ' num2str(F_KEY) ' GHz'];
-            text(ax, tx, ty-(e-1)*dy, txt, 'Units','normalized', ...
-                'Color', entries{e}.col, 'FontSize', 8.5, 'FontWeight','bold', ...
-                'HorizontalAlignment','right', 'BackgroundColor',[1 1 1 0.7], ...
-                'Interpreter','none');
-        end
-    end
-
     % ── C6 · Fig C1 — Transmisión (sin límite) ─────────────────────────────
     fig_c1 = wg_new_fig(['CompTX\_' master_name], FIG_CM);
     ax_c1  = gca; hold on;
@@ -559,6 +506,56 @@ function ylim_val = wg_ask_ylim(title_str, def_lo, def_hi)
         if any(isnan(ylim_val)) || ylim_val(1) >= ylim_val(2)
             ylim_val = [str2double(def_lo), str2double(def_hi)];
         end
+    end
+end
+
+
+function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
+                      param, F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, ...
+                      to_dB, sm)
+% Dibuja thru before/after + curvas promedio de cada prototipo + anotaciones.
+    if ~isempty(thru_before) && isfield(thru_before, param)
+        plot(ax, freq_ref, sm(to_dB(thru_before.(param))), '-', ...
+            'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before');
+    end
+    if ~isempty(thru_after) && isfield(thru_after, param)
+        plot(ax, freq_ref, sm(to_dB(thru_after.(param))), '-', ...
+            'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after');
+    end
+    for j = 1:numel(cases)
+        c = cases(j);
+        if isfield(c, param)
+            lbl = [strrep(c.name,'_','\_') ' (n=' num2str(c.n) ')'];
+            plot(ax, c.freq, sm(to_dB(c.(param))), '-', ...
+                'Color', c.col, 'LineWidth', LW_COMP, 'DisplayName', lbl);
+        end
+    end
+    entries = {};
+    if ~isempty(thru_before) && isfield(thru_before, param)
+        entries{end+1} = struct('freq', freq_ref, ...
+            'vals', sm(to_dB(thru_before.(param))), 'col', COL_TB, 'lbl', 'Thru before');
+    end
+    if ~isempty(thru_after) && isfield(thru_after, param)
+        entries{end+1} = struct('freq', freq_ref, ...
+            'vals', sm(to_dB(thru_after.(param))), 'col', COL_TA, 'lbl', 'Thru after');
+    end
+    for j = 1:numel(cases)
+        c = cases(j);
+        if isfield(c, param)
+            entries{end+1} = struct('freq', c.freq, ...
+                'vals', sm(to_dB(c.(param))), 'col', c.col, ...
+                'lbl', strrep(c.name,'_',' '));
+        end
+    end
+    tx = 0.97; ty = 0.96; dy = 0.048;
+    for e = 1:numel(entries)
+        val = interp1(entries{e}.freq, entries{e}.vals, F_KEY, 'linear', NaN);
+        if isnan(val); continue; end
+        txt = [entries{e}.lbl ': ' num2str(val,'%.1f') ' dB @ ' num2str(F_KEY) ' GHz'];
+        text(ax, tx, ty-(e-1)*dy, txt, 'Units','normalized', ...
+            'Color', entries{e}.col, 'FontSize', 8.5, 'FontWeight','bold', ...
+            'HorizontalAlignment','right', 'BackgroundColor',[1 1 1 0.7], ...
+            'Interpreter','none');
     end
 end
 
