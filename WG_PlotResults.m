@@ -64,23 +64,32 @@ if strcmp(mode_sel, 'Visualizar')
     save_dir   = proto_dir;
 
     % ── V4b · Archivos de simulación (opcional) ────────────────────────────
+    % Formato esperado: .txt con 2 columnas (freq[GHz], valor[dB]), líneas # ignoradas.
+    % Se piden 2 archivos por simulación: uno para S31 y otro para S11.
     SIM_COLS  = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
     LW_SIM    = 2.0;
     sim_files = {};
     add_sim = questdlg('Anadir simulaciones a Fig 1 y Fig 2?', ...
         'Simulacion', 'Si', 'No', 'No');
     while strcmp(add_sim, 'Si')
-        [f_sim, p_sim] = uigetfile( ...
-            {'*.txt;*.s2p;*.dat','S-params (*.txt,*.s2p,*.dat)';'*.*','Todos'}, ...
-            sprintf('Simulacion %d — selecciona archivo', numel(sim_files)+1));
-        if ~isequal(f_sim, 0)
-            [fs_, S11_, S21_] = wg_read_sparams(fullfile(p_sim, f_sim));
-            f_lbl_ = strrep(strtok(f_sim,'.'),'_','\_');
-            c_idx_ = mod(numel(sim_files), size(SIM_COLS,1)) + 1;
-            sim_files{end+1} = struct('freq',fs_,'S11',S11_,'S31',S21_, ...
-                'lbl',f_lbl_,'col',SIM_COLS(c_idx_,:));
-            fprintf('  Sim %d cargada: %s\n', numel(sim_files), f_sim);
+        n_s = numel(sim_files) + 1;
+        % Archivo S31 (Transmisión)
+        [f31, p31] = uigetfile({'*.txt;*.dat','Datos (*.txt, *.dat)';'*.*','Todos'}, ...
+            sprintf('Sim %d — S31 / Transmision (.txt)', n_s));
+        if isequal(f31, 0); break; end
+        [fs31_, s31_lin_] = wg_read_txt_dB(fullfile(p31, f31));
+        f_lbl_ = strrep(strtok(f31, '.'),'_','\_');
+        % Archivo S11 (Reflexión) — Cancelar para omitir
+        [f11, p11] = uigetfile({'*.txt;*.dat','Datos (*.txt, *.dat)';'*.*','Todos'}, ...
+            sprintf('Sim %d — S11 / Reflexion (.txt)  [Cancelar = omitir]', n_s));
+        s11_lin_ = [];
+        if ~isequal(f11, 0)
+            [~, s11_lin_] = wg_read_txt_dB(fullfile(p11, f11));
         end
+        c_idx_ = mod(numel(sim_files), size(SIM_COLS,1)) + 1;
+        sim_files{end+1} = struct('freq',fs31_,'S11',s11_lin_,'S31',s31_lin_, ...
+            'lbl',f_lbl_,'col',SIM_COLS(c_idx_,:));
+        fprintf('  Sim %d: S31 = %s\n', numel(sim_files), f31);
         if numel(sim_files) >= size(SIM_COLS,1); break; end
         add_sim = questdlg('Anadir otra simulacion?', 'Simulacion', 'Si', 'No', 'No');
     end
@@ -93,8 +102,10 @@ if strcmp(mode_sel, 'Visualizar')
         COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
     for si = 1:numel(sim_files)
         sf = sim_files{si};
-        plot(ax1, sf.freq, sm(to_dB(sf.S31)), '-', ...
-            'Color', sf.col, 'LineWidth', LW_SIM, 'DisplayName', ['Sim: ' sf.lbl]);
+        if ~isempty(sf.S31)
+            plot(ax1, sf.freq, sm(to_dB(sf.S31)), '-', ...
+                'Color', sf.col, 'LineWidth', LW_SIM, 'DisplayName', ['Sim: ' sf.lbl]);
+        end
     end
     wg_annotate_all(ax1, freq, thru_before, thru_after, proto, K, sim_files, ...
         'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
@@ -110,8 +121,10 @@ if strcmp(mode_sel, 'Visualizar')
         COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
     for si = 1:numel(sim_files)
         sf = sim_files{si};
-        plot(ax2, sf.freq, sm(to_dB(sf.S11)), '-', ...
-            'Color', sf.col, 'LineWidth', LW_SIM, 'DisplayName', ['Sim: ' sf.lbl]);
+        if ~isempty(sf.S11)
+            plot(ax2, sf.freq, sm(to_dB(sf.S11)), '-', ...
+                'Color', sf.col, 'LineWidth', LW_SIM, 'DisplayName', ['Sim: ' sf.lbl]);
+        end
     end
     wg_annotate_all(ax2, freq, thru_before, thru_after, proto, K, sim_files, ...
         'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
@@ -287,22 +300,27 @@ else  % Comparar
     if strcmp(resp2, 'Si')
         ylim_c = wg_ask_ylim('Fig. C3 --- Escala eje Y', '-30', '0');
 
-        % Simulación opcional (múltiples archivos)
+        % Simulación opcional (múltiples, formato .txt 2 columnas)
         SIM_COLS_C = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
         sim_files_c = {};
         add_sim_c = questdlg('Anadir simulacion?', 'Simulacion', 'Si', 'No', 'No');
         while strcmp(add_sim_c, 'Si')
-            [f_sim, p_sim] = uigetfile( ...
-                {'*.txt;*.s2p;*.dat','S-params';'*.*','Todos'}, ...
-                sprintf('Simulacion %d — selecciona archivo', numel(sim_files_c)+1));
-            if ~isequal(f_sim, 0)
-                [fs, S11s, S21s] = wg_read_sparams(fullfile(p_sim, f_sim));
-                f_lbl = strrep(strtok(f_sim,'.'),'_','\_');
-                c_idx_c = mod(numel(sim_files_c), size(SIM_COLS_C,1)) + 1;
-                sim_files_c{end+1} = struct('freq',fs,'S11',S11s,'S31',S21s, ...
-                    'lbl',f_lbl,'col',SIM_COLS_C(c_idx_c,:));
-                fprintf('  Sim %d cargada: %s\n', numel(sim_files_c), f_sim);
+            n_sc = numel(sim_files_c) + 1;
+            [f31c, p31c] = uigetfile({'*.txt;*.dat','Datos';'*.*','Todos'}, ...
+                sprintf('Sim %d — S31 / Transmision (.txt)', n_sc));
+            if isequal(f31c, 0); break; end
+            [fs31c, s31c_lin] = wg_read_txt_dB(fullfile(p31c, f31c));
+            f_lbl_c = strrep(strtok(f31c,'.'),'_','\_');
+            [f11c, p11c] = uigetfile({'*.txt;*.dat','Datos';'*.*','Todos'}, ...
+                sprintf('Sim %d — S11 / Reflexion (.txt)  [Cancelar = omitir]', n_sc));
+            s11c_lin = [];
+            if ~isequal(f11c, 0)
+                [~, s11c_lin] = wg_read_txt_dB(fullfile(p11c, f11c));
             end
+            c_idx_c = mod(numel(sim_files_c), size(SIM_COLS_C,1)) + 1;
+            sim_files_c{end+1} = struct('freq',fs31c,'S11',s11c_lin,'S31',s31c_lin, ...
+                'lbl',f_lbl_c,'col',SIM_COLS_C(c_idx_c,:));
+            fprintf('  Sim %d: %s\n', numel(sim_files_c), f31c);
             if numel(sim_files_c) >= size(SIM_COLS_C,1); break; end
             add_sim_c = questdlg('Anadir otra simulacion?', 'Simulacion', 'Si', 'No', 'No');
         end
@@ -351,12 +369,16 @@ else  % Comparar
         % Simulaciones
         for si = 1:numel(sim_files_c)
             sf = sim_files_c{si};
-            plot(ax_c3, sf.freq, sm(to_dB(sf.S31)), '-', ...
-                'Color', sf.col, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['$S_{31}$ Sim: ' sf.lbl]);
-            plot(ax_c3, sf.freq, sm(to_dB(sf.S11)), ':', ...
-                'Color', sf.col, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['$S_{11}$ Sim: ' sf.lbl]);
+            if ~isempty(sf.S31)
+                plot(ax_c3, sf.freq, sm(to_dB(sf.S31)), '-', ...
+                    'Color', sf.col, 'LineWidth', LW_SIM, ...
+                    'DisplayName', ['$S_{31}$ Sim: ' sf.lbl]);
+            end
+            if ~isempty(sf.S11)
+                plot(ax_c3, sf.freq, sm(to_dB(sf.S11)), ':', ...
+                    'Color', sf.col, 'LineWidth', LW_SIM, ...
+                    'DisplayName', ['$S_{11}$ Sim: ' sf.lbl]);
+            end
         end
         wg_format_ax(ax_c3, freq_c, ...
             ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$) Comparison} --- ' ...
@@ -500,7 +522,7 @@ function wg_annotate_all(ax, freq, thru_before, thru_after, proto, K, ...
     end
     for si = 1:numel(sim_files)
         sf = sim_files{si};
-        if isfield(sf, param)
+        if isfield(sf, param) && ~isempty(sf.(param))
             entries{end+1} = struct('f',sf.freq,'v',sm(to_dB(sf.(param))), ...
                 'c',sf.col,'l',['Sim: ' sf.lbl]);
         end
@@ -580,6 +602,37 @@ function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
             'HorizontalAlignment','right', 'BackgroundColor',[1 1 1 0.7], ...
             'Interpreter','none');
     end
+end
+
+
+function [freq_ghz, val_lin] = wg_read_txt_dB(filepath)
+% Lee archivo .txt de 2 columnas: freq[GHz]  valor[dB].
+% Líneas que empiezan con # se ignoran (comentarios/cabeceras).
+% Devuelve val_lin = magnitud lineal (compatible con to_dB = 20*log10(abs(x))).
+    fid = fopen(filepath, 'r');
+    if fid < 0; error('No se pudo abrir: %s', filepath); end
+    freq_ghz = []; val_db = [];
+    while ~feof(fid)
+        raw = fgetl(fid);
+        if ~ischar(raw); break; end
+        line = strtrim(raw);
+        if isempty(line) || line(1) == '#'; continue; end
+        nums = sscanf(line, '%f');
+        if numel(nums) >= 2
+            freq_ghz(end+1) = nums(1); %#ok
+            val_db(end+1)   = nums(2); %#ok
+        end
+    end
+    fclose(fid);
+    if isempty(freq_ghz); error('Sin datos numericos en: %s', filepath); end
+    freq_ghz = freq_ghz(:).';
+    % Detección automática de unidad de frecuencia
+    if max(freq_ghz) > 1e6
+        freq_ghz = freq_ghz / 1e9;   % Hz → GHz
+    elseif max(freq_ghz) > 1e3
+        freq_ghz = freq_ghz / 1e3;   % MHz → GHz
+    end
+    val_lin = 10.^(val_db(:).' / 20);   % dB → lineal (real positivo)
 end
 
 
