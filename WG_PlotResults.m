@@ -299,7 +299,7 @@ else  % Comparar
     resp2 = questdlg('Anadir escala fija y/o simulacion?', ...
         'Comparacion avanzada', 'Si', 'No', 'No');
     if strcmp(resp2, 'Si')
-        ylim_c = wg_ask_ylim('Figs. C3 & C4 --- Escala eje Y', '-30', '0');
+        ylim_c = wg_ask_ylim('Fig. C3 --- Escala eje Y', '-30', '0');
 
         % Simulación opcional
         sim_data = [];
@@ -315,35 +315,62 @@ else  % Comparar
             end
         end
 
-        % Fig C3 — TX con escala
-        fig_c3 = wg_new_fig(['CompTX\_lim\_' master_name], FIG_CM);
+        % Fig C3 — S31 (--) + S11 (:) combinados con escala
+        fig_c3 = wg_new_fig(['Comp\_lim\_' master_name], [2 2 22 15]);
         ax_c3  = gca; hold on;
-        wg_ref_lines(ax_c3, F_KEY, -3);
-        wg_comp_plot(ax_c3, freq_c, thru_before, thru_after, cases, 'S31', ...
-            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+        wg_ref_lines(ax_c3, F_KEY, []);
+        % Thru before
+        if ~isempty(thru_before)
+            if isfield(thru_before,'S31')
+                plot(ax_c3, freq_c, sm(to_dB(thru_before.S31)), '-', ...
+                    'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', '$S_{31}$ Thru before');
+            end
+            if isfield(thru_before,'S11')
+                plot(ax_c3, freq_c, sm(to_dB(thru_before.S11)), ':', ...
+                    'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', '$S_{11}$ Thru before');
+            end
+        end
+        % Thru after
+        if ~isempty(thru_after)
+            if isfield(thru_after,'S31')
+                plot(ax_c3, freq_c, sm(to_dB(thru_after.S31)), '-', ...
+                    'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', '$S_{31}$ Thru after');
+            end
+            if isfield(thru_after,'S11')
+                plot(ax_c3, freq_c, sm(to_dB(thru_after.S11)), ':', ...
+                    'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', '$S_{11}$ Thru after');
+            end
+        end
+        % Prototipos
+        for j = 1:numel(cases)
+            c3c = cases(j);
+            lbl_base = strrep(c3c.name,'_','\_');
+            if isfield(c3c,'S31')
+                plot(ax_c3, c3c.freq, sm(to_dB(c3c.S31)), '-', ...
+                    'Color', c3c.col, 'LineWidth', LW_COMP, ...
+                    'DisplayName', ['$S_{31}$ ' lbl_base]);
+            end
+            if isfield(c3c,'S11')
+                plot(ax_c3, c3c.freq, sm(to_dB(c3c.S11)), ':', ...
+                    'Color', c3c.col, 'LineWidth', LW_COMP, ...
+                    'DisplayName', ['$S_{11}$ ' lbl_base]);
+            end
+        end
+        % Simulación
         if ~isempty(sim_data)
             plot(ax_c3, sim_data.freq, sm(to_dB(sim_data.S31)), '-', ...
                 'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['Sim: ' sim_data.lbl]);
+                'DisplayName', ['$S_{31}$ Sim: ' sim_data.lbl]);
+            plot(ax_c3, sim_data.freq, sm(to_dB(sim_data.S11)), ':', ...
+                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
+                'DisplayName', ['$S_{11}$ Sim: ' sim_data.lbl]);
         end
         wg_format_ax(ax_c3, freq_c, ...
-            ['\textbf{Insertion Loss Comparison}'], '$|S_{31}|$ (dB)', ylim_c);
-        saveas(fig_c3, fullfile(master_dir, [master_name '_Comp_TX_lim.png']));
-
-        % Fig C4 — RX con escala
-        fig_c4 = wg_new_fig(['CompRX\_lim\_' master_name], FIG_CM);
-        ax_c4  = gca; hold on;
-        wg_ref_lines(ax_c4, F_KEY, -15);
-        wg_comp_plot(ax_c4, freq_c, thru_before, thru_after, cases, 'S11', ...
-            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
-        if ~isempty(sim_data)
-            plot(ax_c4, sim_data.freq, sm(to_dB(sim_data.S11)), '-', ...
-                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['Sim: ' sim_data.lbl]);
-        end
-        wg_format_ax(ax_c4, freq_c, ...
-            ['\textbf{Return Loss Comparison}'], '$|S_{11}|$ (dB)', ylim_c);
-        saveas(fig_c4, fullfile(master_dir, [master_name '_Comp_RX_lim.png']));
+            ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$) Comparison} --- ' ...
+             strrep(master_name,'_','\_')], ...
+            'Level (dB)', ylim_c);
+        set(legend(ax_c3), 'Location', 'eastoutside');
+        saveas(fig_c3, fullfile(master_dir, [master_name '_Comp_lim.png']));
     end
 
 end  % fin modo comparar
