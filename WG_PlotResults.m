@@ -69,8 +69,8 @@ if strcmp(mode_sel, 'Visualizar')
     wg_ref_lines(ax1, F_KEY, THRESH_TX);
     wg_plot_curves(ax1, freq, thru_before, thru_after, proto, 'S31', ...
         COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
-    wg_annotate_all(ax1, freq, thru_before, thru_after, proto, K, [], ...
-        'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, [], to_dB, sm);
+    wg_annotate_all(ax1, freq, thru_before, thru_after, proto, K, {}, ...
+        'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
     wg_format_ax(ax1, freq, ...
         ['\textbf{Insertion Loss} --- ' proto_lbl], '$|S_{31}|$ (dB)', []);
     saveas(fig1, fullfile(save_dir, [proto_name '_S31.png']));
@@ -81,8 +81,8 @@ if strcmp(mode_sel, 'Visualizar')
     wg_ref_lines(ax2, F_KEY, THRESH_RX);
     wg_plot_curves(ax2, freq, thru_before, thru_after, proto, 'S11', ...
         COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
-    wg_annotate_all(ax2, freq, thru_before, thru_after, proto, K, [], ...
-        'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, [], to_dB, sm);
+    wg_annotate_all(ax2, freq, thru_before, thru_after, proto, K, {}, ...
+        'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
     wg_format_ax(ax2, freq, ...
         ['\textbf{Return Loss} --- ' proto_lbl], '$|S_{11}|$ (dB)', []);
     saveas(fig2, fullfile(save_dir, [proto_name '_S11.png']));
@@ -132,51 +132,66 @@ if strcmp(mode_sel, 'Visualizar')
     set(legend(ax3), 'Location', 'eastoutside');
     saveas(fig3, fullfile(save_dir, [proto_name '_S31_S11.png']));
 
-    % ── V8 · Figs 4/5 — vs simulación (opcional) ──────────────────────────
-    resp = questdlg('Comparar con simulacion?', 'Simulacion', 'Si', 'No', 'No');
-    if strcmp(resp, 'Si')
+    % ── V8 · Figs 4/5 — vs simulación (opcional, múltiples archivos) ────────
+    SIM_COLS = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
+    sim_files = {};
+    add_sim = questdlg('Comparar con simulacion?', 'Simulacion', 'Si', 'No', 'No');
+    while strcmp(add_sim, 'Si')
         [f_sim, p_sim] = uigetfile( ...
             {'*.txt;*.s2p;*.dat','S-params (*.txt,*.s2p,*.dat)';'*.*','Todos'}, ...
-            'Selecciona archivo de simulacion');
+            sprintf('Simulacion %d — selecciona archivo', numel(sim_files)+1));
         if ~isequal(f_sim, 0)
-            [freq_sim, S11_sim, S21_sim] = wg_read_sparams(fullfile(p_sim, f_sim));
-            f_lbl = strrep(strtok(f_sim,'.'),'_','\_');
-            ylim45 = wg_ask_ylim('Figs. 4 & 5 --- Escala eje Y', '-30', '0');
-
-            % Fig 4 — TX vs sim
-            fig4 = wg_new_fig(['TX\_sim\_' proto_name], FIG_CM);
-            ax4 = gca; hold on;
-            wg_ref_lines(ax4, F_KEY, THRESH_TX);
-            wg_plot_curves(ax4, freq, thru_before, thru_after, proto(1:K), 'S31', ...
-                COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
-            plot(ax4, freq_sim, sm(to_dB(S21_sim)), '-', ...
-                'Color', COL_SIM, 'LineWidth', LW.sim, ...
-                'DisplayName', ['Sim: ' f_lbl]);
-            wg_annotate_all(ax4, freq, thru_before, thru_after, proto, K, ...
-                struct('freq',freq_sim,'S31',S21_sim,'S11',S11_sim), ...
-                'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, COL_SIM, to_dB, sm);
-            wg_format_ax(ax4, freq, ...
-                ['\textbf{Insertion Loss: Measured vs Sim} --- ' proto_lbl], ...
-                '$|S_{31}|$ (dB)', ylim45);
-            saveas(fig4, fullfile(save_dir, [proto_name '_TX_vs_sim.png']));
-
-            % Fig 5 — RX vs sim
-            fig5 = wg_new_fig(['RX\_sim\_' proto_name], FIG_CM);
-            ax5 = gca; hold on;
-            wg_ref_lines(ax5, F_KEY, THRESH_RX);
-            wg_plot_curves(ax5, freq, thru_before, thru_after, proto(1:K), 'S11', ...
-                COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
-            plot(ax5, freq_sim, sm(to_dB(S11_sim)), '-', ...
-                'Color', COL_SIM, 'LineWidth', LW.sim, ...
-                'DisplayName', ['Sim: ' f_lbl]);
-            wg_annotate_all(ax5, freq, thru_before, thru_after, proto, K, ...
-                struct('freq',freq_sim,'S31',S21_sim,'S11',S11_sim), ...
-                'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, COL_SIM, to_dB, sm);
-            wg_format_ax(ax5, freq, ...
-                ['\textbf{Return Loss: Measured vs Sim} --- ' proto_lbl], ...
-                '$|S_{11}|$ (dB)', ylim45);
-            saveas(fig5, fullfile(save_dir, [proto_name '_RX_vs_sim.png']));
+            [fs_, S11_, S21_] = wg_read_sparams(fullfile(p_sim, f_sim));
+            f_lbl_ = strrep(strtok(f_sim,'.'),'_','\_');
+            c_idx_ = mod(numel(sim_files), size(SIM_COLS,1)) + 1;
+            sim_files{end+1} = struct('freq',fs_,'S11',S11_,'S31',S21_, ...
+                'lbl',f_lbl_,'col',SIM_COLS(c_idx_,:));
+            fprintf('  Sim %d cargada: %s\n', numel(sim_files), f_sim);
         end
+        if numel(sim_files) >= size(SIM_COLS,1); break; end
+        add_sim = questdlg('Anadir otra simulacion?', 'Simulacion', 'Si', 'No', 'No');
+    end
+
+    if ~isempty(sim_files)
+        ylim45 = wg_ask_ylim('Figs. 4 & 5 --- Escala eje Y', '-30', '0');
+
+        % Fig 4 — TX vs sim
+        fig4 = wg_new_fig(['TX\_sim\_' proto_name], FIG_CM);
+        ax4 = gca; hold on;
+        wg_ref_lines(ax4, F_KEY, THRESH_TX);
+        wg_plot_curves(ax4, freq, thru_before, thru_after, proto(1:K), 'S31', ...
+            COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+        for si = 1:numel(sim_files)
+            sf = sim_files{si};
+            plot(ax4, sf.freq, sm(to_dB(sf.S31)), '-', ...
+                'Color', sf.col, 'LineWidth', LW.sim, ...
+                'DisplayName', ['Sim: ' sf.lbl]);
+        end
+        wg_annotate_all(ax4, freq, thru_before, thru_after, proto, K, sim_files, ...
+            'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
+        wg_format_ax(ax4, freq, ...
+            ['\textbf{Insertion Loss: Measured vs Sim} --- ' proto_lbl], ...
+            '$|S_{31}|$ (dB)', ylim45);
+        saveas(fig4, fullfile(save_dir, [proto_name '_TX_vs_sim.png']));
+
+        % Fig 5 — RX vs sim
+        fig5 = wg_new_fig(['RX\_sim\_' proto_name], FIG_CM);
+        ax5 = gca; hold on;
+        wg_ref_lines(ax5, F_KEY, THRESH_RX);
+        wg_plot_curves(ax5, freq, thru_before, thru_after, proto(1:K), 'S11', ...
+            COL_TB, COL_TA, COL_PROTO, LW.ref, LW.proto, to_dB, sm);
+        for si = 1:numel(sim_files)
+            sf = sim_files{si};
+            plot(ax5, sf.freq, sm(to_dB(sf.S11)), '-', ...
+                'Color', sf.col, 'LineWidth', LW.sim, ...
+                'DisplayName', ['Sim: ' sf.lbl]);
+        end
+        wg_annotate_all(ax5, freq, thru_before, thru_after, proto, K, sim_files, ...
+            'S11', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
+        wg_format_ax(ax5, freq, ...
+            ['\textbf{Return Loss: Measured vs Sim} --- ' proto_lbl], ...
+            '$|S_{11}|$ (dB)', ylim45);
+        saveas(fig5, fullfile(save_dir, [proto_name '_RX_vs_sim.png']));
     end
 
 %% ═══════════════════════════════════════════════════════════════════════════
@@ -301,18 +316,24 @@ else  % Comparar
     if strcmp(resp2, 'Si')
         ylim_c = wg_ask_ylim('Fig. C3 --- Escala eje Y', '-30', '0');
 
-        % Simulación opcional
-        sim_data = [];
-        resp3 = questdlg('Anadir simulacion?', 'Simulacion', 'Si', 'No', 'No');
-        if strcmp(resp3, 'Si')
+        % Simulación opcional (múltiples archivos)
+        SIM_COLS_C = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
+        sim_files_c = {};
+        add_sim_c = questdlg('Anadir simulacion?', 'Simulacion', 'Si', 'No', 'No');
+        while strcmp(add_sim_c, 'Si')
             [f_sim, p_sim] = uigetfile( ...
                 {'*.txt;*.s2p;*.dat','S-params';'*.*','Todos'}, ...
-                'Selecciona archivo de simulacion');
+                sprintf('Simulacion %d — selecciona archivo', numel(sim_files_c)+1));
             if ~isequal(f_sim, 0)
                 [fs, S11s, S21s] = wg_read_sparams(fullfile(p_sim, f_sim));
                 f_lbl = strrep(strtok(f_sim,'.'),'_','\_');
-                sim_data = struct('freq',fs,'S11',S11s,'S31',S21s,'lbl',f_lbl);
+                c_idx_c = mod(numel(sim_files_c), size(SIM_COLS_C,1)) + 1;
+                sim_files_c{end+1} = struct('freq',fs,'S11',S11s,'S31',S21s, ...
+                    'lbl',f_lbl,'col',SIM_COLS_C(c_idx_c,:));
+                fprintf('  Sim %d cargada: %s\n', numel(sim_files_c), f_sim);
             end
+            if numel(sim_files_c) >= size(SIM_COLS_C,1); break; end
+            add_sim_c = questdlg('Anadir otra simulacion?', 'Simulacion', 'Si', 'No', 'No');
         end
 
         % Fig C3 — S31 (--) + S11 (:) combinados con escala
@@ -356,14 +377,15 @@ else  % Comparar
                     'DisplayName', ['$S_{11}$ ' lbl_base]);
             end
         end
-        % Simulación
-        if ~isempty(sim_data)
-            plot(ax_c3, sim_data.freq, sm(to_dB(sim_data.S31)), '-', ...
-                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['$S_{31}$ Sim: ' sim_data.lbl]);
-            plot(ax_c3, sim_data.freq, sm(to_dB(sim_data.S11)), ':', ...
-                'Color', COL_SIM, 'LineWidth', LW_SIM, ...
-                'DisplayName', ['$S_{11}$ Sim: ' sim_data.lbl]);
+        % Simulaciones
+        for si = 1:numel(sim_files_c)
+            sf = sim_files_c{si};
+            plot(ax_c3, sf.freq, sm(to_dB(sf.S31)), '-', ...
+                'Color', sf.col, 'LineWidth', LW_SIM, ...
+                'DisplayName', ['$S_{31}$ Sim: ' sf.lbl]);
+            plot(ax_c3, sf.freq, sm(to_dB(sf.S11)), ':', ...
+                'Color', sf.col, 'LineWidth', LW_SIM, ...
+                'DisplayName', ['$S_{11}$ Sim: ' sf.lbl]);
         end
         wg_format_ax(ax_c3, freq_c, ...
             ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$) Comparison} --- ' ...
@@ -486,9 +508,10 @@ end
 
 
 function wg_annotate_all(ax, freq, thru_before, thru_after, proto, K, ...
-                          sim_data, param, F_KEY, ...
-                          col_tb, col_ta, col_proto, col_sim, to_dB, sm)
-% Anotaciones de valor en F_KEY: thru before, thru after, reps 1..K, sim.
+                          sim_files, param, F_KEY, ...
+                          col_tb, col_ta, col_proto, to_dB, sm)
+% Anotaciones de valor en F_KEY: thru before, thru after, reps 1..K, sims.
+% sim_files: cell array of structs with .freq .S11 .S31 .lbl .col
     entries = {};
     if ~isempty(thru_before) && isfield(thru_before,param)
         entries{end+1} = struct('f',freq,'v',sm(to_dB(thru_before.(param))), ...
@@ -504,10 +527,12 @@ function wg_annotate_all(ax, freq, thru_before, thru_after, proto, K, ...
                 'c',col_proto(k,:),'l',['Rep ' num2str(k)]);
         end
     end
-    if ~isempty(sim_data) && isfield(sim_data,param)
-        entries{end+1} = struct('f',sim_data.freq, ...
-            'v',sm(to_dB(sim_data.(param))), ...
-            'c',col_sim,'l','Sim');
+    for si = 1:numel(sim_files)
+        sf = sim_files{si};
+        if isfield(sf, param)
+            entries{end+1} = struct('f',sf.freq,'v',sm(to_dB(sf.(param))), ...
+                'c',sf.col,'l',['Sim: ' sf.lbl]);
+        end
     end
     tx = 0.97; ty = 0.96; dy = 0.048;
     for i = 1:numel(entries)
