@@ -103,6 +103,28 @@ if isempty(D_MAX_CM)
     D_MAX_CM = 100 * dist_d(round(Nd/2));    % media ventana sin ambigüedad
 end
 
+%% ── 3b · Simulación opcional (comparar medida vs simulación) ─────────────
+% Carga el S11 de simulación (.txt: freq/Re/Im o freq/dB), lo interpola a la
+% rejilla de frecuencia MEDIDA (mismo eje de distancia) y lo transforma con
+% la misma ventana/IFFT para comparar en distancia y en return loss gateado.
+S11_sim = [];  env_sim = [];  sim_lbl = '';
+resp_sim = questdlg('Anadir simulacion (S11 .txt) para comparar?', ...
+    'Simulacion', 'Si', 'No', 'No');
+if strcmp(resp_sim, 'Si')
+    [f_sim, p_sim] = uigetfile( ...
+        {'*.txt;*.dat','S11 sim (freq/Re/Im o freq/dB)';'*.*','Todos'}, ...
+        'Selecciona S11 de simulacion (reflexion)');
+    if ~isequal(f_sim, 0)
+        [fsim, S11_raw] = wg_read_txt_cplx(fullfile(p_sim, f_sim));
+        S11_sim = interp1(fsim, real(S11_raw), freq, 'linear', 0) + ...
+             1j * interp1(fsim, imag(S11_raw), freq, 'linear', 0);
+        hsim    = ifft(S11_sim .* w, Nd);
+        env_sim = 20*log10(abs(hsim)/max(abs(hsim)) + 1e-12);
+        sim_lbl = strrep(strtok(f_sim,'.'),'_','\_');
+        fprintf('Simulacion: %s\n', f_sim);
+    end
+end
+
 %% ── 4 · Fig 1 — S11 y S33 en distancia (localizar discontinuidades) ──────
 fig1 = figure('Name',['TDR\_' proto_name],'NumberTitle','off');
 set(fig1,'Units','centimeters','Position',[2 2 22 14]);
@@ -111,6 +133,10 @@ plot(ax1, 100*dist_d, env11, '-',  'Color',[0.00 0.45 0.74], ...
     'LineWidth',1.8, 'DisplayName','$S_{11}$ (desde puerto 1)');
 plot(ax1, 100*dist_d, env33, '--', 'Color',[0.85 0.33 0.10], ...
     'LineWidth',1.8, 'DisplayName','$S_{33}$ (desde puerto 3)');
+if ~isempty(env_sim)
+    plot(ax1, 100*dist_d, env_sim, ':', 'Color',[0.10 0.10 0.10], ...
+        'LineWidth',1.8, 'DisplayName',['Sim: ' sim_lbl]);
+end
 title(ax1, ['\textbf{Respuesta en distancia (reflexion)} --- ' proto_lbl], ...
     'FontSize',15);
 xlabel(ax1, 'Distancia (cm)  [ida y vuelta / 2]', 'FontSize',14);
@@ -146,6 +172,10 @@ g = wg_gate_window(dist_g, GATE_D(1), GATE_D(2));         % raised-cosine 0..1
 
 S11_gated = wg_apply_gate(S.S11, w, g);
 S33_gated = wg_apply_gate(S.S33, w, g);
+S11_sim_gated = [];
+if ~isempty(S11_sim)
+    S11_sim_gated = wg_apply_gate(S11_sim, w, g);
+end
 
 %% ── 7 · Fig 2 — S11 original vs gateado (frecuencia) ─────────────────────
 to_dB = @(x) 20*log10(abs(x) + 1e-12);
@@ -156,6 +186,10 @@ plot(ax2, freq, to_dB(S.S11),   '-',  'Color',[0.70 0.70 0.70], ...
     'LineWidth',1.4, 'DisplayName','$S_{11}$ original');
 plot(ax2, freq, to_dB(S11_gated), '-','Color',[0.00 0.45 0.74], ...
     'LineWidth',1.9, 'DisplayName','$S_{11}$ gateado (guia EBG)');
+if ~isempty(S11_sim_gated)
+    plot(ax2, freq, to_dB(S11_sim_gated), '-', 'Color',[0.10 0.10 0.10], ...
+        'LineWidth',1.7, 'DisplayName',['Sim gateado: ' sim_lbl]);
+end
 title(ax2, ['\textbf{Return Loss: original vs gateado} --- ' proto_lbl], ...
     'FontSize',15);
 xlabel(ax2, 'Frequency (GHz)', 'FontSize',14);
@@ -246,4 +280,37 @@ function Sg = wg_apply_gate(Sf, w, g)
     % Deshacer la ventana con un suelo para no amplificar los bordes de banda
     wsafe = max(w, 0.05 * max(w));
     Sg = Sw ./ wsafe;
+end
+
+
+function [freq_ghz, val] = wg_read_txt_cplx(filepath)
+% Lee un .txt de simulación → valor complejo. Auto-detecta el formato:
+%   3 columnas: freq | Real | Imag  → S = Re + jIm
+%   2 columnas: freq | Magnitud dB  → S = 10^(dB/20)
+% Ignora líneas que empiezan con #. Detecta la unidad de frecuencia.
+    fid = fopen(filepath, 'r');
+    if fid < 0; error('No se pudo abrir: %s', filepath); end
+    rows = {};
+    while ~feof(fid)
+        raw = fgetl(fid);
+        if ~ischar(raw); break; end
+        line = strtrim(raw);
+        if isempty(line) || line(1) == '#'; continue; end
+        nums = sscanf(line, '%f').';
+        if numel(nums) >= 2; rows{end+1} = nums; end %#ok
+    end
+    fclose(fid);
+    if isempty(rows); error('Sin datos numericos en: %s', filepath); end
+    ncol = min(cellfun(@numel, rows));
+    M = nan(numel(rows), ncol);
+    for r = 1:numel(rows); M(r,1:ncol) = rows{r}(1:ncol); end
+    freq_ghz = M(:,1).';
+    if ncol >= 3
+        val = (M(:,2) + 1j*M(:,3)).';       % Re/Im → complejo
+    else
+        val = 10.^(M(:,2).' / 20);          % dB → lineal (real positivo)
+    end
+    if     max(freq_ghz) > 1e6; freq_ghz = freq_ghz / 1e9;   % Hz → GHz
+    elseif max(freq_ghz) > 1e3; freq_ghz = freq_ghz / 1e3;   % MHz → GHz
+    end
 end
