@@ -64,13 +64,27 @@ fprintf('Prototipo : %s  (%d reps, %d puntos, %.0f–%.0f GHz)\n', ...
 
 %% ── 2 · Parámetros ───────────────────────────────────────────────────────
 c        = physconst('Lightspeed');   % 299792458 m/s
-VELFAC   = 1.0;        % 1 = distancia eléctrica; v_g/c para física aprox.
 WIN_BETA = 6;          % Kaiser beta (0 = rectangular; 6 ≈ buen compromiso)
 ZPAD     = 8;          % factor de zero-padding para el DISPLAY (interpola)
 D_MAX_CM = [];         % límite del eje de distancia en cm (vacío = auto)
 
 % Gate en distancia (m). Vacío → selección interactiva con el ratón.
 GATE_D   = [];         % p.ej. [0.010 0.045] para aislar 1.0–4.5 cm
+
+% VELFAC (factor de velocidad, v_g/c). Opciones:
+%   AUTO_VELFAC = true  → se calcula de la FASE de S31 (Opción B).
+%   AUTO_VELFAC = false → se usa el valor fijo de VELFAC de abajo.
+AUTO_VELFAC = true;
+VELFAC      = 1.0;     % usado solo si AUTO_VELFAC = false (1 = dist. eléctrica)
+L_REF_MM    = 68.24;   % longitud física entre planos de referencia (P1↔P3) [mm]
+F_VG_BAND   = [130 150];  % banda GHz para promediar v_g
+
+if AUTO_VELFAC
+    [VELFAC, vg_band, ~] = wg_group_velocity(S.S31, freq, L_REF_MM*1e-3, ...
+                                             F_VG_BAND, c);
+    fprintf('VELFAC (de fase S31)  : %.4f   (v_g ≈ %.3e m/s en %g–%g GHz)\n', ...
+        VELFAC, vg_band, F_VG_BAND(1), F_VG_BAND(2));
+end
 
 res_cm = 100 * c/(2*BW) * VELFAC;
 fprintf('Resolucion espacial  Δd ≈ %.2f cm  (BW = %.0f GHz)\n', res_cm, BW/1e9);
@@ -167,6 +181,41 @@ function dist = wg_dist_axis(n_orig, Nfft, f_s_GHz, f_stop_GHz, c, velfac)
     dt   = 1 / (Nfft * df);
     t    = (0:Nfft-1) * dt;
     dist = t * c * velfac / 2;        % /2 : reflexión
+end
+
+
+function [velfac_band, vg_band, vg] = wg_group_velocity(S21, freq_GHz, L_m, band_GHz, c)
+% Velocidad de grupo a partir de la FASE de la transmisión (Opción B).
+%   S21      : transmisión compleja (fila, p.ej. S31)
+%   freq_GHz : eje de frecuencia (GHz)
+%   L_m      : longitud física entre planos de referencia (m)
+%   band_GHz : [f_lo f_hi] banda para promediar (GHz)
+%   c        : velocidad de la luz (m/s)
+% Salidas:
+%   velfac_band : v_g/c promediado en la banda (escalar)
+%   vg_band     : v_g promediado en la banda (m/s)
+%   vg          : v_g(f) completo (dispersión), mismo tamaño que freq
+%
+% Física:  phi(f) = unwrap(angle(S21)) = -beta(f)*L   (fase de propagación)
+%          tau_g  = -(1/2pi) dphi/df       (retardo de grupo)
+%          v_g    =  L / tau_g
+% Nota: usa L entre planos de referencia → v_g medio de TODA la estructura
+% (transiciones + EBG). Para la dispersión intrínseca del EBG, de-embeber el
+% thru y pasar L = longitud del EBG.
+    f  = freq_GHz(:).' * 1e9;              % Hz
+    phi = unwrap(angle(S21(:).'));         % fase desenvuelta [rad]
+    % Retardo de grupo por diferencias centradas:  tau = -(1/2pi) dphi/df
+    tau = -(1/(2*pi)) * gradient(phi, f);  % s
+    tau(tau <= 0) = NaN;                   % descarta tramos no físicos
+    vg  = L_m ./ tau;                      % m/s  (v_g(f))
+
+    m = (freq_GHz(:).' >= band_GHz(1)) & (freq_GHz(:).' <= band_GHz(2));
+    vg_band     = mean(vg(m), 'omitnan');
+    velfac_band = vg_band / c;
+    if ~isfinite(velfac_band) || velfac_band <= 0
+        warning('v_g no física (fase ruidosa?). Usa AUTO_VELFAC=false.');
+        velfac_band = 1.0;  vg_band = c;
+    end
 end
 
 
