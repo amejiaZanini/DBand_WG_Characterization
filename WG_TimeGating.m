@@ -66,7 +66,7 @@ fprintf('Prototipo : %s  (%d reps, %d puntos, %.0f–%.0f GHz)\n', ...
 c        = physconst('Lightspeed');   % 299792458 m/s
 WIN_BETA = 6;          % Kaiser beta (0 = rectangular; 6 ≈ buen compromiso)
 ZPAD     = 8;          % factor de zero-padding para el DISPLAY (interpola)
-D_MAX_CM = [];         % límite del eje de distancia en cm (vacío = auto)
+D_MAX_CM = 7;         % límite del eje de distancia en cm (vacío = auto)
 
 % Gate en distancia (m). Vacío → selección interactiva con el ratón.
 GATE_D   = [];         % p.ej. [0.010 0.045] para aislar 1.0–4.5 cm
@@ -77,7 +77,7 @@ GATE_D   = [];         % p.ej. [0.010 0.045] para aislar 1.0–4.5 cm
 AUTO_VELFAC = true;
 VELFAC      = 1.0;     % usado solo si AUTO_VELFAC = false (1 = dist. eléctrica)
 L_REF_MM    = 68.24;   % longitud física entre planos de referencia (P1↔P3) [mm]
-F_VG_BAND   = [130 150];  % banda GHz para promediar v_g
+F_VG_BAND   = [110 170];  % banda GHz para promediar v_g
 
 if AUTO_VELFAC
     [VELFAC, vg_band, ~] = wg_group_velocity(S.S31, freq, L_REF_MM*1e-3, ...
