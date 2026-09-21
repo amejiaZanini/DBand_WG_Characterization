@@ -3,17 +3,19 @@
 % Dos modos de operación (se pregunta al inicio):
 %
 %  [Visualizar]  — Un prototipo con todas sus repeticiones.
-%    Fig 1: Transmisión |S31| — todas las reps
+%    Fig 1: Transmisión |S21| — todas las reps
 %    Fig 2: Reflexión   |S11| — todas las reps
-%    Fig 3: S31 + S11 combinados — 5 primeras reps, ylim a medida
-%    Fig 4/5: TX / RX medida vs simulación (opcional)
+%    Fig 3: S21 + S11 combinados — 5 primeras reps, ylim a medida
+%    (nota: los datos .mat guardan el campo S31, que se etiqueta como S21;
+%     de igual modo S33→S22 y S13→S12 en los otros scripts.)
 %
 %  [Comparar]   — Varias carpetas de prototipo, una curva promedio c/u.
-%    Selección múltiple de subcarpetas desde una carpeta maestra.
-%    Media de las 5 primeras medidas por prototipo → curva representativa.
-%    Fig C1: Transmisión — comparación sin límite
-%    Fig C2: Reflexión   — comparación sin límite
-%    Fig C3/C4: idem con ylim y simulación opcionales
+%    Color por material (Ni=rojo, Cu=azul), opacidad por muestra;
+%    S21 discontinua, S11 continua.
+%    Fig C1: Transmisión S21 — sin límite, con thru
+%    Fig C2: Reflexión   S11 — sin límite, con thru
+%    Fig C3/C4: S21/S11 con escala + simulación (sin thru, sin threshold)
+%    Fig CT1/CT2: thru before/after aparte, misma escala que C3/C4
 %
 % Requiere MATLAB R2016b o posterior.
 % ─────────────────────────────────────────────────────────────────────────
@@ -64,8 +66,9 @@ if strcmp(mode_sel, 'Visualizar')
     save_dir   = proto_dir;
 
     % ── V4b · Archivos de simulación (opcional) ────────────────────────────
-    % Formato esperado: .txt con 2 columnas (freq[GHz], valor[dB]), líneas # ignoradas.
-    % Se piden 2 archivos por simulación: uno para S31 y otro para S11.
+    % Formato .txt: freq/Re/Im (3 col) o freq/dB (2 col), líneas # ignoradas.
+    % Se piden 2 archivos por simulación: uno para S21 (transmisión, campo
+    % S31 en los .mat) y otro para S11 (reflexión).
     SIM_COLS  = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
     LW_SIM    = 2.0;
     sim_files = {};
@@ -75,7 +78,7 @@ if strcmp(mode_sel, 'Visualizar')
         n_s = numel(sim_files) + 1;
         % Archivo S31 (Transmisión)
         [f31, p31] = uigetfile({'*.txt;*.dat','Datos (*.txt, *.dat)';'*.*','Todos'}, ...
-            sprintf('Sim %d — S31 / Transmision (.txt)', n_s));
+            sprintf('Sim %d — S21 / Transmision (.txt)', n_s));
         if isequal(f31, 0); break; end
         [fs31_, s31_lin_] = wg_read_txt_dB(fullfile(p31, f31));
         f_lbl_ = strrep(strtok(f31, '.'),'_','\_');
@@ -110,7 +113,7 @@ if strcmp(mode_sel, 'Visualizar')
     wg_annotate_all(ax1, freq, thru_before, thru_after, proto, K, sim_files, ...
         'S31', F_KEY, COL_TB, COL_TA, COL_PROTO, to_dB, sm);
     wg_format_ax(ax1, freq, ...
-        ['\textbf{Insertion Loss} --- ' proto_lbl], '$|S_{31}|$ (dB)', []);
+        ['\textbf{Insertion Loss} --- ' proto_lbl], '$|S_{21}|$ (dB)', []);
     saveas(fig1, fullfile(save_dir, [proto_name '_S31.png']));
 
     % ── V6 · Fig 2 — Reflexión |S11| ──────────────────────────────────────
@@ -141,7 +144,7 @@ if strcmp(mode_sel, 'Visualizar')
     if ~isempty(thru_before)
         if isfield(thru_before,'S31')
             plot(ax3, freq, sm(to_dB(thru_before.S31)), '-', ...
-                'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{31}$ Thru before');
+                'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{21}$ Thru before');
         end
         if isfield(thru_before,'S11')
             plot(ax3, freq, sm(to_dB(thru_before.S11)), ':', ...
@@ -151,7 +154,7 @@ if strcmp(mode_sel, 'Visualizar')
     if ~isempty(thru_after)
         if isfield(thru_after,'S31')
             plot(ax3, freq, sm(to_dB(thru_after.S31)), '-', ...
-                'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{31}$ Thru after');
+                'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{21}$ Thru after');
         end
         if isfield(thru_after,'S11')
             plot(ax3, freq, sm(to_dB(thru_after.S11)), ':', ...
@@ -163,7 +166,7 @@ if strcmp(mode_sel, 'Visualizar')
         if isfield(proto{k},'S31')
             plot(ax3, freq, sm(to_dB(proto{k}.S31)), '--', ...
                 'Color', c, 'LineWidth', LW.proto, ...
-                'DisplayName', ['$S_{31}$ Rep ' num2str(k)]);
+                'DisplayName', ['$S_{21}$ Rep ' num2str(k)]);
         end
         if isfield(proto{k},'S11')
             plot(ax3, freq, sm(to_dB(proto{k}.S11)), ':', ...
@@ -172,7 +175,7 @@ if strcmp(mode_sel, 'Visualizar')
         end
     end
     wg_format_ax(ax3, freq, ...
-        ['\textbf{$S_{31}$ (---) \& $S_{11}$ ($\cdots$)} --- ' proto_lbl], ...
+        ['\textbf{$S_{21}$ (---) \& $S_{11}$ ($\cdots$)} --- ' proto_lbl], ...
         'Level (dB)', ylim3);
     set(legend(ax3), 'Location', 'eastoutside');
     saveas(fig3, fullfile(save_dir, [proto_name '_S31_S11.png']));
@@ -272,40 +275,53 @@ else  % Comparar
         error('Ningun prototipo cargado correctamente.');
     end
 
-    % ── C6 · Fig C1 — Transmisión (sin límite) ─────────────────────────────
+    % ── C5 · Estilo por material (color) y muestra (opacidad) ──────────────
+    % Color por material: Niquel → rojo, Cobre → azul (gama azul↔rojo).
+    % Muestras del mismo material comparten color y se distinguen por
+    % opacidad.  Linea: S21 (--), S11 (—).  El thru va en neutros (negro/gris)
+    % para no chocar con los colores de material.
+    cases   = wg_assign_material_style(cases);
+    COL_TB  = [0.00 0.00 0.00];   % thru before → negro
+    COL_TA  = [0.50 0.50 0.50];   % thru after  → gris
+    STY_S21 = '--';               % transmision → discontinua
+    STY_S11 = '-';                % reflexion   → continua
+
+    % ── C6 · Fig C1 — Transmisión S21 (sin límite, con thru) ───────────────
     fig_c1 = wg_new_fig(['CompTX\_' master_name], FIG_CM);
     ax_c1  = gca; hold on;
     wg_ref_lines(ax_c1, F_KEY, []);
-    wg_comp_plot(ax_c1, freq_c, thru_before, thru_after, cases, 'S31', ...
-        F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+    wg_plot_thru2(ax_c1, freq_c, thru_before, thru_after, 'S31', STY_S21, ...
+        COL_TB, COL_TA, LW_REF, to_dB, sm);
+    wg_plot_cases(ax_c1, cases, 'S31', STY_S21, LW_COMP, to_dB, sm);
     wg_format_ax(ax_c1, freq_c, ...
         ['\textbf{Insertion Loss Comparison} --- ' strrep(master_name,'_','\_')], ...
-        '$|S_{31}|$ (dB)', []);
+        '$|S_{21}|$ (dB)', []);
     saveas(fig_c1, fullfile(master_dir, [master_name '_Comp_TX.png']));
 
-    % ── C7 · Fig C2 — Reflexión (sin límite) ──────────────────────────────
+    % ── C7 · Fig C2 — Reflexión S11 (sin límite, con thru) ─────────────────
     fig_c2 = wg_new_fig(['CompRX\_' master_name], FIG_CM);
     ax_c2  = gca; hold on;
     wg_ref_lines(ax_c2, F_KEY, []);
-    wg_comp_plot(ax_c2, freq_c, thru_before, thru_after, cases, 'S11', ...
-        F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+    wg_plot_thru2(ax_c2, freq_c, thru_before, thru_after, 'S11', STY_S11, ...
+        COL_TB, COL_TA, LW_REF, to_dB, sm);
+    wg_plot_cases(ax_c2, cases, 'S11', STY_S11, LW_COMP, to_dB, sm);
     wg_format_ax(ax_c2, freq_c, ...
         ['\textbf{Return Loss Comparison} --- ' strrep(master_name,'_','\_')], ...
         '$|S_{11}|$ (dB)', []);
     saveas(fig_c2, fullfile(master_dir, [master_name '_Comp_RX.png']));
 
-    % ── C8 · Figs C3/C4 — con escala y simulación opcionales ──────────────
+    % ── C8 · Figs C3/C4 — con escala + simulación (sin thru, sin threshold) ─
     resp2 = questdlg('Anadir escala fija y/o simulacion?', ...
         'Comparacion avanzada', 'Si', 'No', 'No');
     if strcmp(resp2, 'Si')
-        % Simulación opcional (múltiples, formato .txt 2 columnas)
+        % Simulación opcional (múltiples; formato .txt freq/Re/Im o freq/dB)
         SIM_COLS_C = [0.10 0.10 0.10; 0.00 0.50 0.00; 0.60 0.00 0.60; 0.55 0.27 0.07];
         sim_files_c = {};
         add_sim_c = questdlg('Anadir simulacion?', 'Simulacion', 'Si', 'No', 'No');
         while strcmp(add_sim_c, 'Si')
             n_sc = numel(sim_files_c) + 1;
             [f31c, p31c] = uigetfile({'*.txt;*.dat','Datos';'*.*','Todos'}, ...
-                sprintf('Sim %d — S31 / Transmision (.txt)', n_sc));
+                sprintf('Sim %d — S21 / Transmision (.txt)', n_sc));
             if isequal(f31c, 0); break; end
             [fs31c, s31c_lin] = wg_read_txt_dB(fullfile(p31c, f31c));
             f_lbl_c = strrep(strtok(f31c,'.'),'_','\_');
@@ -323,13 +339,12 @@ else  % Comparar
             add_sim_c = questdlg('Anadir otra simulacion?', 'Simulacion', 'Si', 'No', 'No');
         end
 
-        % Fig C3 — S31 (Insertion Loss) con escala
-        ylim_tx = wg_ask_ylim('Fig. C3 — S31 Escala eje Y', '-5', '0');
+        % Fig C3 — S21 con escala (medidas por material + simulación, sin thru)
+        ylim_tx = wg_ask_ylim('Fig. C3 — S21 Escala eje Y', '-5', '0');
         fig_c3 = wg_new_fig(['CompTX\_lim\_' master_name], FIG_CM);
         ax_c3  = gca; hold on;
-        wg_ref_lines(ax_c3, F_KEY, -3);
-        wg_comp_plot(ax_c3, freq_c, thru_before, thru_after, cases, 'S31', ...
-            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+        wg_ref_lines(ax_c3, F_KEY, []);
+        wg_plot_cases(ax_c3, cases, 'S31', STY_S21, LW_COMP, to_dB, sm);
         for si = 1:numel(sim_files_c)
             sf = sim_files_c{si};
             if ~isempty(sf.S31)
@@ -338,17 +353,16 @@ else  % Comparar
                     'DisplayName', ['Sim: ' sf.lbl]);
             end
         end
-        wg_format_ax(ax_c3, freq_c, ...
-            ['\textbf{Insertion Loss Comparison}'], '$|S_{31}|$ (dB)', ylim_tx);
+        wg_format_ax(ax_c3, freq_c, '\textbf{Insertion Loss Comparison}', ...
+            '$|S_{21}|$ (dB)', ylim_tx);
         saveas(fig_c3, fullfile(master_dir, [master_name '_Comp_TX_lim.png']));
 
-        % Fig C4 — S11 (Return Loss) con escala
+        % Fig C4 — S11 con escala (medidas por material + simulación, sin thru)
         ylim_rx = wg_ask_ylim('Fig. C4 — S11 Escala eje Y', '-30', '0');
         fig_c4 = wg_new_fig(['CompRX\_lim\_' master_name], FIG_CM);
         ax_c4  = gca; hold on;
-        wg_ref_lines(ax_c4, F_KEY, -15);
-        wg_comp_plot(ax_c4, freq_c, thru_before, thru_after, cases, 'S11', ...
-            F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, to_dB, sm);
+        wg_ref_lines(ax_c4, F_KEY, []);
+        wg_plot_cases(ax_c4, cases, 'S11', STY_S11, LW_COMP, to_dB, sm);
         for si = 1:numel(sim_files_c)
             sf = sim_files_c{si};
             if ~isempty(sf.S11)
@@ -357,9 +371,28 @@ else  % Comparar
                     'DisplayName', ['Sim: ' sf.lbl]);
             end
         end
-        wg_format_ax(ax_c4, freq_c, ...
-            ['\textbf{Return Loss Comparison}'], '$|S_{11}|$ (dB)', ylim_rx);
+        wg_format_ax(ax_c4, freq_c, '\textbf{Return Loss Comparison}', ...
+            '$|S_{11}|$ (dB)', ylim_rx);
         saveas(fig_c4, fullfile(master_dir, [master_name '_Comp_RX_lim.png']));
+
+        % Fig CT1/CT2 — Thru before/after en gráficas aparte, misma escala
+        fig_ct1 = wg_new_fig(['CompThruTX\_' master_name], FIG_CM);
+        ax_ct1  = gca; hold on;
+        wg_ref_lines(ax_ct1, F_KEY, []);
+        wg_plot_thru2(ax_ct1, freq_c, thru_before, thru_after, 'S31', STY_S21, ...
+            COL_TB, COL_TA, LW_REF, to_dB, sm);
+        wg_format_ax(ax_ct1, freq_c, '\textbf{Thru reference --- Transmision}', ...
+            '$|S_{21}|$ (dB)', ylim_tx);
+        saveas(fig_ct1, fullfile(master_dir, [master_name '_Comp_Thru_TX.png']));
+
+        fig_ct2 = wg_new_fig(['CompThruRX\_' master_name], FIG_CM);
+        ax_ct2  = gca; hold on;
+        wg_ref_lines(ax_ct2, F_KEY, []);
+        wg_plot_thru2(ax_ct2, freq_c, thru_before, thru_after, 'S11', STY_S11, ...
+            COL_TB, COL_TA, LW_REF, to_dB, sm);
+        wg_format_ax(ax_ct2, freq_c, '\textbf{Thru reference --- Reflexion}', ...
+            '$|S_{11}|$ (dB)', ylim_rx);
+        saveas(fig_ct2, fullfile(master_dir, [master_name '_Comp_Thru_RX.png']));
     end
 
 end  % fin modo comparar
@@ -529,52 +562,75 @@ function ylim_val = wg_ask_ylim(title_str, def_lo, def_hi)
 end
 
 
-function wg_comp_plot(ax, freq_ref, thru_before, thru_after, cases, ...
-                      param, F_KEY, COL_TB, COL_TA, LW_REF, LW_COMP, ...
-                      to_dB, sm)
-% Dibuja thru before/after + curvas promedio de cada prototipo + anotaciones.
-    if ~isempty(thru_before) && isfield(thru_before, param)
-        plot(ax, freq_ref, sm(to_dB(thru_before.(param))), '-', ...
-            'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before');
-    end
-    if ~isempty(thru_after) && isfield(thru_after, param)
-        plot(ax, freq_ref, sm(to_dB(thru_after.(param))), '-', ...
-            'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after');
-    end
-    for j = 1:numel(cases)
-        c = cases(j);
-        if isfield(c, param)
-            lbl = [strrep(c.name,'_','\_') ' (n=' num2str(c.n) ')'];
-            plot(ax, c.freq, sm(to_dB(c.(param))), '--', ...
-                'Color', c.col, 'LineWidth', LW_COMP, 'DisplayName', lbl);
+function cases = wg_assign_material_style(cases)
+% Asigna a cada caso: color por material y opacidad por muestra.
+%   Niquel → rojo, Cobre → azul, otro → gris.
+%   Muestras del mismo material: misma tonalidad, opacidad 1.0 → 0.45.
+    mat = cell(1, numel(cases));
+    for j = 1:numel(cases); mat{j} = wg_material_of(cases(j).name); end
+    um = unique(mat, 'stable');
+    for u = 1:numel(um)
+        idx = find(strcmp(mat, um{u}));
+        nm  = numel(idx);
+        rgb = wg_material_rgb(um{u});
+        for r = 1:nm
+            if nm > 1; a = 1.0 - 0.55*(r-1)/(nm-1); else; a = 1.0; end
+            cases(idx(r)).mrgb  = rgb;
+            cases(idx(r)).alpha = a;
         end
     end
-    entries = {};
-    if ~isempty(thru_before) && isfield(thru_before, param)
-        entries{end+1} = struct('freq', freq_ref, ...
-            'vals', sm(to_dB(thru_before.(param))), 'col', COL_TB, 'lbl', 'Thru before');
+end
+
+
+function m = wg_material_of(name)
+% Detecta el material a partir del nombre de la carpeta del prototipo.
+    ln = lower(name);
+    if contains(ln,'ni')
+        m = 'Ni';
+    elseif contains(ln,'cop') || contains(ln,'cu')
+        m = 'Cu';
+    else
+        m = 'Otro';
     end
-    if ~isempty(thru_after) && isfield(thru_after, param)
-        entries{end+1} = struct('freq', freq_ref, ...
-            'vals', sm(to_dB(thru_after.(param))), 'col', COL_TA, 'lbl', 'Thru after');
+end
+
+
+function rgb = wg_material_rgb(m)
+% Color base por material (gama azul↔rojo).
+    switch m
+        case 'Ni';   rgb = [0.80 0.10 0.10];   % niquel → rojo
+        case 'Cu';   rgb = [0.00 0.30 0.80];   % cobre  → azul
+        otherwise;   rgb = [0.35 0.35 0.35];   % otro   → gris
     end
+end
+
+
+function wg_plot_cases(ax, cases, param, style, lw, to_dB, sm)
+% Dibuja cada caso con su color de material y su opacidad de muestra.
     for j = 1:numel(cases)
         c = cases(j);
-        if isfield(c, param)
-            entries{end+1} = struct('freq', c.freq, ...
-                'vals', sm(to_dB(c.(param))), 'col', c.col, ...
-                'lbl', strrep(c.name,'_',' '));
+        if ~isfield(c, param) || isempty(c.(param)); continue; end
+        lbl = [strrep(c.name,'_','\_') ' (n=' num2str(c.n) ')'];
+        h = plot(ax, c.freq, sm(to_dB(c.(param))), style, ...
+            'Color', c.mrgb, 'LineWidth', lw, 'DisplayName', lbl);
+        try
+            h.Color = [c.mrgb c.alpha];                      % opacidad real (R2018b+)
+        catch
+            h.Color = c.mrgb*c.alpha + (1-c.alpha)*[1 1 1];  % fallback: mezcla a blanco
         end
     end
-    tx = 0.97; ty = 0.96; dy = 0.048;
-    for e = 1:numel(entries)
-        val = interp1(entries{e}.freq, entries{e}.vals, F_KEY, 'linear', NaN);
-        if isnan(val); continue; end
-        txt = [entries{e}.lbl ': ' num2str(val,'%.1f') ' dB @ ' num2str(F_KEY) ' GHz'];
-        text(ax, tx, ty-(e-1)*dy, txt, 'Units','normalized', ...
-            'Color', entries{e}.col, 'FontSize', 8.5, 'FontWeight','bold', ...
-            'HorizontalAlignment','right', 'BackgroundColor',[1 1 1 0.7], ...
-            'Interpreter','none');
+end
+
+
+function wg_plot_thru2(ax, freq, tb, ta, param, style, col_b, col_a, lw, to_dB, sm)
+% Dibuja thru before/after de un parámetro en colores neutros (negro/gris).
+    if ~isempty(tb) && isfield(tb, param)
+        plot(ax, freq, sm(to_dB(tb.(param))), style, ...
+            'Color', col_b, 'LineWidth', lw, 'DisplayName', 'Thru before');
+    end
+    if ~isempty(ta) && isfield(ta, param)
+        plot(ax, freq, sm(to_dB(ta.(param))), style, ...
+            'Color', col_a, 'LineWidth', lw, 'DisplayName', 'Thru after');
     end
 end
 
