@@ -10,12 +10,12 @@
 %     de igual modo S33→S22 y S13→S12 en los otros scripts.)
 %
 %  [Comparar]   — Varias carpetas de prototipo, una curva promedio c/u.
-%    Color por material (Ni=rojo, Cu=azul), opacidad por muestra;
-%    S21 discontinua, S11 continua.
+%    Color por material (Ni=rojo suave, Cu=azul suave), opacidad por muestra;
+%    S21 continua, S11 discontinua.
 %    Fig C1: Transmisión S21 — sin límite, con thru
 %    Fig C2: Reflexión   S11 — sin límite, con thru
 %    Fig C3/C4: S21/S11 con escala + simulación (sin thru, sin threshold)
-%    Fig CT1/CT2: thru before/after aparte, misma escala que C3/C4
+%    Fig CT: thru before/after (S21 y S11 en la misma figura)
 %
 % Requiere MATLAB R2016b o posterior.
 % ─────────────────────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@ if strcmp(mode_sel, 'Visualizar')
                 'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{21}$ Thru before');
         end
         if isfield(thru_before,'S11')
-            plot(ax3, freq, sm(to_dB(thru_before.S11)), ':', ...
+            plot(ax3, freq, sm(to_dB(thru_before.S11)), '--', ...
                 'Color', COL_TB, 'LineWidth', LW.ref, 'DisplayName', '$S_{11}$ Thru before');
         end
     end
@@ -157,25 +157,25 @@ if strcmp(mode_sel, 'Visualizar')
                 'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{21}$ Thru after');
         end
         if isfield(thru_after,'S11')
-            plot(ax3, freq, sm(to_dB(thru_after.S11)), ':', ...
+            plot(ax3, freq, sm(to_dB(thru_after.S11)), '--', ...
                 'Color', COL_TA, 'LineWidth', LW.ref, 'DisplayName', '$S_{11}$ Thru after');
         end
     end
     for k = 1:K
         c = COL_PROTO(k,:);
         if isfield(proto{k},'S31')
-            plot(ax3, freq, sm(to_dB(proto{k}.S31)), '--', ...
+            plot(ax3, freq, sm(to_dB(proto{k}.S31)), '-', ...
                 'Color', c, 'LineWidth', LW.proto, ...
                 'DisplayName', ['$S_{21}$ Rep ' num2str(k)]);
         end
         if isfield(proto{k},'S11')
-            plot(ax3, freq, sm(to_dB(proto{k}.S11)), ':', ...
+            plot(ax3, freq, sm(to_dB(proto{k}.S11)), '--', ...
                 'Color', c, 'LineWidth', LW.proto, ...
                 'DisplayName', ['$S_{11}$ Rep ' num2str(k)]);
         end
     end
     wg_format_ax(ax3, freq, ...
-        ['\textbf{$S_{21}$ (---) \& $S_{11}$ ($\cdots$)} --- ' proto_lbl], ...
+        ['\textbf{$S_{21}$ (---) \& $S_{11}$ (- -)} --- ' proto_lbl], ...
         'Level (dB)', ylim3);
     set(legend(ax3), 'Location', 'eastoutside');
     saveas(fig3, fullfile(save_dir, [proto_name '_S31_S11.png']));
@@ -283,8 +283,8 @@ else  % Comparar
     cases   = wg_assign_material_style(cases);
     COL_TB  = [0.00 0.00 0.00];   % thru before → negro
     COL_TA  = [0.50 0.50 0.50];   % thru after  → gris
-    STY_S21 = '--';               % transmision → discontinua
-    STY_S11 = '-';                % reflexion   → continua
+    STY_S21 = '-';                % transmision → continua
+    STY_S11 = '--';               % reflexion   → discontinua
 
     % ── C6 · Fig C1 — Transmisión S21 (sin límite, con thru) ───────────────
     fig_c1 = wg_new_fig(['CompTX\_' master_name], FIG_CM);
@@ -375,24 +375,35 @@ else  % Comparar
             '$|S_{11}|$ (dB)', ylim_rx);
         saveas(fig_c4, fullfile(master_dir, [master_name '_Comp_RX_lim.png']));
 
-        % Fig CT1/CT2 — Thru before/after en gráficas aparte, misma escala
-        fig_ct1 = wg_new_fig(['CompThruTX\_' master_name], FIG_CM);
-        ax_ct1  = gca; hold on;
-        wg_ref_lines(ax_ct1, F_KEY, []);
-        wg_plot_thru2(ax_ct1, freq_c, thru_before, thru_after, 'S31', STY_S21, ...
-            COL_TB, COL_TA, LW_REF, to_dB, sm);
-        wg_format_ax(ax_ct1, freq_c, '\textbf{Thru reference --- Transmision}', ...
-            '$|S_{21}|$ (dB)', ylim_tx);
-        saveas(fig_ct1, fullfile(master_dir, [master_name '_Comp_Thru_TX.png']));
-
-        fig_ct2 = wg_new_fig(['CompThruRX\_' master_name], FIG_CM);
-        ax_ct2  = gca; hold on;
-        wg_ref_lines(ax_ct2, F_KEY, []);
-        wg_plot_thru2(ax_ct2, freq_c, thru_before, thru_after, 'S11', STY_S11, ...
-            COL_TB, COL_TA, LW_REF, to_dB, sm);
-        wg_format_ax(ax_ct2, freq_c, '\textbf{Thru reference --- Reflexion}', ...
-            '$|S_{11}|$ (dB)', ylim_rx);
-        saveas(fig_ct2, fullfile(master_dir, [master_name '_Comp_Thru_RX.png']));
+        % Fig CT — Thru before/after (S21 y S11 en la misma figura)
+        % S21 continua, S11 discontinua; before negro, after gris. Escala S11.
+        fig_ct = wg_new_fig(['CompThru\_' master_name], FIG_CM);
+        ax_ct  = gca; hold on;
+        wg_ref_lines(ax_ct, F_KEY, []);
+        if ~isempty(thru_before)
+            if isfield(thru_before,'S31')
+                plot(ax_ct, freq_c, sm(to_dB(thru_before.S31)), STY_S21, ...
+                    'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before $S_{21}$');
+            end
+            if isfield(thru_before,'S11')
+                plot(ax_ct, freq_c, sm(to_dB(thru_before.S11)), STY_S11, ...
+                    'Color', COL_TB, 'LineWidth', LW_REF, 'DisplayName', 'Thru before $S_{11}$');
+            end
+        end
+        if ~isempty(thru_after)
+            if isfield(thru_after,'S31')
+                plot(ax_ct, freq_c, sm(to_dB(thru_after.S31)), STY_S21, ...
+                    'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after $S_{21}$');
+            end
+            if isfield(thru_after,'S11')
+                plot(ax_ct, freq_c, sm(to_dB(thru_after.S11)), STY_S11, ...
+                    'Color', COL_TA, 'LineWidth', LW_REF, 'DisplayName', 'Thru after $S_{11}$');
+            end
+        end
+        wg_format_ax(ax_ct, freq_c, ...
+            ['\textbf{Thru reference (before/after)} --- ' strrep(master_name,'_','\_')], ...
+            'Level (dB)', ylim_rx);
+        saveas(fig_ct, fullfile(master_dir, [master_name '_Comp_Thru.png']));
     end
 
 end  % fin modo comparar
@@ -596,11 +607,11 @@ end
 
 
 function rgb = wg_material_rgb(m)
-% Color base por material (gama azul↔rojo).
+% Color base por material (gama azul↔rojo, tonos suaves/apagados).
     switch m
-        case 'Ni';   rgb = [0.80 0.10 0.10];   % niquel → rojo
-        case 'Cu';   rgb = [0.00 0.30 0.80];   % cobre  → azul
-        otherwise;   rgb = [0.35 0.35 0.35];   % otro   → gris
+        case 'Ni';   rgb = [0.82 0.42 0.35];   % niquel → rojo suave (tipo "Echo")
+        case 'Cu';   rgb = [0.29 0.45 0.69];   % cobre  → azul suave (tipo "Bravo")
+        otherwise;   rgb = [0.45 0.45 0.45];   % otro   → gris
     end
 end
 
