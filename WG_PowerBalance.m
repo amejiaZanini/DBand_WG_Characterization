@@ -2,16 +2,16 @@
 % ─────────────────────────────────────────────────────────────────────────
 % Balance de potencia de un prototipo de guía de onda (banda D).
 %
-% A partir de S11, S31, S13, S33 (complejos, R+jI) descompone la potencia
-% incidente (normalizada a 1) en tres fracciones:
+% A partir de S11, S21, S12, S22 (complejos, R+jI; en los .mat: S11, S31,
+% S13, S33) descompone la potencia incidente (normalizada a 1) en tres
+% fracciones. Forma estándar (matriz unitaria, UNA excitación, puerto 1):
 %
-%     R = (|S11|^2 + |S33|^2)/2     → potencia REFLEJADA (desadaptación)
-%     T = (|S31|^2 + |S13|^2)/2     → potencia TRANSMITIDA
-%     L = 1 - R - T                 → potencia PERDIDA dentro de la estructura
-%                                     (óhmica + radiación, todavía juntas)
+%     R = |S11|^2          → potencia REFLEJADA (desadaptación)
+%     T = |S21|^2          → potencia TRANSMITIDA
+%     L = 1 - R - T        → potencia PERDIDA (óhmica + radiación, juntas)
 %
-% Se promedian las dos direcciones de excitación (puerto 1 y puerto 3) para
-% una estimación más robusta en una estructura recíproca.
+% (SIN /2: el /2 solo aparece si se PROMEDIAN las dos excitaciones, y entonces
+%  va en R y T a la vez → AVERAGE_DIRECTIONS en la sección 4.)
 %
 % Sobre las repeticiones se promedia la POTENCIA (|S|^2), no el fasor
 % complejo: es lo físicamente correcto para un balance de potencia y evita
@@ -75,9 +75,26 @@ P13 = acc.P13 / N;   % <|S13|^2>
 P33 = acc.P33 / N;   % <|S33|^2>
 
 %% ── 4 · Fracciones de potencia ───────────────────────────────────────────
-R = (P11 + P33) / 2;      % reflejada
-T = (P31 + P13) / 2;      % transmitida
-L = 1 - R - T;            % perdida (óhmica + radiación)
+% Balance por conservación de energía (matriz S, UNA excitación):
+%       1 = |S11|^2 + |S21|^2 + L   →   L = 1 - |S11|^2 - |S21|^2   (SIN /2)
+% Esta es la forma estándar (matriz unitaria) y es lo que pide el tutor: el
+% /2 NO va aquí.
+%
+% AVERAGE_DIRECTIONS = true promedia las DOS excitaciones (puerto 1 y 3).
+% En ese caso el /2 va en R y en T a la vez y L = 1-R-T sigue siendo válido
+% (es el promedio de los dos balances de energía). Con guía recíproca y
+% simétrica (|S11|≈|S22|, |S21|≈|S12|) ambos resultados coinciden; el
+% promedio solo reduce ruido.  Lo que NUNCA es válido es quitar el /2 pero
+% seguir sumando las dos direcciones (daría R+T≈2 y L negativo).
+AVERAGE_DIRECTIONS = false;
+if AVERAGE_DIRECTIONS
+    R = (P11 + P33) / 2;      % reflejada   (promedio P1 y P3, con /2)
+    T = (P31 + P13) / 2;      % transmitida (promedio P1 y P3, con /2)
+else
+    R = P11;                  % reflejada   (excitación puerto 1, sin /2)
+    T = P31;                  % transmitida (excitación puerto 1, sin /2)
+end
+L = 1 - R - T;                % perdida (óhmica + radiación)
 
 if SMOOTH > 1
     sm = @(v) smoothdata(v(:).', 'gaussian', SMOOTH);

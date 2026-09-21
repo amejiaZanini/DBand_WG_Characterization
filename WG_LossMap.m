@@ -94,7 +94,7 @@ ax1 = gca; hold on;
 plot(ax1, dist, 10*log10(p11 + 1e-12), '-', 'Color',[0.00 0.45 0.74], ...
     'LineWidth',1.8, 'DisplayName','$S_{11}$ (desde P1)');
 plot(ax1, dist_33_mirror, 10*log10(p33 + 1e-12), '--', 'Color',[0.85 0.33 0.10], ...
-    'LineWidth',1.8, 'DisplayName','$S_{33}$ (desde P3, espejado)');
+    'LineWidth',1.8, 'DisplayName','$S_{22}$ (desde P3, espejado)');
 % Planos de referencia
 xline(ax1, 0,       ':', 'Color',[0.4 0.4 0.4], 'HandleVisibility','off');
 xline(ax1, L_TOTAL, ':', 'Color',[0.4 0.4 0.4], 'HandleVisibility','off');
