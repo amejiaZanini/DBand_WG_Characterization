@@ -24,9 +24,11 @@ OUT = Path(__file__).resolve().parent
 # ── Parámetros ────────────────────────────────────────────────────────────────
 T_PLATE = 0.005                     # espesor de chapado de diseño (5 µm)
 
-X_FACE = 68.24 / 2                  # caras de brida
+X_FACE = 68.24 / 2                  # cara del resalte de contacto (boca)
 T_FLANGE = 7.62
 X_FL_BACK = X_FACE - T_FLANGE       # 26.50
+BOSS_D, BOSS_H = 9.525, 0.508       # resalte de contacto (STEP actual)
+X_DISC_FACE = X_FACE - BOSS_H       # 33.612
 R_FLANGE = 19.1 / 2
 Z_AXIS = -0.41                      # centro de la boca (la cavidad va de z=-0.82 a 0)
 H_HALF = 6.0
@@ -56,34 +58,36 @@ M3_HEAD_H = 3.0
 NUT_AF = 5.7
 NUT_H = 2.6
 
-BC_SCREW = 14.288                   # VERIFICAR
-BC_ALIGN = 11.890                   # VERIFICAR
-D_FL_ALIGN = 1.70
-D_FL_SCREW = 3.00
-HEAD_FL = 4.8                       # VERIFICAR (cabeza del tornillo de brida)
-GROOVE_HW = HEAD_FL / 2 + 0.5
-GROOVE_L = 12.0
-Z_SCREW_TOP = Z_AXIS + BC_SCREW / 2
-Z_SCREW_BOT = Z_AXIS - BC_SCREW / 2
-GROOVE_TOP_Z = Z_SCREW_TOP - HEAD_FL / 2 - 0.3
-GROOVE_BOT_Z = Z_SCREW_BOT + HEAD_FL / 2 + 0.3
+BC_FLANGE = 14.288                  # 4-40 y alineamiento en el mismo círculo (STEP)
+D_FL_ALIGN = 1.778                  # 4x a 45°
+TAP_4_40 = 2.261                    # broca de roscar 4-40 (#43)
+THREAD_4_40 = 2.845                 # diámetro nominal 4-40
+TAP_DEPTH = 6.0                     # ciego: no sale por detrás del disco
 
-# Diseño actual (aprox., leído de las capturas) para la comparativa
+# Diseño actual (STEP FV4_EBG_C_raw) para la comparativa
 OLD_SPINE_HW = 10.0
 OLD_FLANGE_HW = 12.5
-OLD_ALIGN = [(x, s * ALIGN_Y) for x in (-13.5, 0.0, 12.0) for s in (1, -1)]
-OLD_M3 = [(sx * 6.2, sy * 25.2) for sx in (1, -1) for sy in (1, -1)]
+OLD_ALIGN = [(x, s * 15.0145) for x in (-12.0, 0.0, 13.5) for s in (1, -1)]
+OLD_M3 = [(x, s * 25.0185) for x in (-6.0, 5.875) for s in (1, -1)]
 
 assert len(PIN_XS) * 2 * len(ROWS_Y) == 316
 assert abs(PIN_XS[-1] - (CAV_HX - 0.30)) < 1e-9
 
 
 def outline(spine_hw=SPINE_HW, flange_hw=R_FLANGE):
-    pts = [(-X_FACE, -flange_hw), (-X_FL_BACK, -flange_hw), (-X_FL_BACK, -spine_hw),
+    b = BOSS_D / 2
+    pts = [(-X_FACE, -b), (-X_DISC_FACE, -b), (-X_DISC_FACE, -flange_hw),
+           (-X_FL_BACK, -flange_hw), (-X_FL_BACK, -spine_hw),
            (-BLOCK_HX, -spine_hw), (-BLOCK_HX, -BLOCK_HY), (BLOCK_HX, -BLOCK_HY),
            (BLOCK_HX, -spine_hw), (X_FL_BACK, -spine_hw), (X_FL_BACK, -flange_hw),
-           (X_FACE, -flange_hw)]
+           (X_DISC_FACE, -flange_hw), (X_DISC_FACE, -b), (X_FACE, -b)]
     return pts + [(x, -y) for x, y in reversed(pts)]
+
+
+def tapped_hole_plan(v):
+    for sx in (1, -1):
+        x0, x1 = sorted((sx * X_DISC_FACE, sx * (X_DISC_FACE - TAP_DEPTH)))
+        v.rect(x0, -TAP_4_40 / 2, x1, TAP_4_40 / 2, "HIDDEN")
 
 
 def hexagon(cx, cy, af):
@@ -157,9 +161,7 @@ def view_bottom_plan(v):
     for sy, tag in ((1, "A: pasador cilíndrico Ø3"), (-1, "B: pasador rómbico Ø3")):
         v.circle(0, sy * ALIGN_Y, ALIGN_D, "ALIGN")
         v.text(tag, 0, sy * (ALIGN_Y + 3.0), h=1.3, layer="ALIGN")
-    for sx in (1, -1):
-        x0, x1 = sorted((sx * (X_FL_BACK - GROOVE_L), sx * X_FL_BACK))
-        v.rect(x0, -GROOVE_HW, x1, GROOVE_HW, "HIDDEN")
+    tapped_hole_plan(v)
     v.line((-X_FACE - 2, 0), (X_FACE + 2, 0), "CENTER")
     v.line((0, -BLOCK_HY - 2), (0, BLOCK_HY + 2), "CENTER")
 
@@ -189,11 +191,7 @@ def view_top_plan(v):
     v.text("A: Ø3.000 H7 (escariar tras chapado)", 0, ALIGN_Y + 3.0, h=1.3, layer="ALIGN")
     v.text("B: Ø3.000 H7 (escariar; pasador rómbico)", 0, -ALIGN_Y - 3.0, h=1.3,
            layer="ALIGN")
-    for sx in (1, -1):
-        x0, x1 = sorted((sx * (X_FL_BACK - GROOVE_L), sx * X_FL_BACK))
-        v.rect(x0, -GROOVE_HW, x1, GROOVE_HW, "OUTLINE")
-        v.text(f"Ranura cabeza 4-40, prof. {H_HALF - GROOVE_TOP_Z:.2f}", (x0 + x1) / 2,
-               GROOVE_HW + 1.2, h=0.9)
+    tapped_hole_plan(v)
     v.text("M3 ISO 4762 (10x), par bajo ~0.3 N·m", 0, -24, h=1.3)
     v.line((-X_FACE - 2, 0), (X_FACE + 2, 0), "CENTER")
     v.line((0, -BLOCK_HY - 2), (0, BLOCK_HY + 2), "CENTER")
@@ -253,28 +251,29 @@ def view_detail(v):
 
 
 def view_flange(v):
-    v.text("CARA DE BRIDA (x3): lapear con las mitades montadas, antes del chapado",
+    v.text("CARA DE BRIDA (x3): lapear el resalte con las mitades montadas, antes del chapado",
            0, R_FLANGE + 4, h=2.0)
     v.circle(0, Z_AXIS, 2 * R_FLANGE, "OUTLINE")
+    v.circle(0, Z_AXIS, BOSS_D, "OUTLINE")
     half = math.sqrt(R_FLANGE ** 2 - Z_AXIS ** 2)
     v.line((-half, 0), (half, 0), "OUTLINE")
     v.rect(-WR_HW, -CAV_D, WR_HW, 0, "CAVITY")
-    v.circle(0, Z_AXIS, BC_SCREW, "CENTER")
-    v.circle(0, Z_AXIS, BC_ALIGN, "CENTER")
-    rs = BC_SCREW / 2
-    for y, z, layer in ((0, Z_AXIS + rs, "HOLES"), (0, Z_AXIS - rs, "HOLES"),
-                        (rs, Z_AXIS, "HIDDEN"), (-rs, Z_AXIS, "HIDDEN")):
-        v.circle(y, z, D_FL_SCREW, layer)
-    ra = BC_ALIGN / 2
+    v.circle(0, Z_AXIS, BC_FLANGE, "CENTER")
+    rs = BC_FLANGE / 2
+    for z in (Z_AXIS + rs, Z_AXIS - rs):
+        v.circle(0, z, TAP_4_40, "HOLES")
+        v.circle(0, z, THREAD_4_40, "HIDDEN")
     for a in (45, 135, 225, 315):
-        v.circle(ra * math.cos(math.radians(a)), Z_AXIS + ra * math.sin(math.radians(a)),
+        v.circle(rs * math.cos(math.radians(a)), Z_AXIS + rs * math.sin(math.radians(a)),
                  D_FL_ALIGN, "ALIGN")
-    v.text("4-40: Ø3.0 pasante arriba/abajo (BC Ø14.288 VERIFICAR)", 0, -R_FLANGE - 2.0, h=1.4)
-    v.text("izq./dcha. (discontinuo): solo opción C", 0, -R_FLANGE - 3.6, h=1.4)
-    v.text("Ø1.70 x4, prof. 3 (BC Ø11.890 VERIFICAR)", 0, -R_FLANGE - 5.2, h=1.4)
-    v.text("plano de partición z=0 (0.41 sobre el eje)", R_FLANGE + 1, 0.6, h=1.2,
+    v.text("2x 4-40 UNC roscado arriba/abajo, ciego prof. 6 (broca Ø2.261)", 0,
+           -R_FLANGE - 2.0, h=1.4)
+    v.text("4x Ø1.778 a 45°, prof. 3;  todo en BC Ø14.288 (como el CAD actual)", 0,
+           -R_FLANGE - 3.6, h=1.4)
+    v.text(f"resalte de contacto Ø{BOSS_D} x {BOSS_H}", 0, Z_AXIS - 2.9, h=1.2)
+    v.text("partición z=0 (techo de la cavidad, 0.41 sobre el eje)", R_FLANGE + 1, 0.6, h=1.2,
            align=TextEntityAlignment.MIDDLE_LEFT)
-    v.dim((-R_FLANGE, Z_AXIS), (R_FLANGE, Z_AXIS), (0, -R_FLANGE - 7.5), h=2.0, text="Ø<>")
+    v.dim((-R_FLANGE, Z_AXIS), (R_FLANGE, Z_AXIS), (0, -R_FLANGE - 6.5), h=2.0, text="Ø<>")
     v.dim((-WR_HW, -CAV_D), (WR_HW, -CAV_D), (0, -2.6), h=2.0)
 
 
@@ -304,8 +303,10 @@ NOTES = [
     "4. Alineamiento: solo A (cilíndrico) + B (rómbico). Imprimir Ø2.90 y escariar Ø3.000 H7 tras chapar.",
     "   Pasadores de acero Ø3; pegados en la mitad inferior. Holgura diametral máx. 0.03 (ideal <= 0.02).",
     "5. M3 pasantes Ø3.4 con tuerca alojada (sin roscas en resina). Las alas van rebajadas 0.20.",
-    "6. Bridas: 4-40 solo arriba/abajo (opción B) con ranura de acceso, o abrazadera circular (opción A).",
-    "7. VERIFICAR con el extensor: BC 4-40 Ø14.288, BC alineamiento Ø11.890, cabeza del tornillo Ø4.8.",
+    "6. Brida estándar Ø19.1 con el patrón del CAD actual (BC Ø14.288). Los 4-40 son ciegos (prof. 6):",
+    "   ya no salen por detrás del disco rozando la cara del cuerpo. Roscar tras chapar (o helicoil).",
+    "7. CAMBIO vs CAD actual: la partición pasa de media altura de la cavidad (z = 0.41) al techo",
+    "   (tapa plana). El gap queda definido y medible en una sola pieza.",
 ]
 
 
@@ -353,10 +354,6 @@ def _plan(ax, new):
             y0r = CAV_HY if sy > 0 else -SPINE_HW
             ax.add_patch(Rectangle((-X_FL_BACK, y0r), 2 * X_FL_BACK, SPINE_HW - CAV_HY,
                                    fc="#cfe8cf", ec="none", alpha=0.9))
-            for sx in (1, -1):
-                x0 = min(sx * (X_FL_BACK - GROOVE_L), sx * X_FL_BACK)
-                ax.add_patch(Rectangle((x0, -GROOVE_HW), GROOVE_L, 2 * GROOVE_HW,
-                                       fc="none", ec="#8a5a00", ls="--", lw=1.1, zorder=5))
     ax.add_patch(Rectangle((-CAV_HX, -CAV_HY), 2 * CAV_HX, 2 * CAV_HY,
                            fc="white", ec="#3a5ba0", lw=1.0))
     xs = [x for x in PIN_XS for _ in range(4)]
@@ -386,15 +383,15 @@ def build_comparison():
     fig, axs = plt.subplots(1, 2, figsize=(17, 9.2))
     _plan(axs[0], new=False)
     _plan(axs[1], new=True)
-    axs[0].set_title("ACTUAL (aprox., leído de las capturas)", fontsize=14, fontweight="bold")
+    axs[0].set_title("ACTUAL (STEP FV4_EBG_C_raw)", fontsize=14, fontweight="bold")
     axs[1].set_title("PROPUESTO UPM v1", fontsize=14, fontweight="bold")
     box = dict(boxstyle="round,pad=0.4", fc="white", ec="0.6", alpha=0.95)
     for txt, xy, xyt in (
-            ("6 pasadores Ø2.8 en Ø3.0\n→ juego ±100 µm y sobre-restringido\n(se agarrota si la resina contrae)",
-             (12, ALIGN_Y), (19, 25)),
-            ("4 M3 a ~25 mm del eje\n→ nada aprieta la tapa junto al canal\n(combadura → gap fuera de ±20 µm)",
-             (-6.2, -25.2), (-39, -37)),
-            ("Brida Ø~25 moleteada\n(no estándar UG-387)", (31, 11), (21, 32))):
+            ("6 pasadores Ø3.0 en Ø3.2\n→ juego ±100 µm y sobre-restringido\n(se agarrota si la resina contrae)",
+             (13.5, 15.0), (19, 25)),
+            ("4 M3 a 25 mm del eje\n→ nada aprieta la tapa junto al canal\n(combadura → gap fuera de ±20 µm)",
+             (-6.0, -25.0), (-39, -37)),
+            ("Brida Ø25 moleteada\n4-40 pasante: sale a ~10 µm\nde la cara del cuerpo", (31, 11), (17, 32))):
         axs[0].annotate(txt, xy, xyt, fontsize=8.5, bbox=box,
                         arrowprops=dict(arrowstyle="->", color="0.3"))
     for txt, xy, xyt in (
@@ -404,7 +401,7 @@ def build_comparison():
              (11.5, M3_Y), (21, 15)),
             ("Raíles de apoyo (verde)\nalas rebajadas 0.20 (rayado)\n→ la tapa solo apoya junto al canal",
              (-14, -14), (-39, -37)),
-            ("Brida estándar Ø19.1\nranura de acceso a la cabeza 4-40", (24, 2), (18, -30))):
+            ("Brida estándar Ø19.1, mismo patrón\n4-40 ciego (prof. 6): sin conflicto", (31, 6), (16, -30))):
         axs[1].annotate(txt, xy, xyt, fontsize=8.5, bbox=box,
                         arrowprops=dict(arrowstyle="->", color="0.3"))
     fig.tight_layout()
