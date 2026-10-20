@@ -285,6 +285,7 @@ else  % Comparar
     COL_TA  = [0.50 0.50 0.50];   % thru after  → gris
     STY_S21 = '-';                % transmision → continua
     STY_S11 = '--';               % reflexion   → discontinua
+    STY_S11 = '-';               % reflexion   → discontinua
 
     % ── C6 · Fig C1 — Transmisión S21 (sin límite, con thru) ───────────────
     fig_c1 = wg_new_fig(['CompTX\_' master_name], FIG_CM);
@@ -510,7 +511,7 @@ function wg_plot_curves(ax, freq, thru_before, thru_after, proto, param, ...
     end
     for k = 1:numel(proto)
         if isfield(proto{k},param)
-            plot(ax,freq,sm(to_dB(proto{k}.(param))),'--', ...
+            plot(ax,freq,sm(to_dB(proto{k}.(param))),'-', ...
                 'Color',col_proto(k,:),'LineWidth',lw_proto, ...
                 'DisplayName',['Rep ' num2str(k)]);
         end
