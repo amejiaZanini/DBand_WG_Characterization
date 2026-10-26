@@ -284,7 +284,6 @@ else  % Comparar
     COL_TB  = [0.00 0.00 0.00];   % thru before → negro
     COL_TA  = [0.50 0.50 0.50];   % thru after  → gris
     STY_S21 = '-';                % transmision → continua
-    STY_S11 = '--';               % reflexion   → discontinua
     STY_S11 = '-';               % reflexion   → discontinua
 
     % ── C6 · Fig C1 — Transmisión S21 (sin límite, con thru) ───────────────
