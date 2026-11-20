@@ -14,7 +14,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon as MPoly
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from manifold3d import Manifold
+from manifold3d import CrossSection, Manifold
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_cst_macro as G  # noqa: E402
@@ -51,6 +51,12 @@ for op in G.OPS:
             S[name] = c.translate([ev(c1), ev(c2), a])
         else:                               # eje x: (x,y,z) -> (z, y, -x)
             S[name] = c.rotate([0, 90, 0]).translate([a, ev(c1), ev(c2)])
+    elif k == "hex":                        # prisma hexagonal, caras planas hacia ±x
+        _, name, xc, yc, z0, h = op
+        s = P["hexS"] / 2 + P["tpl"]
+        pts = [(s * math.cos(math.radians(a)) / 0.8660254, s * math.sin(math.radians(a)) / 0.8660254)
+               for a in (30, 90, 150, 210, 270, 330)]
+        S[name] = Manifold.extrude(CrossSection([pts]), ev(h)).translate([ev(xc), ev(yc), ev(z0)])
     elif k == "translate":
         _, name, vec, reps, unite, dest = op
         v = np.array([ev(x) for x in vec])
@@ -212,7 +218,7 @@ for xb, yb, db in sorted(hb, key=lambda h: (round(h[1], 1), h[0])):
     xt, yt, dt = min(ht, key=lambda h: math.hypot(h[0] - xb, h[1] - yb))
     dev = 1000 * math.hypot(xt - xb, yt - yb)
     worst = max(worst, dev)
-    tag = next((n for (x, y), n in names.items() if math.hypot(x - xb, y - yb) < 0.5), "M3")
+    tag = next((n for (x, y), n in names.items() if math.hypot(x - xb, y - yb) < 0.5), "tornillo")
     print(f"  {tag:<9}{xb:9.3f}{yb:9.3f}{db:8.3f}{xt:9.3f}{yt:9.3f}{dt:8.3f}{dev:11.2f}")
 print(f"  -> {len(hb)} agujeros en la base, {len(ht)} en la tapa; desvío máximo base-tapa = {worst:.2f} µm")
 
@@ -232,6 +238,32 @@ fr = holes(base.rotate([0, -90, 0]), P["Lwg"] / 2 - P["tboss"] - 0.5) + \
 L = sorted((round(-u, 3), round(v, 3), round(d, 3)) for u, v, d in fl)
 R = sorted((round(-u, 3), round(-v, 3), round(d, 3)) for u, v, d in fr)
 print(f"  brida derecha = izquierda girada 180°: {'SÍ' if L == R else 'NO'}  ({len(L)} agujeros por brida)")
+
+# Holguras mínimas (analíticas, con tpl)
+rh_flat = P["hexS"] / 2 + P["tpl"]                 # semientrecaras (hacia ±x)
+rh_vert = rh_flat / 0.8660254                      # semidiagonal (hacia ±y)
+rs = P["dsc"] / 2 + P["tpl"]
+ztop = zp + P["Hhalf"]
+y_up = math.sqrt(P["Rdisc"] ** 2 - ztop ** 2)       # el disco asoma sobre la tapa si |y| < y_up
+y_dn = math.sqrt(P["Rdisc"] ** 2 - (zp - P["Hhalf"]) ** 2)
+x_disc = P["Lwg"] / 2 - P["tboss"] - P["tdisc"]
+x_end = P["Lwg"] / 2 - P["tboss"]
+xrow = 3 * P["xsc"]
+chk = [
+    ("pared tornillo de fila - cavidad", P["ysc"] - rs - P["Wcav"] / 2 - P["tpl"]),
+    ("resina entre tuercas vecinas (caras planas)", P["xsc"] - 2 * rh_flat),
+    ("tuerca exterior de fila - disco que asoma", x_disc - xrow - rh_flat),
+    ("tuerca de esquina - disco que asoma (en y)", P["yce"] - rh_vert - y_up),
+    ("tuerca de esquina - cara de brida (en x)", x_end - P["xce"] - rh_flat),
+    ("cabeza M2.5 (Ø4.5) de esquina - disco bajo la base", P["yce"] - 2.25 - y_dn),
+    ("tuerca de esquina - tuerca de fila", math.hypot(P["xce"] - xrow, P["yce"] - P["ysc"]) - 2 * rh_vert),
+    ("agujero A/B - tuerca más cercana", min(math.hypot(P["xab"] - x, P["yab"] - y) for x, y in
+     [(k * P["xsc"], P["ysc"]) for k in range(-3, 4)] + [(P["xce"], P["yce"])]) - rh_vert - P["dab"] / 2),
+    ("agujero A/B - borde exterior", P["Wbody"] / 2 - P["yab"] - P["dab"] / 2),
+]
+print("\nHolguras mínimas (mm):")
+for txt, v in chk:
+    print(f"  {txt:<52}{v:7.2f}  {'OK' if v >= 0.4 else 'REVISAR'}")
 
 # Figura de alineación: cara de unión de la base con los agujeros de la tapa superpuestos
 fig, axs = plt.subplots(1, 3, figsize=(19, 6.4), gridspec_kw=dict(width_ratios=[2.2, 1, 1]))

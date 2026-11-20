@@ -24,17 +24,17 @@
 '   ltap    = 6              ' profundidad de rosca (ciega) desde la cara del disco
 '   dcb     = 3.556          ' avellanado de los 4-40
 '   lcb     = 1.016          ' profundidad del avellanado
-'   dpst    = 1.5875         ' agujero para pasador de 1/16 in
-'   dprc    = 1.638          ' agujero de alineación de la otra diagonal
+'   dprc    = 1.638          ' 4 agujeros a 45° para los pasadores 1/16 in del extensor (valen en cualquier diagonal)
 '   lal     = 3              ' profundidad de los agujeros de alineación de brida
-'   chir    = 1              ' 1 o -1: intercambia las diagonales pasador/agujero
-'   xm3     = 11.5           ' paso de los tornillos M3 en x
-'   ym3     = 11.45          ' posición de los M3 en y
-'   dm3     = 3.4            ' agujero pasante M3
-'   hexS    = 5.7            ' entrecaras del alojamiento de tuerca M3
-'   hexH    = 2.6            ' profundidad del alojamiento de tuerca
+'   xsc     = 7.7            ' paso de los tornillos de cierre en x (7 por fila)
+'   ysc     = 7.75           ' filas de tornillos en y = ±ysc (pared de 1.3 mm a la cavidad)
+'   xce     = 29.8           ' tornillos de esquina junto a cada boca: |x|
+'   yce     = 10.5           ' tornillos de esquina junto a cada boca: |y| (fuera del disco)
+'   dsc     = 2.9            ' agujero pasante M2.5 (ISO 273 medio)
+'   hexS    = 5.2            ' entrecaras del alojamiento de tuerca M2.5 (tuerca S5 + 0.2)
+'   hexH    = 2.3            ' profundidad del alojamiento de tuerca (tuerca m = 2.0 + 0.3)
 '   xab     = 17.25          ' pasadores de centrado A/B: |x|
-'   yab     = 7.8            ' pasadores de centrado A/B: |y|
+'   yab     = 14.5           ' pasadores de centrado A/B: |y|
 '   dab     = 2.8            ' agujero de centrado A/B pasante (mismo en base y tapa); escariar a 3.0 H7 con las dos mitades montadas
 
 '## 01 - use template: WG6_Pins (UPM v2)
@@ -6395,11 +6395,11 @@ With Cylinder
      .Name "al1L"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dpst/2+tpl"
+     .OuterRadius "dprc/2+tpl"
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
-     .Ycenter "chir*r45"
+     .Ycenter "r45"
      .Zcenter "r45"
      .Segments "0"
      .Create
@@ -6411,11 +6411,11 @@ With Cylinder
      .Name "al1R"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dpst/2+tpl"
+     .OuterRadius "dprc/2+tpl"
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
-     .Ycenter "-(chir*r45)"
+     .Ycenter "-(r45)"
      .Zcenter "r45"
      .Segments "0"
      .Create
@@ -6427,11 +6427,11 @@ With Cylinder
      .Name "al2L"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dpst/2+tpl"
+     .OuterRadius "dprc/2+tpl"
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
-     .Ycenter "-chir*r45"
+     .Ycenter "-r45"
      .Zcenter "-r45"
      .Segments "0"
      .Create
@@ -6443,11 +6443,11 @@ With Cylinder
      .Name "al2R"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dpst/2+tpl"
+     .OuterRadius "dprc/2+tpl"
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
-     .Ycenter "-(-chir*r45)"
+     .Ycenter "-(-r45)"
      .Zcenter "-r45"
      .Segments "0"
      .Create
@@ -6463,7 +6463,7 @@ With Cylinder
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
-     .Ycenter "-chir*r45"
+     .Ycenter "-r45"
      .Zcenter "r45"
      .Segments "0"
      .Create
@@ -6479,7 +6479,7 @@ With Cylinder
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
-     .Ycenter "-(-chir*r45)"
+     .Ycenter "-(-r45)"
      .Zcenter "r45"
      .Segments "0"
      .Create
@@ -6495,7 +6495,7 @@ With Cylinder
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
-     .Ycenter "chir*r45"
+     .Ycenter "r45"
      .Zcenter "-r45"
      .Segments "0"
      .Create
@@ -6511,7 +6511,7 @@ With Cylinder
      .InnerRadius "0.0"
      .Axis "x"
      .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
-     .Ycenter "-(chir*r45)"
+     .Ycenter "-(r45)"
      .Zcenter "-r45"
      .Segments "0"
      .Create
@@ -6566,163 +6566,291 @@ Solid.Subtract "Base:mono", "Base:al4L"
 ' boolean subtract shapes: Base:mono, Base:al4R
 Solid.Subtract "Base:mono", "Base:al4R"
 
-'## 23 - define cylinders: Base:pasantes M3 (10) y centrado A/B (2)
-' define cylinder: Base:m3_a0
+'## 23 - define cylinders: Base:pasantes M2.5 (18) y centrado A/B (2)
+' define cylinder: Base:sc_a0
 With Cylinder
      .Reset
-     .Name "m3_a0"
+     .Name "sc_a0"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "-2*xm3"
-     .Ycenter "ym3"
+     .Xcenter "-3*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_a1
+' define cylinder: Base:sc_a1
 With Cylinder
      .Reset
-     .Name "m3_a1"
+     .Name "sc_a1"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "-1*xm3"
-     .Ycenter "ym3"
+     .Xcenter "-2*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_a2
+' define cylinder: Base:sc_a2
 With Cylinder
      .Reset
-     .Name "m3_a2"
+     .Name "sc_a2"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "0*xm3"
-     .Ycenter "ym3"
+     .Xcenter "-1*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_a3
+' define cylinder: Base:sc_a3
 With Cylinder
      .Reset
-     .Name "m3_a3"
+     .Name "sc_a3"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "1*xm3"
-     .Ycenter "ym3"
+     .Xcenter "0*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_a4
+' define cylinder: Base:sc_a4
 With Cylinder
      .Reset
-     .Name "m3_a4"
+     .Name "sc_a4"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "2*xm3"
-     .Ycenter "ym3"
+     .Xcenter "1*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_b0
+' define cylinder: Base:sc_a5
 With Cylinder
      .Reset
-     .Name "m3_b0"
+     .Name "sc_a5"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "-2*xm3"
-     .Ycenter "-ym3"
+     .Xcenter "2*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_b1
+' define cylinder: Base:sc_a6
 With Cylinder
      .Reset
-     .Name "m3_b1"
+     .Name "sc_a6"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "-1*xm3"
-     .Ycenter "-ym3"
+     .Xcenter "3*xsc"
+     .Ycenter "ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_b2
+' define cylinder: Base:sc_b0
 With Cylinder
      .Reset
-     .Name "m3_b2"
+     .Name "sc_b0"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "0*xm3"
-     .Ycenter "-ym3"
+     .Xcenter "-3*xsc"
+     .Ycenter "-ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_b3
+' define cylinder: Base:sc_b1
 With Cylinder
      .Reset
-     .Name "m3_b3"
+     .Name "sc_b1"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "1*xm3"
-     .Ycenter "-ym3"
+     .Xcenter "-2*xsc"
+     .Ycenter "-ysc"
      .Segments "0"
      .Create
 End With
 
-' define cylinder: Base:m3_b4
+' define cylinder: Base:sc_b2
 With Cylinder
      .Reset
-     .Name "m3_b4"
+     .Name "sc_b2"
      .Component "Base"
      .Material "Ni_plated"
-     .OuterRadius "dm3/2+tpl"
+     .OuterRadius "dsc/2+tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "2*xm3"
-     .Ycenter "-ym3"
+     .Xcenter "-1*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b3
+With Cylinder
+     .Reset
+     .Name "sc_b3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b4
+With Cylinder
+     .Reset
+     .Name "sc_b4"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b5
+With Cylinder
+     .Reset
+     .Name "sc_b5"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b6
+With Cylinder
+     .Reset
+     .Name "sc_b6"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "3*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_e0
+With Cylinder
+     .Reset
+     .Name "sc_e0"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-xce"
+     .Ycenter "yce"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_e1
+With Cylinder
+     .Reset
+     .Name "sc_e1"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "xce"
+     .Ycenter "yce"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_e2
+With Cylinder
+     .Reset
+     .Name "sc_e2"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-xce"
+     .Ycenter "-yce"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_e3
+With Cylinder
+     .Reset
+     .Name "sc_e3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "xce"
+     .Ycenter "-yce"
      .Segments "0"
      .Create
 End With
@@ -6760,35 +6888,59 @@ With Cylinder
 End With
 
 '## 24 - boolean subtract shapes: Base:mono, pasantes
-' boolean subtract shapes: Base:mono, Base:m3_a0
-Solid.Subtract "Base:mono", "Base:m3_a0"
+' boolean subtract shapes: Base:mono, Base:sc_a0
+Solid.Subtract "Base:mono", "Base:sc_a0"
 
-' boolean subtract shapes: Base:mono, Base:m3_a1
-Solid.Subtract "Base:mono", "Base:m3_a1"
+' boolean subtract shapes: Base:mono, Base:sc_a1
+Solid.Subtract "Base:mono", "Base:sc_a1"
 
-' boolean subtract shapes: Base:mono, Base:m3_a2
-Solid.Subtract "Base:mono", "Base:m3_a2"
+' boolean subtract shapes: Base:mono, Base:sc_a2
+Solid.Subtract "Base:mono", "Base:sc_a2"
 
-' boolean subtract shapes: Base:mono, Base:m3_a3
-Solid.Subtract "Base:mono", "Base:m3_a3"
+' boolean subtract shapes: Base:mono, Base:sc_a3
+Solid.Subtract "Base:mono", "Base:sc_a3"
 
-' boolean subtract shapes: Base:mono, Base:m3_a4
-Solid.Subtract "Base:mono", "Base:m3_a4"
+' boolean subtract shapes: Base:mono, Base:sc_a4
+Solid.Subtract "Base:mono", "Base:sc_a4"
 
-' boolean subtract shapes: Base:mono, Base:m3_b0
-Solid.Subtract "Base:mono", "Base:m3_b0"
+' boolean subtract shapes: Base:mono, Base:sc_a5
+Solid.Subtract "Base:mono", "Base:sc_a5"
 
-' boolean subtract shapes: Base:mono, Base:m3_b1
-Solid.Subtract "Base:mono", "Base:m3_b1"
+' boolean subtract shapes: Base:mono, Base:sc_a6
+Solid.Subtract "Base:mono", "Base:sc_a6"
 
-' boolean subtract shapes: Base:mono, Base:m3_b2
-Solid.Subtract "Base:mono", "Base:m3_b2"
+' boolean subtract shapes: Base:mono, Base:sc_b0
+Solid.Subtract "Base:mono", "Base:sc_b0"
 
-' boolean subtract shapes: Base:mono, Base:m3_b3
-Solid.Subtract "Base:mono", "Base:m3_b3"
+' boolean subtract shapes: Base:mono, Base:sc_b1
+Solid.Subtract "Base:mono", "Base:sc_b1"
 
-' boolean subtract shapes: Base:mono, Base:m3_b4
-Solid.Subtract "Base:mono", "Base:m3_b4"
+' boolean subtract shapes: Base:mono, Base:sc_b2
+Solid.Subtract "Base:mono", "Base:sc_b2"
+
+' boolean subtract shapes: Base:mono, Base:sc_b3
+Solid.Subtract "Base:mono", "Base:sc_b3"
+
+' boolean subtract shapes: Base:mono, Base:sc_b4
+Solid.Subtract "Base:mono", "Base:sc_b4"
+
+' boolean subtract shapes: Base:mono, Base:sc_b5
+Solid.Subtract "Base:mono", "Base:sc_b5"
+
+' boolean subtract shapes: Base:mono, Base:sc_b6
+Solid.Subtract "Base:mono", "Base:sc_b6"
+
+' boolean subtract shapes: Base:mono, Base:sc_e0
+Solid.Subtract "Base:mono", "Base:sc_e0"
+
+' boolean subtract shapes: Base:mono, Base:sc_e1
+Solid.Subtract "Base:mono", "Base:sc_e1"
+
+' boolean subtract shapes: Base:mono, Base:sc_e2
+Solid.Subtract "Base:mono", "Base:sc_e2"
+
+' boolean subtract shapes: Base:mono, Base:sc_e3
+Solid.Subtract "Base:mono", "Base:sc_e3"
 
 ' boolean subtract shapes: Base:mono, Base:abA
 Solid.Subtract "Base:mono", "Base:abA"
@@ -6857,164 +7009,418 @@ Solid.Rename "Base:mono", "base"
 '## 31 - rename block: Tapa:mono to: Tapa:tapa
 Solid.Rename "Tapa:mono", "tapa"
 
-'## 32 - define cylinders: Tapa:hex (10)
-' define cylinder: Tapa:hex_a0
-With Cylinder
+'## 32 - define extrudes: Tapa:hex (18)
+' define extrude: Tapa:hex_a0
+With Extrude
      .Reset
      .Name "hex_a0"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "-2*xm3"
-     .Ycenter "ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-3*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_a1
-With Cylinder
+' define extrude: Tapa:hex_a1
+With Extrude
      .Reset
      .Name "hex_a1"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "-1*xm3"
-     .Ycenter "ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-2*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_a2
-With Cylinder
+' define extrude: Tapa:hex_a2
+With Extrude
      .Reset
      .Name "hex_a2"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "0*xm3"
-     .Ycenter "ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-1*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_a3
-With Cylinder
+' define extrude: Tapa:hex_a3
+With Extrude
      .Reset
      .Name "hex_a3"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "1*xm3"
-     .Ycenter "ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "0*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_a4
-With Cylinder
+' define extrude: Tapa:hex_a4
+With Extrude
      .Reset
      .Name "hex_a4"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "2*xm3"
-     .Ycenter "ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "1*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_b0
-With Cylinder
+' define extrude: Tapa:hex_a5
+With Extrude
+     .Reset
+     .Name "hex_a5"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "2*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a6
+With Extrude
+     .Reset
+     .Name "hex_a6"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "3*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b0
+With Extrude
      .Reset
      .Name "hex_b0"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "-2*xm3"
-     .Ycenter "-ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-3*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_b1
-With Cylinder
+' define extrude: Tapa:hex_b1
+With Extrude
      .Reset
      .Name "hex_b1"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "-1*xm3"
-     .Ycenter "-ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-2*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_b2
-With Cylinder
+' define extrude: Tapa:hex_b2
+With Extrude
      .Reset
      .Name "hex_b2"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "0*xm3"
-     .Ycenter "-ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-1*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_b3
-With Cylinder
+' define extrude: Tapa:hex_b3
+With Extrude
      .Reset
      .Name "hex_b3"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "1*xm3"
-     .Ycenter "-ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "0*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
-' define cylinder: Tapa:hex_b4
-With Cylinder
+' define extrude: Tapa:hex_b4
+With Extrude
      .Reset
      .Name "hex_b4"
      .Component "Tapa"
      .Material "Ni_plated"
-     .OuterRadius "(hexS/2+tpl)/0.8660254"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
-     .Xcenter "2*xm3"
-     .Ycenter "-ym3"
-     .Segments "6"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "1*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b5
+With Extrude
+     .Reset
+     .Name "hex_b5"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "2*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b6
+With Extrude
+     .Reset
+     .Name "hex_b6"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "3*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_e0
+With Extrude
+     .Reset
+     .Name "hex_e0"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-xce", "yce", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_e1
+With Extrude
+     .Reset
+     .Name "hex_e1"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "xce", "yce", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_e2
+With Extrude
+     .Reset
+     .Name "hex_e2"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-xce", "-yce", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_e3
+With Extrude
+     .Reset
+     .Name "hex_e3"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "xce", "-yce", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
      .Create
 End With
 
@@ -7034,6 +7440,12 @@ Solid.Subtract "Tapa:tapa", "Tapa:hex_a3"
 ' boolean subtract shapes: Tapa:tapa, Tapa:hex_a4
 Solid.Subtract "Tapa:tapa", "Tapa:hex_a4"
 
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a5
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a5"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a6
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a6"
+
 ' boolean subtract shapes: Tapa:tapa, Tapa:hex_b0
 Solid.Subtract "Tapa:tapa", "Tapa:hex_b0"
 
@@ -7048,6 +7460,24 @@ Solid.Subtract "Tapa:tapa", "Tapa:hex_b3"
 
 ' boolean subtract shapes: Tapa:tapa, Tapa:hex_b4
 Solid.Subtract "Tapa:tapa", "Tapa:hex_b4"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b5
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b5"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b6
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b6"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_e0
+Solid.Subtract "Tapa:tapa", "Tapa:hex_e0"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_e1
+Solid.Subtract "Tapa:tapa", "Tapa:hex_e1"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_e2
+Solid.Subtract "Tapa:tapa", "Tapa:hex_e2"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_e3
+Solid.Subtract "Tapa:tapa", "Tapa:hex_e3"
 
 '## 34 - define port: 1
 With Port

@@ -45,17 +45,17 @@ PARAMS = [
     ("ltap", "6", "profundidad de rosca (ciega) desde la cara del disco"),
     ("dcb", "3.556", "avellanado de los 4-40"),
     ("lcb", "1.016", "profundidad del avellanado"),
-    ("dpst", "1.5875", "agujero para pasador de 1/16 in"),
-    ("dprc", "1.638", "agujero de alineación de la otra diagonal"),
+    ("dprc", "1.638", "4 agujeros a 45° para los pasadores 1/16 in del extensor (valen en cualquier diagonal)"),
     ("lal", "3", "profundidad de los agujeros de alineación de brida"),
-    ("chir", "1", "1 o -1: intercambia las diagonales pasador/agujero"),
-    ("xm3", "11.5", "paso de los tornillos M3 en x"),
-    ("ym3", "11.45", "posición de los M3 en y"),
-    ("dm3", "3.4", "agujero pasante M3"),
-    ("hexS", "5.7", "entrecaras del alojamiento de tuerca M3"),
-    ("hexH", "2.6", "profundidad del alojamiento de tuerca"),
+    ("xsc", "7.7", "paso de los tornillos de cierre en x (7 por fila)"),
+    ("ysc", "7.75", "filas de tornillos en y = ±ysc (pared de 1.3 mm a la cavidad)"),
+    ("xce", "29.8", "tornillos de esquina junto a cada boca: |x|"),
+    ("yce", "10.5", "tornillos de esquina junto a cada boca: |y| (fuera del disco)"),
+    ("dsc", "2.9", "agujero pasante M2.5 (ISO 273 medio)"),
+    ("hexS", "5.2", "entrecaras del alojamiento de tuerca M2.5 (tuerca S5 + 0.2)"),
+    ("hexH", "2.3", "profundidad del alojamiento de tuerca (tuerca m = 2.0 + 0.3)"),
     ("xab", "17.25", "pasadores de centrado A/B: |x|"),
-    ("yab", "7.8", "pasadores de centrado A/B: |y|"),
+    ("yab", "14.5", "pasadores de centrado A/B: |y|"),
     ("dab", "2.8", "agujero de centrado A/B pasante (mismo en base y tapa); escariar a 3.0 H7 con las dos mitades montadas"),
 ]
 
@@ -127,6 +127,22 @@ def translate(shape, vec, reps="1", unite=True, dest=""):
     OPS.append(("translate", shape, vec, reps, unite, dest))
     _transform(shape, "Translate", [f"     .Vector {q(*vec)}", '     .UsePickedPoints "False"',
                                     '     .InvertPickedPoints "False"'], reps, True, unite, dest)
+
+
+def hexprism(comp, name, xc, yc, z0, h):
+    """Prisma hexagonal regular (entrecaras hexS+2tpl) con caras planas mirando a ±x."""
+    OPS.append(("hex", f"{comp}:{name}", xc, yc, z0, h))
+    s, k1, k2 = "(hexS/2+tpl)", "0.5773503", "1.1547005"
+    pts = [(s, f"{s}*{k1}"), ("0", f"{s}*{k2}"), (f"-{s}", f"{s}*{k1}"),
+           (f"-{s}", f"-{s}*{k1}"), ("0", f"-{s}*{k2}"), (s, f"-{s}*{k1}")]
+    add(f"define extrude: {comp}:{name}", [
+        "With Extrude", "     .Reset", f'     .Name "{name}"', f'     .Component "{comp}"',
+        f'     .Material "{MAT}"', '     .Mode "Pointlist"', f'     .Height "{h}"',
+        '     .Twist "0.0"', '     .Taper "0.0"', f'     .Origin "{xc}", "{yc}", "{z0}"',
+        '     .Uvector "1.0", "0.0", "0.0"', '     .Vvector "0.0", "1.0", "0.0"',
+        f'     .Point "{pts[0][0]}", "{pts[0][1]}"',
+        *[f'     .LineTo "{u}", "{v}"' for u, v in pts[1:]], f'     .LineTo "{pts[0][0]}", "{pts[0][1]}"',
+        "     .Create", "End With"])
 
 
 def boolean(op, a, b):
@@ -249,10 +265,10 @@ FL = [("cbT", "dcb/2+tpl", "lcb", "0", "BCfl/2"),
       ("cbB", "dcb/2+tpl", "lcb", "0", "-BCfl/2"),
       ("tpT", "dtap/2+tpl", "ltap", "0", "BCfl/2"),
       ("tpB", "dtap/2+tpl", "ltap", "0", "-BCfl/2"),
-      ("al1", "dpst/2+tpl", "lal", "chir*r45", "r45"),
-      ("al2", "dpst/2+tpl", "lal", "-chir*r45", "-r45"),
-      ("al3", "dprc/2+tpl", "lal", "-chir*r45", "r45"),
-      ("al4", "dprc/2+tpl", "lal", "chir*r45", "-r45")]
+      ("al1", "dprc/2+tpl", "lal", "r45", "r45"),
+      ("al2", "dprc/2+tpl", "lal", "-r45", "-r45"),
+      ("al3", "dprc/2+tpl", "lal", "-r45", "r45"),
+      ("al4", "dprc/2+tpl", "lal", "r45", "-r45")]
 FLT = []
 for name, r, depth, yc, zc in FL:
     FLT.append((f"{name}L", r, (f"{XDF}-0.1", f"{XDF}+{depth}"), yc, zc))
@@ -265,12 +281,15 @@ with group("boolean subtract shapes: Base:mono, taladros de brida"):
         boolean("Subtract", "Base:mono", f"Base:{name}")
 
 # ── 9. Pasantes que atraviesan las DOS mitades a la vez (antes de partir) ───
-#    M3 (10) y centrado A/B: un solo cilindro por agujero -> idéntico y concéntrico en base y tapa.
-M3 = [(f"m3_{'ab'[s]}{k}", f"{k - 2}*xm3", "ym3" if s == 0 else "-ym3") for s in (0, 1) for k in range(5)]
+#    Tornillos M2.5 (14 en dos filas + 4 de esquina junto a las bocas) y centrado A/B:
+#    un solo cilindro por agujero -> idéntico y concéntrico en base y tapa.
+SCR = [(f"sc_{'ab'[s]}{k}", f"{k - 3}*xsc", "ysc" if s == 0 else "-ysc") for s in (0, 1) for k in range(7)]
+SCR += [(f"sc_e{i}", f"{sx}xce", f"{sy}yce") for i, (sx, sy) in enumerate((("-", ""), ("", ""), ("-", "-"), ("", "-")))]
+M3 = SCR
 AB = [("abA", "-xab", "yab"), ("abB", "xab", "-yab")]
-with group("define cylinders: Base:pasantes M3 (10) y centrado A/B (2)"):
-    for name, xc, yc in M3:
-        cyl("Base", name, "z", "dm3/2+tpl", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), xc, yc)
+with group("define cylinders: Base:pasantes M2.5 (18) y centrado A/B (2)"):
+    for name, xc, yc in SCR:
+        cyl("Base", name, "z", "dsc/2+tpl", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), xc, yc)
     for name, xc, yc in AB:
         cyl("Base", name, "z", "dab/2", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), xc, yc)
 with group("boolean subtract shapes: Base:mono, pasantes"):
@@ -286,11 +305,11 @@ intersect("Tapa:mono", "Tapa:cutT")
 rename("Base:mono", "base")
 rename("Tapa:mono", "tapa")
 
-# ── 11-12. Tapa: alojamientos hexagonales de tuerca M3 (10) ─────────────────
-HEX = [(f"hex_{'ab'[s]}{k}", f"{k - 2}*xm3", "ym3" if s == 0 else "-ym3") for s in (0, 1) for k in range(5)]
-with group("define cylinders: Tapa:hex (10)"):
+# ── 11-12. Tapa: alojamientos hexagonales de tuerca (18), caras planas hacia ±x ─
+HEX = [(f"hex{n[2:]}", xc, yc) for n, xc, yc in SCR]
+with group("define extrudes: Tapa:hex (18)"):
     for name, xc, yc in HEX:
-        cyl("Tapa", name, "z", "(hexS/2+tpl)/0.8660254", (f"{ZTOP}-hexH", f"{ZTOP}+0.1"), xc, yc, seg="6")
+        hexprism("Tapa", name, xc, yc, f"{ZTOP}-hexH", "hexH+0.1")
 with group("boolean subtract shapes: Tapa:tapa, hex"):
     for name, *_ in HEX:
         boolean("Subtract", "Tapa:tapa", f"Tapa:{name}")
