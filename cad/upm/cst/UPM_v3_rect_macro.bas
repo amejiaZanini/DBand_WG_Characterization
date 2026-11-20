@@ -1,4 +1,4 @@
-' UPM v2 - macro generada por gen_cst_macro.py (no editar a mano)
+' UPM v3 - macro generada por gen_cst_macro.py (no editar a mano)
 ' Uso: proyecto CST nuevo y vacío -> Macros > Run Macro... -> este archivo.
 ' Crea los parámetros y añade cada paso al History List.
 
@@ -9,7 +9,6 @@ Sub Main ()
 
     StoreParameter "Lwg", "68.24"
     StoreParameter "Wbody", "40"
-    StoreParameter "Hhalf", "6"
     StoreParameter "aWR", "1.651"
     StoreParameter "bWR", "0.82"
     StoreParameter "zpart", "bWR/2"
@@ -26,18 +25,21 @@ Sub Main ()
     StoreParameter "Rboss", "4.7625"
     StoreParameter "tdisc", "7.112"
     StoreParameter "Rdisc", "9.525"
+    StoreParameter "Hhalf", "Rdisc+zpart"
     StoreParameter "BCfl", "14.2875"
     StoreParameter "r45", "5.051394"
-    StoreParameter "dtap", "2.2606"
-    StoreParameter "ltap", "6"
+    StoreParameter "dcl", "3.0"
+    StoreParameter "lcl", "8"
+    StoreParameter "xn0", "3.4"
+    StoreParameter "nT", "2.6"
+    StoreParameter "nW", "6.55"
+    StoreParameter "nR", "3.77"
     StoreParameter "dcb", "3.556"
     StoreParameter "lcb", "1.016"
     StoreParameter "dprc", "1.638"
     StoreParameter "lal", "3"
-    StoreParameter "xsc", "7.7"
+    StoreParameter "xsc", "7.25"
     StoreParameter "ysc", "7.75"
-    StoreParameter "xce", "29.8"
-    StoreParameter "yce", "10.5"
     StoreParameter "dsc", "2.9"
     StoreParameter "hexS", "5.2"
     StoreParameter "hexH", "2.3"
@@ -45,7 +47,7 @@ Sub Main ()
     StoreParameter "yab", "14.5"
     StoreParameter "dab", "2.8"
 
-    ' 01 - use template: WG6_Pins (UPM v2)
+    ' 01 - use template: WG6_Pins (UPM v3)
     s = ""
     s = s & "With Units" & vbCrLf
     s = s & "     .SetUnit ""Length"", ""mm""" & vbCrLf
@@ -106,7 +108,7 @@ Sub Main ()
     s = s & "     .MeshType ""PBA""" & vbCrLf
     s = s & "End With" & vbCrLf
     s = s & "ChangeSolverType(""HF Time Domain"")" & vbCrLf
-    AddToHistory "use template: WG6_Pins (UPM v2)", s
+    AddToHistory "use template: WG6_Pins (UPM v3)", s
 
     ' 02 - define material: Ni_plated
     s = ""
@@ -5116,10 +5118,10 @@ Sub Main ()
     s = s & "     .Name ""tpTL""" & vbCrLf
     s = s & "     .Component ""Base""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dtap/2+tpl""" & vbCrLf
+    s = s & "     .OuterRadius ""dcl/2+tpl""" & vbCrLf
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""x""" & vbCrLf
-    s = s & "     .Xrange ""(-Lwg/2+tboss)-0.1"", ""(-Lwg/2+tboss)+ltap""" & vbCrLf
+    s = s & "     .Xrange ""(-Lwg/2+tboss)-0.1"", ""(-Lwg/2+tboss)+lcl""" & vbCrLf
     s = s & "     .Ycenter ""0""" & vbCrLf
     s = s & "     .Zcenter ""BCfl/2""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
@@ -5132,10 +5134,10 @@ Sub Main ()
     s = s & "     .Name ""tpTR""" & vbCrLf
     s = s & "     .Component ""Base""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dtap/2+tpl""" & vbCrLf
+    s = s & "     .OuterRadius ""dcl/2+tpl""" & vbCrLf
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""x""" & vbCrLf
-    s = s & "     .Xrange ""(Lwg/2-tboss)-ltap"", ""(Lwg/2-tboss)+0.1""" & vbCrLf
+    s = s & "     .Xrange ""(Lwg/2-tboss)-lcl"", ""(Lwg/2-tboss)+0.1""" & vbCrLf
     s = s & "     .Ycenter ""-(0)""" & vbCrLf
     s = s & "     .Zcenter ""BCfl/2""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
@@ -5148,10 +5150,10 @@ Sub Main ()
     s = s & "     .Name ""tpBL""" & vbCrLf
     s = s & "     .Component ""Base""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dtap/2+tpl""" & vbCrLf
+    s = s & "     .OuterRadius ""dcl/2+tpl""" & vbCrLf
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""x""" & vbCrLf
-    s = s & "     .Xrange ""(-Lwg/2+tboss)-0.1"", ""(-Lwg/2+tboss)+ltap""" & vbCrLf
+    s = s & "     .Xrange ""(-Lwg/2+tboss)-0.1"", ""(-Lwg/2+tboss)+lcl""" & vbCrLf
     s = s & "     .Ycenter ""0""" & vbCrLf
     s = s & "     .Zcenter ""-BCfl/2""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
@@ -5164,10 +5166,10 @@ Sub Main ()
     s = s & "     .Name ""tpBR""" & vbCrLf
     s = s & "     .Component ""Base""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dtap/2+tpl""" & vbCrLf
+    s = s & "     .OuterRadius ""dcl/2+tpl""" & vbCrLf
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""x""" & vbCrLf
-    s = s & "     .Xrange ""(Lwg/2-tboss)-ltap"", ""(Lwg/2-tboss)+0.1""" & vbCrLf
+    s = s & "     .Xrange ""(Lwg/2-tboss)-lcl"", ""(Lwg/2-tboss)+0.1""" & vbCrLf
     s = s & "     .Ycenter ""-(0)""" & vbCrLf
     s = s & "     .Zcenter ""-BCfl/2""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
@@ -5366,7 +5368,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-3*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-4*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5382,7 +5384,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-2*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-3*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5398,7 +5400,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-1*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-2*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5414,7 +5416,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""0*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-1*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5430,7 +5432,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""1*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""0*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5446,7 +5448,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""2*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""1*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5462,7 +5464,39 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
+    s = s & "     .Xcenter ""2*xsc""" & vbCrLf
+    s = s & "     .Ycenter ""ysc""" & vbCrLf
+    s = s & "     .Segments ""0""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define cylinder: Base:sc_a7" & vbCrLf
+    s = s & "With Cylinder" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""sc_a7""" & vbCrLf
+    s = s & "     .Component ""Base""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
+    s = s & "     .InnerRadius ""0.0""" & vbCrLf
+    s = s & "     .Axis ""z""" & vbCrLf
+    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
     s = s & "     .Xcenter ""3*xsc""" & vbCrLf
+    s = s & "     .Ycenter ""ysc""" & vbCrLf
+    s = s & "     .Segments ""0""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define cylinder: Base:sc_a8" & vbCrLf
+    s = s & "With Cylinder" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""sc_a8""" & vbCrLf
+    s = s & "     .Component ""Base""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
+    s = s & "     .InnerRadius ""0.0""" & vbCrLf
+    s = s & "     .Axis ""z""" & vbCrLf
+    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
+    s = s & "     .Xcenter ""4*xsc""" & vbCrLf
     s = s & "     .Ycenter ""ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5478,7 +5512,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-3*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-4*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5494,7 +5528,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-2*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-3*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5510,7 +5544,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-1*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-2*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5526,7 +5560,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""0*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""-1*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5542,7 +5576,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""1*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""0*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5558,7 +5592,7 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""2*xsc""" & vbCrLf
+    s = s & "     .Xcenter ""1*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
@@ -5574,72 +5608,40 @@ Sub Main ()
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
+    s = s & "     .Xcenter ""2*xsc""" & vbCrLf
+    s = s & "     .Ycenter ""-ysc""" & vbCrLf
+    s = s & "     .Segments ""0""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define cylinder: Base:sc_b7" & vbCrLf
+    s = s & "With Cylinder" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""sc_b7""" & vbCrLf
+    s = s & "     .Component ""Base""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
+    s = s & "     .InnerRadius ""0.0""" & vbCrLf
+    s = s & "     .Axis ""z""" & vbCrLf
+    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
     s = s & "     .Xcenter ""3*xsc""" & vbCrLf
     s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
     s = s & "End With" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' define cylinder: Base:sc_e0" & vbCrLf
+    s = s & "' define cylinder: Base:sc_b8" & vbCrLf
     s = s & "With Cylinder" & vbCrLf
     s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""sc_e0""" & vbCrLf
+    s = s & "     .Name ""sc_b8""" & vbCrLf
     s = s & "     .Component ""Base""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
     s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
     s = s & "     .InnerRadius ""0.0""" & vbCrLf
     s = s & "     .Axis ""z""" & vbCrLf
     s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-xce""" & vbCrLf
-    s = s & "     .Ycenter ""yce""" & vbCrLf
-    s = s & "     .Segments ""0""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define cylinder: Base:sc_e1" & vbCrLf
-    s = s & "With Cylinder" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""sc_e1""" & vbCrLf
-    s = s & "     .Component ""Base""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
-    s = s & "     .InnerRadius ""0.0""" & vbCrLf
-    s = s & "     .Axis ""z""" & vbCrLf
-    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""xce""" & vbCrLf
-    s = s & "     .Ycenter ""yce""" & vbCrLf
-    s = s & "     .Segments ""0""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define cylinder: Base:sc_e2" & vbCrLf
-    s = s & "With Cylinder" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""sc_e2""" & vbCrLf
-    s = s & "     .Component ""Base""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
-    s = s & "     .InnerRadius ""0.0""" & vbCrLf
-    s = s & "     .Axis ""z""" & vbCrLf
-    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""-xce""" & vbCrLf
-    s = s & "     .Ycenter ""-yce""" & vbCrLf
-    s = s & "     .Segments ""0""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define cylinder: Base:sc_e3" & vbCrLf
-    s = s & "With Cylinder" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""sc_e3""" & vbCrLf
-    s = s & "     .Component ""Base""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .OuterRadius ""dsc/2+tpl""" & vbCrLf
-    s = s & "     .InnerRadius ""0.0""" & vbCrLf
-    s = s & "     .Axis ""z""" & vbCrLf
-    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""(zpart+Hhalf)+0.1""" & vbCrLf
-    s = s & "     .Xcenter ""xce""" & vbCrLf
-    s = s & "     .Ycenter ""-yce""" & vbCrLf
+    s = s & "     .Xcenter ""4*xsc""" & vbCrLf
+    s = s & "     .Ycenter ""-ysc""" & vbCrLf
     s = s & "     .Segments ""0""" & vbCrLf
     s = s & "     .Create" & vbCrLf
     s = s & "End With" & vbCrLf
@@ -5700,6 +5702,12 @@ Sub Main ()
     s = s & "' boolean subtract shapes: Base:mono, Base:sc_a6" & vbCrLf
     s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_a6""" & vbCrLf
     s = s & "" & vbCrLf
+    s = s & "' boolean subtract shapes: Base:mono, Base:sc_a7" & vbCrLf
+    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_a7""" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' boolean subtract shapes: Base:mono, Base:sc_a8" & vbCrLf
+    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_a8""" & vbCrLf
+    s = s & "" & vbCrLf
     s = s & "' boolean subtract shapes: Base:mono, Base:sc_b0" & vbCrLf
     s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_b0""" & vbCrLf
     s = s & "" & vbCrLf
@@ -5721,17 +5729,11 @@ Sub Main ()
     s = s & "' boolean subtract shapes: Base:mono, Base:sc_b6" & vbCrLf
     s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_b6""" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Base:mono, Base:sc_e0" & vbCrLf
-    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_e0""" & vbCrLf
+    s = s & "' boolean subtract shapes: Base:mono, Base:sc_b7" & vbCrLf
+    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_b7""" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Base:mono, Base:sc_e1" & vbCrLf
-    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_e1""" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Base:mono, Base:sc_e2" & vbCrLf
-    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_e2""" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Base:mono, Base:sc_e3" & vbCrLf
-    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_e3""" & vbCrLf
+    s = s & "' boolean subtract shapes: Base:mono, Base:sc_b8" & vbCrLf
+    s = s & "Solid.Subtract ""Base:mono"", ""Base:sc_b8""" & vbCrLf
     s = s & "" & vbCrLf
     s = s & "' boolean subtract shapes: Base:mono, Base:abA" & vbCrLf
     s = s & "Solid.Subtract ""Base:mono"", ""Base:abA""" & vbCrLf
@@ -5815,7 +5817,83 @@ Sub Main ()
     s = s & "Solid.Rename ""Tapa:mono"", ""tapa""" & vbCrLf
     AddToHistory "rename block: Tapa:mono to: Tapa:tapa", s
 
-    ' 32 - define extrudes: Tapa:hex (18)
+    ' 32 - define brick: Tapa:nutL
+    s = ""
+    s = s & "With Brick" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""nutL""" & vbCrLf
+    s = s & "     .Component ""Tapa""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Xrange ""(-Lwg/2+tboss)+xn0"", ""(-Lwg/2+tboss)+xn0+nT""" & vbCrLf
+    s = s & "     .Yrange ""-nW/2"", ""nW/2""" & vbCrLf
+    s = s & "     .Zrange ""BCfl/2-nR"", ""(zpart+Hhalf)+0.1""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    AddToHistory "define brick: Tapa:nutL", s
+
+    ' 33 - boolean subtract shapes: Tapa:tapa, Tapa:nutL
+    s = ""
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:nutL""" & vbCrLf
+    AddToHistory "boolean subtract shapes: Tapa:tapa, Tapa:nutL", s
+
+    ' 34 - define brick: Tapa:nutR
+    s = ""
+    s = s & "With Brick" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""nutR""" & vbCrLf
+    s = s & "     .Component ""Tapa""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Xrange ""(Lwg/2-tboss)-xn0-nT"", ""(Lwg/2-tboss)-xn0""" & vbCrLf
+    s = s & "     .Yrange ""-nW/2"", ""nW/2""" & vbCrLf
+    s = s & "     .Zrange ""BCfl/2-nR"", ""(zpart+Hhalf)+0.1""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    AddToHistory "define brick: Tapa:nutR", s
+
+    ' 35 - boolean subtract shapes: Tapa:tapa, Tapa:nutR
+    s = ""
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:nutR""" & vbCrLf
+    AddToHistory "boolean subtract shapes: Tapa:tapa, Tapa:nutR", s
+
+    ' 36 - define brick: Base:nutL
+    s = ""
+    s = s & "With Brick" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""nutL""" & vbCrLf
+    s = s & "     .Component ""Base""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Xrange ""(-Lwg/2+tboss)+xn0"", ""(-Lwg/2+tboss)+xn0+nT""" & vbCrLf
+    s = s & "     .Yrange ""-nW/2"", ""nW/2""" & vbCrLf
+    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""-BCfl/2+nR""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    AddToHistory "define brick: Base:nutL", s
+
+    ' 37 - boolean subtract shapes: Base:base, Base:nutL
+    s = ""
+    s = s & "Solid.Subtract ""Base:base"", ""Base:nutL""" & vbCrLf
+    AddToHistory "boolean subtract shapes: Base:base, Base:nutL", s
+
+    ' 38 - define brick: Base:nutR
+    s = ""
+    s = s & "With Brick" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""nutR""" & vbCrLf
+    s = s & "     .Component ""Base""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Xrange ""(Lwg/2-tboss)-xn0-nT"", ""(Lwg/2-tboss)-xn0""" & vbCrLf
+    s = s & "     .Yrange ""-nW/2"", ""nW/2""" & vbCrLf
+    s = s & "     .Zrange ""(zpart-Hhalf)-0.1"", ""-BCfl/2+nR""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    AddToHistory "define brick: Base:nutR", s
+
+    ' 39 - boolean subtract shapes: Base:base, Base:nutR
+    s = ""
+    s = s & "Solid.Subtract ""Base:base"", ""Base:nutR""" & vbCrLf
+    AddToHistory "boolean subtract shapes: Base:base, Base:nutR", s
+
+    ' 40 - define extrudes: Tapa:hex (18)
     s = ""
     s = s & "' define extrude: Tapa:hex_a0" & vbCrLf
     s = s & "With Extrude" & vbCrLf
@@ -5827,7 +5905,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-3*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-4*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5850,7 +5928,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-2*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-3*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5873,7 +5951,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-1*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-2*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5896,7 +5974,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""0*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-1*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5919,7 +5997,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""1*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""0*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5942,7 +6020,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""2*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""1*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5965,7 +6043,53 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
+    s = s & "     .Origin ""2*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
+    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
+    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define extrude: Tapa:hex_a7" & vbCrLf
+    s = s & "With Extrude" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""hex_a7""" & vbCrLf
+    s = s & "     .Component ""Tapa""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Mode ""Pointlist""" & vbCrLf
+    s = s & "     .Height ""hexH+0.1""" & vbCrLf
+    s = s & "     .Twist ""0.0""" & vbCrLf
+    s = s & "     .Taper ""0.0""" & vbCrLf
     s = s & "     .Origin ""3*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
+    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
+    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define extrude: Tapa:hex_a8" & vbCrLf
+    s = s & "With Extrude" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""hex_a8""" & vbCrLf
+    s = s & "     .Component ""Tapa""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Mode ""Pointlist""" & vbCrLf
+    s = s & "     .Height ""hexH+0.1""" & vbCrLf
+    s = s & "     .Twist ""0.0""" & vbCrLf
+    s = s & "     .Taper ""0.0""" & vbCrLf
+    s = s & "     .Origin ""4*xsc"", ""ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -5988,7 +6112,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-3*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-4*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6011,7 +6135,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-2*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-3*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6034,7 +6158,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-1*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-2*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6057,7 +6181,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""0*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""-1*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6080,7 +6204,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""1*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""0*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6103,7 +6227,7 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""2*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""1*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6126,6 +6250,29 @@ Sub Main ()
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
+    s = s & "     .Origin ""2*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
+    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
+    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
+    s = s & "     .Create" & vbCrLf
+    s = s & "End With" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' define extrude: Tapa:hex_b7" & vbCrLf
+    s = s & "With Extrude" & vbCrLf
+    s = s & "     .Reset" & vbCrLf
+    s = s & "     .Name ""hex_b7""" & vbCrLf
+    s = s & "     .Component ""Tapa""" & vbCrLf
+    s = s & "     .Material ""Ni_plated""" & vbCrLf
+    s = s & "     .Mode ""Pointlist""" & vbCrLf
+    s = s & "     .Height ""hexH+0.1""" & vbCrLf
+    s = s & "     .Twist ""0.0""" & vbCrLf
+    s = s & "     .Taper ""0.0""" & vbCrLf
     s = s & "     .Origin ""3*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
@@ -6139,86 +6286,17 @@ Sub Main ()
     s = s & "     .Create" & vbCrLf
     s = s & "End With" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' define extrude: Tapa:hex_e0" & vbCrLf
+    s = s & "' define extrude: Tapa:hex_b8" & vbCrLf
     s = s & "With Extrude" & vbCrLf
     s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""hex_e0""" & vbCrLf
+    s = s & "     .Name ""hex_b8""" & vbCrLf
     s = s & "     .Component ""Tapa""" & vbCrLf
     s = s & "     .Material ""Ni_plated""" & vbCrLf
     s = s & "     .Mode ""Pointlist""" & vbCrLf
     s = s & "     .Height ""hexH+0.1""" & vbCrLf
     s = s & "     .Twist ""0.0""" & vbCrLf
     s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-xce"", ""yce"", ""(zpart+Hhalf)-hexH""" & vbCrLf
-    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
-    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
-    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define extrude: Tapa:hex_e1" & vbCrLf
-    s = s & "With Extrude" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""hex_e1""" & vbCrLf
-    s = s & "     .Component ""Tapa""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .Mode ""Pointlist""" & vbCrLf
-    s = s & "     .Height ""hexH+0.1""" & vbCrLf
-    s = s & "     .Twist ""0.0""" & vbCrLf
-    s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""xce"", ""yce"", ""(zpart+Hhalf)-hexH""" & vbCrLf
-    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
-    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
-    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define extrude: Tapa:hex_e2" & vbCrLf
-    s = s & "With Extrude" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""hex_e2""" & vbCrLf
-    s = s & "     .Component ""Tapa""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .Mode ""Pointlist""" & vbCrLf
-    s = s & "     .Height ""hexH+0.1""" & vbCrLf
-    s = s & "     .Twist ""0.0""" & vbCrLf
-    s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""-xce"", ""-yce"", ""(zpart+Hhalf)-hexH""" & vbCrLf
-    s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
-    s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
-    s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""-(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""0"", ""-(hexS/2+tpl)*1.1547005""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""-(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .LineTo ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
-    s = s & "     .Create" & vbCrLf
-    s = s & "End With" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' define extrude: Tapa:hex_e3" & vbCrLf
-    s = s & "With Extrude" & vbCrLf
-    s = s & "     .Reset" & vbCrLf
-    s = s & "     .Name ""hex_e3""" & vbCrLf
-    s = s & "     .Component ""Tapa""" & vbCrLf
-    s = s & "     .Material ""Ni_plated""" & vbCrLf
-    s = s & "     .Mode ""Pointlist""" & vbCrLf
-    s = s & "     .Height ""hexH+0.1""" & vbCrLf
-    s = s & "     .Twist ""0.0""" & vbCrLf
-    s = s & "     .Taper ""0.0""" & vbCrLf
-    s = s & "     .Origin ""xce"", ""-yce"", ""(zpart+Hhalf)-hexH""" & vbCrLf
+    s = s & "     .Origin ""4*xsc"", ""-ysc"", ""(zpart+Hhalf)-hexH""" & vbCrLf
     s = s & "     .Uvector ""1.0"", ""0.0"", ""0.0""" & vbCrLf
     s = s & "     .Vvector ""0.0"", ""1.0"", ""0.0""" & vbCrLf
     s = s & "     .Point ""(hexS/2+tpl)"", ""(hexS/2+tpl)*0.5773503""" & vbCrLf
@@ -6232,7 +6310,7 @@ Sub Main ()
     s = s & "End With" & vbCrLf
     AddToHistory "define extrudes: Tapa:hex (18)", s
 
-    ' 33 - boolean subtract shapes: Tapa:tapa, hex
+    ' 41 - boolean subtract shapes: Tapa:tapa, hex
     s = ""
     s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_a0" & vbCrLf
     s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_a0""" & vbCrLf
@@ -6255,6 +6333,12 @@ Sub Main ()
     s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_a6" & vbCrLf
     s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_a6""" & vbCrLf
     s = s & "" & vbCrLf
+    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_a7" & vbCrLf
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_a7""" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_a8" & vbCrLf
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_a8""" & vbCrLf
+    s = s & "" & vbCrLf
     s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_b0" & vbCrLf
     s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_b0""" & vbCrLf
     s = s & "" & vbCrLf
@@ -6276,20 +6360,14 @@ Sub Main ()
     s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_b6" & vbCrLf
     s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_b6""" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_e0" & vbCrLf
-    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_e0""" & vbCrLf
+    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_b7" & vbCrLf
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_b7""" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_e1" & vbCrLf
-    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_e1""" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_e2" & vbCrLf
-    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_e2""" & vbCrLf
-    s = s & "" & vbCrLf
-    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_e3" & vbCrLf
-    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_e3""" & vbCrLf
+    s = s & "' boolean subtract shapes: Tapa:tapa, Tapa:hex_b8" & vbCrLf
+    s = s & "Solid.Subtract ""Tapa:tapa"", ""Tapa:hex_b8""" & vbCrLf
     AddToHistory "boolean subtract shapes: Tapa:tapa, hex", s
 
-    ' 34 - define port: 1
+    ' 42 - define port: 1
     s = ""
     s = s & "With Port" & vbCrLf
     s = s & "     .Reset" & vbCrLf
@@ -6318,7 +6396,7 @@ Sub Main ()
     s = s & "End With" & vbCrLf
     AddToHistory "define port: 1", s
 
-    ' 35 - define port: 2
+    ' 43 - define port: 2
     s = ""
     s = s & "With Port" & vbCrLf
     s = s & "     .Reset" & vbCrLf
@@ -6347,7 +6425,7 @@ Sub Main ()
     s = s & "End With" & vbCrLf
     AddToHistory "define port: 2", s
 
-    ' 36 - define time domain solver parameters
+    ' 44 - define time domain solver parameters
     s = ""
     s = s & "Mesh.SetCreator ""High Frequency""" & vbCrLf
     s = s & "With Solver" & vbCrLf
@@ -6369,5 +6447,5 @@ Sub Main ()
     s = s & "End With" & vbCrLf
     AddToHistory "define time domain solver parameters", s
 
-    MsgBox "UPM v2: 36 pasos añadidos al historial.", vbInformation
+    MsgBox "UPM v3: 44 pasos añadidos al historial.", vbInformation
 End Sub

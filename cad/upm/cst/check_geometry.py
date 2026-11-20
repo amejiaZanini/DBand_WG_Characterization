@@ -1,6 +1,6 @@
 """Ejecuta las MISMAS operaciones de gen_cst_macro.py con un motor CSG (manifold3d)
 para comprobar el modelo antes de abrir CST: piezas finales, número de pines,
-interferencias y cortes. Genera UPM_v2_check.png.
+interferencias y cortes. Genera UPM_v3_check.png.
 
 Uso:  python check_geometry.py [rect] [tpl]      (requiere manifold3d, numpy y matplotlib)
 """
@@ -188,7 +188,7 @@ ax.set_title("Corte ZY a 0.5 mm de la cara del disco (brida izquierda)", fontsiz
 ax.set_xlim(-21, 21); ax.set_ylim(-11, 11); ax.set_aspect("equal"); ax.tick_params(labelsize=8)
 
 fig.tight_layout()
-out = Path(__file__).resolve().parent / f"UPM_v2{G.SUFFIX}_check.png"
+out = Path(__file__).resolve().parent / f"UPM_v3{G.SUFFIX}_check.png"
 fig.savefig(out, dpi=110, facecolor="white")
 print(out)
 
@@ -246,30 +246,39 @@ R = sorted((round(-u, 3), round(-v, 3), round(d, 3)) for u, v, d in fr)
 print(f"  brida derecha = izquierda girada 180°: {'SÍ' if L == R else 'NO'}  ({len(L)} agujeros por brida)")
 
 # Holguras mínimas (analíticas, con tpl)
-rh_flat = P["hexS"] / 2 + P["tpl"]                 # semientrecaras (hacia ±x)
+rh_flat = P["hexS"] / 2 + P["tpl"]                 # semientrecaras de la tuerca M2.5 (hacia ±x)
 rh_vert = rh_flat / 0.8660254                      # semidiagonal (hacia ±y)
-rs = P["dsc"] / 2 + P["tpl"]
-ztop = zp + P["Hhalf"]
-y_up = math.sqrt(P["Rdisc"] ** 2 - ztop ** 2)       # el disco asoma sobre la tapa si |y| < y_up
-y_dn = math.sqrt(P["Rdisc"] ** 2 - (zp - P["Hhalf"]) ** 2)
-x_disc = P["Lwg"] / 2 - P["tboss"] - P["tdisc"]
-x_end = P["Lwg"] / 2 - P["tboss"]
-xrow = 3 * P["xsc"]
-chk = [
-    ("pared tornillo de fila - cavidad", P["ysc"] - rs - P["Wcav"] / 2 - P["tpl"]),
-    ("resina entre tuercas vecinas (caras planas)", P["xsc"] - 2 * rh_flat),
-    ("tuerca exterior de fila - disco que asoma", x_disc - xrow - rh_flat),
-    ("tuerca de esquina - disco que asoma (en y)", P["yce"] - rh_vert - y_up),
-    ("tuerca de esquina - cara de brida (en x)", x_end - P["xce"] - rh_flat),
-    ("cabeza M2.5 (Ø4.5) de esquina - disco bajo la base", P["yce"] - 2.25 - y_dn),
-    ("tuerca de esquina - tuerca de fila", math.hypot(P["xce"] - xrow, P["yce"] - P["ysc"]) - 2 * rh_vert),
-    ("agujero A/B - tuerca más cercana", min(math.hypot(P["xab"] - x, P["yab"] - y) for x, y in
-     [(k * P["xsc"], P["ysc"]) for k in range(-3, 4)] + [(P["xce"], P["yce"])]) - rh_vert - P["dab"] / 2),
-    ("agujero A/B - borde exterior", P["Wbody"] / 2 - P["yab"] - P["dab"] / 2),
+rs = P["dsc"] / 2 + P["tpl"]                       # agujero M2.5
+ra = P["dprc"] / 2 + P["tpl"]                      # agujeros a 45° de la brida
+x_end = P["Lwg"] / 2 - P["tboss"]                  # cara del disco
+xrow = 4 * P["xsc"]                                # tornillo extremo de cada fila
+rows = [(k * P["xsc"], P["ysc"]) for k in range(-4, 5)]
+
+
+def gap2(dx, dy):
+    """Separación entre dos cuerpos separados en x y/o y (negativo si se solapan en ambos)."""
+    return math.hypot(max(dx, 0), max(dy, 0)) if (dx > 0 or dy > 0) else max(dx, dy)
+
+
+chk = [  # (texto, valor, mínimo aceptable)
+    ("caras exteriores planas (bloque cubre el disco)", P["Hhalf"] - (P["Rdisc"] + zp), 0.0),
+    ("pared tornillo M2.5 - cavidad", P["ysc"] - rs - P["Wcav"] / 2 - P["tpl"], 0.4),
+    ("resina entre tuercas M2.5 vecinas (caras planas)", P["xsc"] - 2 * rh_flat, 0.4),
+    ("tuerca M2.5 extrema - cara de brida", x_end - xrow - rh_flat, 0.4),
+    ("tornillo M2.5 extremo - agujero a 45° de brida",
+     gap2(x_end - P["lal"] - (xrow + rs), P["ysc"] - rs - (P["r45"] + ra)), 0.4),
+    ("ranura tuerca 4-40 - agujero a 45° de brida", gap2(P["xn0"] - P["lal"], P["r45"] - ra - P["nW"] / 2), 0.4),
+    ("ranura tuerca 4-40 - tornillo M2.5", P["ysc"] - rs - P["nW"] / 2, 0.4),
+    ("ranura tuerca 4-40 - alojamiento tuerca M2.5", P["ysc"] - rh_vert - P["nW"] / 2, 0.4),
+    ("resina entre ranura 4-40 y cavidad/canal", P["BCfl"] / 2 - P["nR"] - zp, 0.4),
+    ("resina que sujeta la tuerca 4-40 (cara - ranura)", P["xn0"] - P["lcb"], 1.0),
+    ("agujero A/B - tuerca M2.5 más cercana",
+     min(math.hypot(P["xab"] - x, P["yab"] - y) for x, y in rows) - rh_vert - P["dab"] / 2, 0.4),
+    ("agujero A/B - borde exterior", P["Wbody"] / 2 - P["yab"] - P["dab"] / 2, 0.4),
 ]
 print("\nHolguras mínimas (mm):")
-for txt, v in chk:
-    print(f"  {txt:<52}{v:7.2f}  {'OK' if v >= 0.4 else 'REVISAR'}")
+for txt, v, vmin in chk:
+    print(f"  {txt:<52}{v:7.2f}  {'OK' if v >= vmin - 1e-9 else 'REVISAR'}")
 
 # Figura de alineación: cara de unión de la base con los agujeros de la tapa superpuestos
 fig, axs = plt.subplots(1, 3, figsize=(19, 6.4), gridspec_kw=dict(width_ratios=[2.2, 1, 1]))
@@ -297,6 +306,6 @@ for ax, ((x0, y0), n) in zip(axs[1:], names.items()):
             f"desvío {1000 * math.hypot(xt - xb, yt - yb):.2f} µm", transform=ax.transAxes, ha="center",
             fontsize=10, bbox=dict(fc="white", ec="0.7"))
 fig.tight_layout()
-out2 = Path(__file__).resolve().parent / f"UPM_v2{G.SUFFIX}_alineacion.png"
+out2 = Path(__file__).resolve().parent / f"UPM_v3{G.SUFFIX}_alineacion.png"
 fig.savefig(out2, dpi=110, facecolor="white")
 print(out2)

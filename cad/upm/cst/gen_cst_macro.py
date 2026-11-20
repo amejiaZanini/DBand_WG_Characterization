@@ -1,9 +1,9 @@
-"""Genera la macro CST (VBA) que reconstruye el prototipo UPM v2 con un historial limpio.
+"""Genera la macro CST (VBA) que reconstruye el prototipo UPM v3 con un historial limpio.
 
 Salidas (en esta carpeta):
-  UPM_v2_macro.bas    -> Macros > Run Macro en un proyecto CST vacío.
+  UPM_v3_macro.bas    -> Macros > Run Macro en un proyecto CST vacío.
                          Crea los parámetros y añade cada paso al History List.
-  UPM_v2_history.txt  -> los mismos pasos en texto plano (para leerlos o pegarlos
+  UPM_v3_history.txt  -> los mismos pasos en texto plano (para leerlos o pegarlos
                          a mano en History List > Edit).
 
 Marco de referencia (centrado):
@@ -20,7 +20,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 # Forma de los pines: "round" (cilíndricos, por defecto) o "rect" (rectangulares).
-#   python gen_cst_macro.py rect   ->  UPM_v2_rect_macro.bas / UPM_v2_rect_history.txt
+#   python gen_cst_macro.py rect   ->  UPM_v3_rect_macro.bas / UPM_v3_rect_history.txt
 PIN_SHAPE = (sys.argv[1] if __name__ == "__main__" and len(sys.argv) > 1
              else os.environ.get("UPM_PINS", "round"))
 assert PIN_SHAPE in ("round", "rect"), PIN_SHAPE
@@ -31,7 +31,6 @@ MAT = "Ni_plated"
 PARAMS = [
     ("Lwg", "68.24", "longitud boca a boca (cara del resalte a cara del resalte)"),
     ("Wbody", "40", "ancho del cuerpo en y (las dos mitades iguales)"),
-    ("Hhalf", "6", "espesor de cada mitad medido desde el plano de partición"),
     ("aWR", "1.651", "ancho de la boca WR-6.5"),
     ("bWR", "0.82", "alto de la boca y de la cámara de pines"),
     ("zpart", "bWR/2", "plano de partición = techo de la cavidad (tapa plana)"),
@@ -50,18 +49,21 @@ PARAMS = [
     ("Rboss", "4.7625", "radio del resalte"),
     ("tdisc", "7.112", "espesor del disco de brida (dentro de Lwg)"),
     ("Rdisc", "9.525", "radio del disco de brida"),
+    ("Hhalf", "Rdisc+zpart", "espesor de cada mitad: cubre el disco -> caras exteriores planas"),
     ("BCfl", "14.2875", "diámetro del círculo de tornillos de la brida"),
     ("r45", "5.051394", "BCfl/2 * cos(45)"),
-    ("dtap", "2.2606", "taladro de rosca 4-40"),
-    ("ltap", "6", "profundidad de rosca (ciega) desde la cara del disco"),
+    ("dcl", "3.0", "paso libre del tornillo 4-40 de la brida"),
+    ("lcl", "8", "profundidad del paso libre desde la cara del disco"),
+    ("xn0", "3.4", "inicio de la ranura de la tuerca 4-40 desde la cara del disco"),
+    ("nT", "2.6", "espesor de la ranura (tuerca 4-40: 2.38)"),
+    ("nW", "6.55", "ancho de la ranura (tuerca 4-40: 6.35 entrecaras)"),
+    ("nR", "3.77", "semialtura de la ranura bajo el eje del tornillo (semidiagonal 3.67 + 0.1)"),
     ("dcb", "3.556", "avellanado de los 4-40"),
     ("lcb", "1.016", "profundidad del avellanado"),
     ("dprc", "1.638", "4 agujeros a 45° para los pasadores 1/16 in del extensor (valen en cualquier diagonal)"),
     ("lal", "3", "profundidad de los agujeros de alineación de brida"),
-    ("xsc", "7.7", "paso de los tornillos de cierre en x (7 por fila)"),
+    ("xsc", "7.25", "paso de los tornillos de cierre en x (9 por fila, hasta las bocas)"),
     ("ysc", "7.75", "filas de tornillos en y = ±ysc (pared de 1.3 mm a la cavidad)"),
-    ("xce", "29.8", "tornillos de esquina junto a cada boca: |x|"),
-    ("yce", "10.5", "tornillos de esquina junto a cada boca: |y| (fuera del disco)"),
     ("dsc", "2.9", "agujero pasante M2.5 (ISO 273 medio)"),
     ("hexS", "5.2", "entrecaras del alojamiento de tuerca M2.5 (tuerca S5 + 0.2)"),
     ("hexH", "2.3", "profundidad del alojamiento de tuerca (tuerca m = 2.0 + 0.3)"),
@@ -173,7 +175,7 @@ def intersect(a, b):
 
 
 # ── 1. Plantilla (copiada de tu WG6_Pins.cfg) ───────────────────────────────
-add("use template: WG6_Pins (UPM v2)", """With Units
+add("use template: WG6_Pins (UPM v3)", """With Units
      .SetUnit "Length", "mm"
      .SetUnit "Frequency", "GHz"
      .SetUnit "Voltage", "V"
@@ -280,8 +282,8 @@ with group("boolean add shapes: Base:mono, Base:pin (316)"):
 # ── 8. Taladros de brida: izquierda y derecha (= izquierda girada 180° en z) ─
 FL = [("cbT", "dcb/2+tpl", "lcb", "0", "BCfl/2"),
       ("cbB", "dcb/2+tpl", "lcb", "0", "-BCfl/2"),
-      ("tpT", "dtap/2+tpl", "ltap", "0", "BCfl/2"),
-      ("tpB", "dtap/2+tpl", "ltap", "0", "-BCfl/2"),
+      ("tpT", "dcl/2+tpl", "lcl", "0", "BCfl/2"),
+      ("tpB", "dcl/2+tpl", "lcl", "0", "-BCfl/2"),
       ("al1", "dprc/2+tpl", "lal", "r45", "r45"),
       ("al2", "dprc/2+tpl", "lal", "-r45", "-r45"),
       ("al3", "dprc/2+tpl", "lal", "-r45", "r45"),
@@ -300,8 +302,7 @@ with group("boolean subtract shapes: Base:mono, taladros de brida"):
 # ── 9. Pasantes que atraviesan las DOS mitades a la vez (antes de partir) ───
 #    Tornillos M2.5 (14 en dos filas + 4 de esquina junto a las bocas) y centrado A/B:
 #    un solo cilindro por agujero -> idéntico y concéntrico en base y tapa.
-SCR = [(f"sc_{'ab'[s]}{k}", f"{k - 3}*xsc", "ysc" if s == 0 else "-ysc") for s in (0, 1) for k in range(7)]
-SCR += [(f"sc_e{i}", f"{sx}xce", f"{sy}yce") for i, (sx, sy) in enumerate((("-", ""), ("", ""), ("-", "-"), ("", "-")))]
+SCR = [(f"sc_{'ab'[s]}{k}", f"{k - 4}*xsc", "ysc" if s == 0 else "-ysc") for s in (0, 1) for k in range(9)]
 M3 = SCR
 AB = [("abA", "-xab", "yab"), ("abB", "xab", "-yab")]
 with group("define cylinders: Base:pasantes M2.5 (18) y centrado A/B (2)"):
@@ -321,6 +322,12 @@ intersect("Base:mono", "Base:cutB")
 intersect("Tapa:mono", "Tapa:cutT")
 rename("Base:mono", "base")
 rename("Tapa:mono", "tapa")
+
+# ── 10b. Ranuras para tuerca 4-40 cautiva (la brida ya no rosca en resina) ─
+for comp, tgt, zr in (("Tapa", "tapa", ("BCfl/2-nR", f"{ZTOP}+0.1")), ("Base", "base", (f"{ZBOT}-0.1", "-BCfl/2+nR"))):
+    for side, xr in (("L", (f"{XDF}+xn0", f"{XDF}+xn0+nT")), ("R", (f"{XDFR}-xn0-nT", f"{XDFR}-xn0"))):
+        brick(comp, f"nut{side}", xr, ("-nW/2", "nW/2"), zr)
+        boolean("Subtract", f"{comp}:{tgt}", f"{comp}:nut{side}")
 
 # ── 11-12. Tapa: alojamientos hexagonales de tuerca (18), caras planas hacia ±x ─
 HEX = [(f"hex{n[2:]}", xc, yc) for n, xc, yc in SCR]
@@ -376,9 +383,9 @@ def vb_str(text):
 
 
 def main():
-    hist = ["' UPM v2 - historial generado por gen_cst_macro.py (no editar a mano)", "' Parámetros:"]
+    hist = ["' UPM v3 - historial generado por gen_cst_macro.py (no editar a mano)", "' Parámetros:"]
     hist += [f"'   {n:<7} = {v:<14} ' {d}" for n, v, d in PARAMS]
-    bas = ["' UPM v2 - macro generada por gen_cst_macro.py (no editar a mano)",
+    bas = ["' UPM v3 - macro generada por gen_cst_macro.py (no editar a mano)",
            "' Uso: proyecto CST nuevo y vacío -> Macros > Run Macro... -> este archivo.",
            "' Crea los parámetros y añade cada paso al History List.",
            "", "Option Explicit", "", "Sub Main ()", "    Dim s As String", ""]
@@ -393,11 +400,11 @@ def main():
         bas += [f'    s = s & "{vb_str(l)}" & vbCrLf' for l in lines]
         bas.append(f'    AddToHistory "{vb_str(cap)}", s')
         bas.append("")
-    bas += ['    MsgBox "UPM v2: ' + str(len(blocks)) + ' pasos añadidos al historial.", vbInformation', "End Sub", ""]
+    bas += ['    MsgBox "UPM v3: ' + str(len(blocks)) + ' pasos añadidos al historial.", vbInformation', "End Sub", ""]
 
-    (HERE / f"UPM_v2{SUFFIX}_macro.bas").write_text("\r\n".join(bas), encoding="cp1252")
-    (HERE / f"UPM_v2{SUFFIX}_history.txt").write_text("\r\n".join(hist) + "\r\n", encoding="cp1252")
-    print(f"{len(blocks)} bloques -> UPM_v2{SUFFIX}_macro.bas, UPM_v2{SUFFIX}_history.txt")
+    (HERE / f"UPM_v3{SUFFIX}_macro.bas").write_text("\r\n".join(bas), encoding="cp1252")
+    (HERE / f"UPM_v3{SUFFIX}_history.txt").write_text("\r\n".join(hist) + "\r\n", encoding="cp1252")
+    print(f"{len(blocks)} bloques -> UPM_v3{SUFFIX}_macro.bas, UPM_v3{SUFFIX}_history.txt")
 
 
 if __name__ == "__main__":
