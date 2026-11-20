@@ -19,7 +19,7 @@ from manifold3d import Manifold
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_cst_macro as G  # noqa: E402
 
-SEG = 40
+SEG = 96
 P = {}
 for n, v, _ in G.PARAMS:
     P[n] = eval(v, {}, P)
@@ -179,3 +179,86 @@ fig.tight_layout()
 out = Path(__file__).resolve().parent / "UPM_v2_check.png"
 fig.savefig(out, dpi=110, facecolor="white")
 print(out)
+
+
+# ── Centrado y alineación ───────────────────────────────────────────────────
+def area(p):
+    return 0.5 * np.sum(p[:, 0] * np.roll(p[:, 1], -1) - np.roll(p[:, 0], -1) * p[:, 1])
+
+
+def centroid(p):
+    a = area(p)
+    x, y = p[:, 0], p[:, 1]
+    c = x * np.roll(y, -1) - np.roll(x, -1) * y
+    return (np.sum((x + np.roll(x, -1)) * c) / (6 * a), np.sum((y + np.roll(y, -1)) * c) / (6 * a))
+
+
+def holes(m, z, dmax=4.0):
+    """Agujeros cerrados (contornos CW) de diámetro equivalente < dmax en el corte z."""
+    out = []
+    for p in m.slice(z).to_polygons():
+        a = area(p)
+        if a < 0 and 2 * math.sqrt(-a / math.pi) < dmax:
+            out.append((*centroid(p), 2 * math.sqrt(-a / math.pi)))
+    return out
+
+
+hb, ht = holes(base, zp - 0.05), holes(tapa, zp + 0.05)
+print("\nAgujeros en la cara de unión (base z = zpart-0.05 · tapa z = zpart+0.05):")
+print(f"  {'agujero':<9}{'x base':>9}{'y base':>9}{'Ø base':>8}{'x tapa':>9}{'y tapa':>9}{'Ø tapa':>8}{'desvío µm':>11}")
+worst = 0.0
+names = {(-P["xab"], P["yab"]): "A", (P["xab"], -P["yab"]): "B"}
+for xb, yb, db in sorted(hb, key=lambda h: (round(h[1], 1), h[0])):
+    xt, yt, dt = min(ht, key=lambda h: math.hypot(h[0] - xb, h[1] - yb))
+    dev = 1000 * math.hypot(xt - xb, yt - yb)
+    worst = max(worst, dev)
+    tag = next((n for (x, y), n in names.items() if math.hypot(x - xb, y - yb) < 0.5), "M3")
+    print(f"  {tag:<9}{xb:9.3f}{yb:9.3f}{db:8.3f}{xt:9.3f}{yt:9.3f}{dt:8.3f}{dev:11.2f}")
+print(f"  -> {len(hb)} agujeros en la base, {len(ht)} en la tapa; desvío máximo base-tapa = {worst:.2f} µm")
+
+# centroide de TODO el corte z = 0 (cuerpo con cavidad, canal, pines y agujeros): debe ser (0, 0)
+_sec = base.slice(0.0).to_polygons()
+_A = sum(area(p) for p in _sec)
+cx = sum(area(p) * centroid(p)[0] for p in _sec) / _A
+cy = sum(area(p) * centroid(p)[1] for p in _sec) / _A
+pins = [centroid(p) for p in base.slice(0.0).to_polygons() if abs(abs(area(p)) - apin) < 0.1 * apin]
+px, py = np.mean([c[0] for c in pins]), np.mean([c[1] for c in pins])
+print(f"  centroide del corte z=0 de la base = ({cx:+.4f}, {cy:+.4f})  ·  centro del bosque de pines = ({px:+.4f}, {py:+.4f})")
+fl = holes(base.rotate([0, -90, 0]), -P["Lwg"] / 2 + P["tboss"] + 0.5) + \
+     holes(tapa.rotate([0, -90, 0]), -P["Lwg"] / 2 + P["tboss"] + 0.5)
+fr = holes(base.rotate([0, -90, 0]), P["Lwg"] / 2 - P["tboss"] - 0.5) + \
+     holes(tapa.rotate([0, -90, 0]), P["Lwg"] / 2 - P["tboss"] - 0.5)
+# en el corte girado: (u, v) = (-z, y). Brida derecha = izquierda girada 180° en z -> (z, y) -> (z, -y)
+L = sorted((round(-u, 3), round(v, 3), round(d, 3)) for u, v, d in fl)
+R = sorted((round(-u, 3), round(-v, 3), round(d, 3)) for u, v, d in fr)
+print(f"  brida derecha = izquierda girada 180°: {'SÍ' if L == R else 'NO'}  ({len(L)} agujeros por brida)")
+
+# Figura de alineación: cara de unión de la base con los agujeros de la tapa superpuestos
+fig, axs = plt.subplots(1, 3, figsize=(19, 6.4), gridspec_kw=dict(width_ratios=[2.2, 1, 1]))
+ax = axs[0]
+even_odd(ax, base.slice(zp - 0.05).to_polygons(), BOT, lw=0.4)
+for x, y, d in ht:
+    ax.add_patch(plt.Circle((x, y), d / 2, fc="none", ec="#c0392b", lw=1.2, ls="--"))
+for (x, y), n in names.items():
+    ax.text(x, y + 2.4, n, ha="center", fontsize=13, fontweight="bold")
+ax.plot(0, 0, "+", color="k", ms=14, mew=1.5)
+ax.set_title("Cara de unión de la BASE (verde) con los agujeros de la TAPA (rojo discontinuo)",
+             fontsize=12, fontweight="bold", loc="left")
+ax.set_xlim(-37, 37); ax.set_ylim(-21, 21); ax.set_aspect("equal"); ax.tick_params(labelsize=8)
+for ax, ((x0, y0), n) in zip(axs[1:], names.items()):
+    xb, yb, db = min(hb, key=lambda h: math.hypot(h[0] - x0, h[1] - y0))
+    xt, yt, dt = min(ht, key=lambda h: math.hypot(h[0] - x0, h[1] - y0))
+    ax.add_patch(plt.Circle((xb, yb), db / 2, fc="#dff2d0", ec=BOT, lw=3))
+    ax.add_patch(plt.Circle((xt, yt), dt / 2, fc="none", ec="#c0392b", lw=1.5, ls="--"))
+    ax.plot([xb], [yb], "+", color=BOT, ms=18, mew=2)
+    ax.plot([xt], [yt], "x", color="#c0392b", ms=12, mew=1.5)
+    ax.set_xlim(x0 - 2.2, x0 + 2.2); ax.set_ylim(y0 - 2.2, y0 + 2.2); ax.set_aspect("equal")
+    ax.tick_params(labelsize=8)
+    ax.set_title(f"Pasador {n} (zoom)", fontsize=12, fontweight="bold", loc="left")
+    ax.text(0.5, 0.04, f"base ({xb:.3f}, {yb:.3f}) Ø{db:.3f}\ntapa ({xt:.3f}, {yt:.3f}) Ø{dt:.3f}\n"
+            f"desvío {1000 * math.hypot(xt - xb, yt - yb):.2f} µm", transform=ax.transAxes, ha="center",
+            fontsize=10, bbox=dict(fc="white", ec="0.7"))
+fig.tight_layout()
+out2 = Path(__file__).resolve().parent / "UPM_v2_alineacion.png"
+fig.savefig(out2, dpi=110, facecolor="white")
+print(out2)

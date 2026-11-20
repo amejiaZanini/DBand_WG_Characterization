@@ -35,10 +35,7 @@
 '   hexH    = 2.6            ' profundidad del alojamiento de tuerca
 '   xab     = 17.25          ' pasadores de centrado A/B: |x|
 '   yab     = 7.8            ' pasadores de centrado A/B: |y|
-'   dpress  = 2.95           ' agujero en la base para pasador Ø3 a presión
-'   dslip   = 3.05           ' agujero/ranura en la tapa para pasador Ø3 (deslizante)
-'   lab     = 5              ' profundidad del pasador en la base
-'   slotL   = 0.3            ' alargamiento de la ranura B (en dirección A-B)
+'   dab     = 2.8            ' agujero de centrado A/B pasante (mismo en base y tapa); escariar a 3.0 H7 con las dos mitades montadas
 
 '## 01 - use template: WG6_Pins (UPM v2)
 With Units
@@ -257,80 +254,6017 @@ End With
 '## 18 - boolean subtract shapes: Base:mono, Base:chan
 Solid.Subtract "Base:mono", "Base:chan"
 
-'## 19 - define cylinder: Base:pins
+'## 19 - define cylinders: Base:pin (316)
+' define cylinder: Base:pin1_00
 With Cylinder
      .Reset
-     .Name "pins"
+     .Name "pin1_00"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dpin/2-tpl"
      .InnerRadius "0.0"
      .Axis "z"
      .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
-     .Xcenter "x0pin"
+     .Xcenter "x0pin+0*ppin"
      .Ycenter "y1pin"
      .Segments "0"
      .Create
 End With
 
-'## 20 - transform: translate Base:pins
-With Transform
-     .Reset
-     .Name "Base:pins"
-     .Vector "0", "ppin", "0"
-     .UsePickedPoints "False"
-     .InvertPickedPoints "False"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "1"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Translate"
-End With
-
-'## 21 - transform: mirror Base:pins
-With Transform
-     .Reset
-     .Name "Base:pins"
-     .Origin "Free"
-     .Center "0", "0", "0"
-     .PlaneNormal "0", "1", "0"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "1"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Mirror"
-End With
-
-'## 22 - transform: translate Base:pins
-With Transform
-     .Reset
-     .Name "Base:pins"
-     .Vector "ppin", "0", "0"
-     .UsePickedPoints "False"
-     .InvertPickedPoints "False"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "78"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Translate"
-End With
-
-'## 23 - boolean add shapes: Base:mono, Base:pins
-Solid.Add "Base:mono", "Base:pins"
-
-'## 24 - define cylinder: Base:fl
+' define cylinder: Base:pin1_01
 With Cylinder
      .Reset
-     .Name "fl"
+     .Name "pin1_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+1*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_02
+With Cylinder
+     .Reset
+     .Name "pin1_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+2*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_03
+With Cylinder
+     .Reset
+     .Name "pin1_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+3*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_04
+With Cylinder
+     .Reset
+     .Name "pin1_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+4*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_05
+With Cylinder
+     .Reset
+     .Name "pin1_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+5*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_06
+With Cylinder
+     .Reset
+     .Name "pin1_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+6*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_07
+With Cylinder
+     .Reset
+     .Name "pin1_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+7*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_08
+With Cylinder
+     .Reset
+     .Name "pin1_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+8*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_09
+With Cylinder
+     .Reset
+     .Name "pin1_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+9*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_10
+With Cylinder
+     .Reset
+     .Name "pin1_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+10*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_11
+With Cylinder
+     .Reset
+     .Name "pin1_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+11*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_12
+With Cylinder
+     .Reset
+     .Name "pin1_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+12*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_13
+With Cylinder
+     .Reset
+     .Name "pin1_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+13*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_14
+With Cylinder
+     .Reset
+     .Name "pin1_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+14*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_15
+With Cylinder
+     .Reset
+     .Name "pin1_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+15*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_16
+With Cylinder
+     .Reset
+     .Name "pin1_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+16*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_17
+With Cylinder
+     .Reset
+     .Name "pin1_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+17*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_18
+With Cylinder
+     .Reset
+     .Name "pin1_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+18*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_19
+With Cylinder
+     .Reset
+     .Name "pin1_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+19*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_20
+With Cylinder
+     .Reset
+     .Name "pin1_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+20*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_21
+With Cylinder
+     .Reset
+     .Name "pin1_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+21*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_22
+With Cylinder
+     .Reset
+     .Name "pin1_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+22*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_23
+With Cylinder
+     .Reset
+     .Name "pin1_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+23*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_24
+With Cylinder
+     .Reset
+     .Name "pin1_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+24*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_25
+With Cylinder
+     .Reset
+     .Name "pin1_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+25*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_26
+With Cylinder
+     .Reset
+     .Name "pin1_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+26*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_27
+With Cylinder
+     .Reset
+     .Name "pin1_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+27*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_28
+With Cylinder
+     .Reset
+     .Name "pin1_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+28*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_29
+With Cylinder
+     .Reset
+     .Name "pin1_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+29*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_30
+With Cylinder
+     .Reset
+     .Name "pin1_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+30*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_31
+With Cylinder
+     .Reset
+     .Name "pin1_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+31*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_32
+With Cylinder
+     .Reset
+     .Name "pin1_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+32*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_33
+With Cylinder
+     .Reset
+     .Name "pin1_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+33*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_34
+With Cylinder
+     .Reset
+     .Name "pin1_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+34*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_35
+With Cylinder
+     .Reset
+     .Name "pin1_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+35*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_36
+With Cylinder
+     .Reset
+     .Name "pin1_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+36*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_37
+With Cylinder
+     .Reset
+     .Name "pin1_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+37*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_38
+With Cylinder
+     .Reset
+     .Name "pin1_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+38*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_39
+With Cylinder
+     .Reset
+     .Name "pin1_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+39*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_40
+With Cylinder
+     .Reset
+     .Name "pin1_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+40*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_41
+With Cylinder
+     .Reset
+     .Name "pin1_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+41*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_42
+With Cylinder
+     .Reset
+     .Name "pin1_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+42*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_43
+With Cylinder
+     .Reset
+     .Name "pin1_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+43*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_44
+With Cylinder
+     .Reset
+     .Name "pin1_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+44*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_45
+With Cylinder
+     .Reset
+     .Name "pin1_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+45*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_46
+With Cylinder
+     .Reset
+     .Name "pin1_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+46*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_47
+With Cylinder
+     .Reset
+     .Name "pin1_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+47*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_48
+With Cylinder
+     .Reset
+     .Name "pin1_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+48*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_49
+With Cylinder
+     .Reset
+     .Name "pin1_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+49*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_50
+With Cylinder
+     .Reset
+     .Name "pin1_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+50*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_51
+With Cylinder
+     .Reset
+     .Name "pin1_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+51*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_52
+With Cylinder
+     .Reset
+     .Name "pin1_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+52*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_53
+With Cylinder
+     .Reset
+     .Name "pin1_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+53*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_54
+With Cylinder
+     .Reset
+     .Name "pin1_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+54*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_55
+With Cylinder
+     .Reset
+     .Name "pin1_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+55*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_56
+With Cylinder
+     .Reset
+     .Name "pin1_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+56*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_57
+With Cylinder
+     .Reset
+     .Name "pin1_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+57*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_58
+With Cylinder
+     .Reset
+     .Name "pin1_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+58*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_59
+With Cylinder
+     .Reset
+     .Name "pin1_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+59*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_60
+With Cylinder
+     .Reset
+     .Name "pin1_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+60*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_61
+With Cylinder
+     .Reset
+     .Name "pin1_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+61*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_62
+With Cylinder
+     .Reset
+     .Name "pin1_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+62*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_63
+With Cylinder
+     .Reset
+     .Name "pin1_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+63*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_64
+With Cylinder
+     .Reset
+     .Name "pin1_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+64*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_65
+With Cylinder
+     .Reset
+     .Name "pin1_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+65*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_66
+With Cylinder
+     .Reset
+     .Name "pin1_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+66*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_67
+With Cylinder
+     .Reset
+     .Name "pin1_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+67*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_68
+With Cylinder
+     .Reset
+     .Name "pin1_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+68*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_69
+With Cylinder
+     .Reset
+     .Name "pin1_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+69*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_70
+With Cylinder
+     .Reset
+     .Name "pin1_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+70*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_71
+With Cylinder
+     .Reset
+     .Name "pin1_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+71*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_72
+With Cylinder
+     .Reset
+     .Name "pin1_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+72*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_73
+With Cylinder
+     .Reset
+     .Name "pin1_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+73*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_74
+With Cylinder
+     .Reset
+     .Name "pin1_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+74*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_75
+With Cylinder
+     .Reset
+     .Name "pin1_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+75*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_76
+With Cylinder
+     .Reset
+     .Name "pin1_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+76*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_77
+With Cylinder
+     .Reset
+     .Name "pin1_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+77*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin1_78
+With Cylinder
+     .Reset
+     .Name "pin1_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+78*ppin"
+     .Ycenter "y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_00
+With Cylinder
+     .Reset
+     .Name "pin2_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+0*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_01
+With Cylinder
+     .Reset
+     .Name "pin2_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+1*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_02
+With Cylinder
+     .Reset
+     .Name "pin2_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+2*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_03
+With Cylinder
+     .Reset
+     .Name "pin2_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+3*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_04
+With Cylinder
+     .Reset
+     .Name "pin2_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+4*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_05
+With Cylinder
+     .Reset
+     .Name "pin2_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+5*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_06
+With Cylinder
+     .Reset
+     .Name "pin2_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+6*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_07
+With Cylinder
+     .Reset
+     .Name "pin2_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+7*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_08
+With Cylinder
+     .Reset
+     .Name "pin2_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+8*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_09
+With Cylinder
+     .Reset
+     .Name "pin2_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+9*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_10
+With Cylinder
+     .Reset
+     .Name "pin2_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+10*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_11
+With Cylinder
+     .Reset
+     .Name "pin2_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+11*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_12
+With Cylinder
+     .Reset
+     .Name "pin2_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+12*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_13
+With Cylinder
+     .Reset
+     .Name "pin2_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+13*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_14
+With Cylinder
+     .Reset
+     .Name "pin2_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+14*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_15
+With Cylinder
+     .Reset
+     .Name "pin2_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+15*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_16
+With Cylinder
+     .Reset
+     .Name "pin2_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+16*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_17
+With Cylinder
+     .Reset
+     .Name "pin2_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+17*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_18
+With Cylinder
+     .Reset
+     .Name "pin2_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+18*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_19
+With Cylinder
+     .Reset
+     .Name "pin2_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+19*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_20
+With Cylinder
+     .Reset
+     .Name "pin2_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+20*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_21
+With Cylinder
+     .Reset
+     .Name "pin2_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+21*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_22
+With Cylinder
+     .Reset
+     .Name "pin2_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+22*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_23
+With Cylinder
+     .Reset
+     .Name "pin2_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+23*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_24
+With Cylinder
+     .Reset
+     .Name "pin2_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+24*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_25
+With Cylinder
+     .Reset
+     .Name "pin2_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+25*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_26
+With Cylinder
+     .Reset
+     .Name "pin2_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+26*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_27
+With Cylinder
+     .Reset
+     .Name "pin2_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+27*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_28
+With Cylinder
+     .Reset
+     .Name "pin2_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+28*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_29
+With Cylinder
+     .Reset
+     .Name "pin2_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+29*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_30
+With Cylinder
+     .Reset
+     .Name "pin2_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+30*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_31
+With Cylinder
+     .Reset
+     .Name "pin2_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+31*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_32
+With Cylinder
+     .Reset
+     .Name "pin2_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+32*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_33
+With Cylinder
+     .Reset
+     .Name "pin2_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+33*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_34
+With Cylinder
+     .Reset
+     .Name "pin2_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+34*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_35
+With Cylinder
+     .Reset
+     .Name "pin2_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+35*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_36
+With Cylinder
+     .Reset
+     .Name "pin2_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+36*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_37
+With Cylinder
+     .Reset
+     .Name "pin2_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+37*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_38
+With Cylinder
+     .Reset
+     .Name "pin2_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+38*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_39
+With Cylinder
+     .Reset
+     .Name "pin2_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+39*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_40
+With Cylinder
+     .Reset
+     .Name "pin2_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+40*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_41
+With Cylinder
+     .Reset
+     .Name "pin2_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+41*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_42
+With Cylinder
+     .Reset
+     .Name "pin2_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+42*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_43
+With Cylinder
+     .Reset
+     .Name "pin2_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+43*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_44
+With Cylinder
+     .Reset
+     .Name "pin2_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+44*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_45
+With Cylinder
+     .Reset
+     .Name "pin2_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+45*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_46
+With Cylinder
+     .Reset
+     .Name "pin2_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+46*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_47
+With Cylinder
+     .Reset
+     .Name "pin2_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+47*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_48
+With Cylinder
+     .Reset
+     .Name "pin2_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+48*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_49
+With Cylinder
+     .Reset
+     .Name "pin2_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+49*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_50
+With Cylinder
+     .Reset
+     .Name "pin2_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+50*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_51
+With Cylinder
+     .Reset
+     .Name "pin2_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+51*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_52
+With Cylinder
+     .Reset
+     .Name "pin2_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+52*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_53
+With Cylinder
+     .Reset
+     .Name "pin2_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+53*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_54
+With Cylinder
+     .Reset
+     .Name "pin2_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+54*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_55
+With Cylinder
+     .Reset
+     .Name "pin2_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+55*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_56
+With Cylinder
+     .Reset
+     .Name "pin2_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+56*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_57
+With Cylinder
+     .Reset
+     .Name "pin2_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+57*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_58
+With Cylinder
+     .Reset
+     .Name "pin2_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+58*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_59
+With Cylinder
+     .Reset
+     .Name "pin2_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+59*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_60
+With Cylinder
+     .Reset
+     .Name "pin2_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+60*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_61
+With Cylinder
+     .Reset
+     .Name "pin2_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+61*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_62
+With Cylinder
+     .Reset
+     .Name "pin2_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+62*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_63
+With Cylinder
+     .Reset
+     .Name "pin2_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+63*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_64
+With Cylinder
+     .Reset
+     .Name "pin2_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+64*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_65
+With Cylinder
+     .Reset
+     .Name "pin2_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+65*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_66
+With Cylinder
+     .Reset
+     .Name "pin2_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+66*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_67
+With Cylinder
+     .Reset
+     .Name "pin2_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+67*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_68
+With Cylinder
+     .Reset
+     .Name "pin2_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+68*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_69
+With Cylinder
+     .Reset
+     .Name "pin2_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+69*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_70
+With Cylinder
+     .Reset
+     .Name "pin2_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+70*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_71
+With Cylinder
+     .Reset
+     .Name "pin2_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+71*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_72
+With Cylinder
+     .Reset
+     .Name "pin2_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+72*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_73
+With Cylinder
+     .Reset
+     .Name "pin2_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+73*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_74
+With Cylinder
+     .Reset
+     .Name "pin2_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+74*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_75
+With Cylinder
+     .Reset
+     .Name "pin2_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+75*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_76
+With Cylinder
+     .Reset
+     .Name "pin2_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+76*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_77
+With Cylinder
+     .Reset
+     .Name "pin2_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+77*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin2_78
+With Cylinder
+     .Reset
+     .Name "pin2_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+78*ppin"
+     .Ycenter "y1pin+ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_00
+With Cylinder
+     .Reset
+     .Name "pin3_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+0*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_01
+With Cylinder
+     .Reset
+     .Name "pin3_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+1*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_02
+With Cylinder
+     .Reset
+     .Name "pin3_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+2*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_03
+With Cylinder
+     .Reset
+     .Name "pin3_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+3*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_04
+With Cylinder
+     .Reset
+     .Name "pin3_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+4*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_05
+With Cylinder
+     .Reset
+     .Name "pin3_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+5*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_06
+With Cylinder
+     .Reset
+     .Name "pin3_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+6*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_07
+With Cylinder
+     .Reset
+     .Name "pin3_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+7*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_08
+With Cylinder
+     .Reset
+     .Name "pin3_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+8*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_09
+With Cylinder
+     .Reset
+     .Name "pin3_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+9*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_10
+With Cylinder
+     .Reset
+     .Name "pin3_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+10*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_11
+With Cylinder
+     .Reset
+     .Name "pin3_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+11*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_12
+With Cylinder
+     .Reset
+     .Name "pin3_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+12*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_13
+With Cylinder
+     .Reset
+     .Name "pin3_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+13*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_14
+With Cylinder
+     .Reset
+     .Name "pin3_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+14*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_15
+With Cylinder
+     .Reset
+     .Name "pin3_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+15*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_16
+With Cylinder
+     .Reset
+     .Name "pin3_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+16*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_17
+With Cylinder
+     .Reset
+     .Name "pin3_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+17*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_18
+With Cylinder
+     .Reset
+     .Name "pin3_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+18*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_19
+With Cylinder
+     .Reset
+     .Name "pin3_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+19*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_20
+With Cylinder
+     .Reset
+     .Name "pin3_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+20*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_21
+With Cylinder
+     .Reset
+     .Name "pin3_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+21*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_22
+With Cylinder
+     .Reset
+     .Name "pin3_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+22*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_23
+With Cylinder
+     .Reset
+     .Name "pin3_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+23*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_24
+With Cylinder
+     .Reset
+     .Name "pin3_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+24*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_25
+With Cylinder
+     .Reset
+     .Name "pin3_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+25*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_26
+With Cylinder
+     .Reset
+     .Name "pin3_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+26*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_27
+With Cylinder
+     .Reset
+     .Name "pin3_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+27*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_28
+With Cylinder
+     .Reset
+     .Name "pin3_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+28*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_29
+With Cylinder
+     .Reset
+     .Name "pin3_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+29*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_30
+With Cylinder
+     .Reset
+     .Name "pin3_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+30*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_31
+With Cylinder
+     .Reset
+     .Name "pin3_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+31*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_32
+With Cylinder
+     .Reset
+     .Name "pin3_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+32*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_33
+With Cylinder
+     .Reset
+     .Name "pin3_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+33*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_34
+With Cylinder
+     .Reset
+     .Name "pin3_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+34*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_35
+With Cylinder
+     .Reset
+     .Name "pin3_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+35*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_36
+With Cylinder
+     .Reset
+     .Name "pin3_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+36*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_37
+With Cylinder
+     .Reset
+     .Name "pin3_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+37*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_38
+With Cylinder
+     .Reset
+     .Name "pin3_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+38*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_39
+With Cylinder
+     .Reset
+     .Name "pin3_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+39*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_40
+With Cylinder
+     .Reset
+     .Name "pin3_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+40*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_41
+With Cylinder
+     .Reset
+     .Name "pin3_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+41*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_42
+With Cylinder
+     .Reset
+     .Name "pin3_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+42*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_43
+With Cylinder
+     .Reset
+     .Name "pin3_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+43*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_44
+With Cylinder
+     .Reset
+     .Name "pin3_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+44*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_45
+With Cylinder
+     .Reset
+     .Name "pin3_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+45*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_46
+With Cylinder
+     .Reset
+     .Name "pin3_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+46*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_47
+With Cylinder
+     .Reset
+     .Name "pin3_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+47*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_48
+With Cylinder
+     .Reset
+     .Name "pin3_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+48*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_49
+With Cylinder
+     .Reset
+     .Name "pin3_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+49*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_50
+With Cylinder
+     .Reset
+     .Name "pin3_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+50*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_51
+With Cylinder
+     .Reset
+     .Name "pin3_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+51*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_52
+With Cylinder
+     .Reset
+     .Name "pin3_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+52*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_53
+With Cylinder
+     .Reset
+     .Name "pin3_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+53*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_54
+With Cylinder
+     .Reset
+     .Name "pin3_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+54*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_55
+With Cylinder
+     .Reset
+     .Name "pin3_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+55*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_56
+With Cylinder
+     .Reset
+     .Name "pin3_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+56*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_57
+With Cylinder
+     .Reset
+     .Name "pin3_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+57*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_58
+With Cylinder
+     .Reset
+     .Name "pin3_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+58*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_59
+With Cylinder
+     .Reset
+     .Name "pin3_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+59*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_60
+With Cylinder
+     .Reset
+     .Name "pin3_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+60*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_61
+With Cylinder
+     .Reset
+     .Name "pin3_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+61*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_62
+With Cylinder
+     .Reset
+     .Name "pin3_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+62*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_63
+With Cylinder
+     .Reset
+     .Name "pin3_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+63*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_64
+With Cylinder
+     .Reset
+     .Name "pin3_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+64*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_65
+With Cylinder
+     .Reset
+     .Name "pin3_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+65*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_66
+With Cylinder
+     .Reset
+     .Name "pin3_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+66*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_67
+With Cylinder
+     .Reset
+     .Name "pin3_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+67*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_68
+With Cylinder
+     .Reset
+     .Name "pin3_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+68*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_69
+With Cylinder
+     .Reset
+     .Name "pin3_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+69*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_70
+With Cylinder
+     .Reset
+     .Name "pin3_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+70*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_71
+With Cylinder
+     .Reset
+     .Name "pin3_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+71*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_72
+With Cylinder
+     .Reset
+     .Name "pin3_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+72*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_73
+With Cylinder
+     .Reset
+     .Name "pin3_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+73*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_74
+With Cylinder
+     .Reset
+     .Name "pin3_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+74*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_75
+With Cylinder
+     .Reset
+     .Name "pin3_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+75*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_76
+With Cylinder
+     .Reset
+     .Name "pin3_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+76*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_77
+With Cylinder
+     .Reset
+     .Name "pin3_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+77*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin3_78
+With Cylinder
+     .Reset
+     .Name "pin3_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+78*ppin"
+     .Ycenter "-y1pin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_00
+With Cylinder
+     .Reset
+     .Name "pin4_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+0*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_01
+With Cylinder
+     .Reset
+     .Name "pin4_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+1*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_02
+With Cylinder
+     .Reset
+     .Name "pin4_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+2*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_03
+With Cylinder
+     .Reset
+     .Name "pin4_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+3*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_04
+With Cylinder
+     .Reset
+     .Name "pin4_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+4*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_05
+With Cylinder
+     .Reset
+     .Name "pin4_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+5*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_06
+With Cylinder
+     .Reset
+     .Name "pin4_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+6*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_07
+With Cylinder
+     .Reset
+     .Name "pin4_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+7*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_08
+With Cylinder
+     .Reset
+     .Name "pin4_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+8*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_09
+With Cylinder
+     .Reset
+     .Name "pin4_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+9*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_10
+With Cylinder
+     .Reset
+     .Name "pin4_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+10*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_11
+With Cylinder
+     .Reset
+     .Name "pin4_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+11*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_12
+With Cylinder
+     .Reset
+     .Name "pin4_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+12*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_13
+With Cylinder
+     .Reset
+     .Name "pin4_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+13*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_14
+With Cylinder
+     .Reset
+     .Name "pin4_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+14*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_15
+With Cylinder
+     .Reset
+     .Name "pin4_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+15*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_16
+With Cylinder
+     .Reset
+     .Name "pin4_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+16*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_17
+With Cylinder
+     .Reset
+     .Name "pin4_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+17*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_18
+With Cylinder
+     .Reset
+     .Name "pin4_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+18*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_19
+With Cylinder
+     .Reset
+     .Name "pin4_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+19*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_20
+With Cylinder
+     .Reset
+     .Name "pin4_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+20*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_21
+With Cylinder
+     .Reset
+     .Name "pin4_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+21*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_22
+With Cylinder
+     .Reset
+     .Name "pin4_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+22*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_23
+With Cylinder
+     .Reset
+     .Name "pin4_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+23*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_24
+With Cylinder
+     .Reset
+     .Name "pin4_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+24*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_25
+With Cylinder
+     .Reset
+     .Name "pin4_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+25*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_26
+With Cylinder
+     .Reset
+     .Name "pin4_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+26*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_27
+With Cylinder
+     .Reset
+     .Name "pin4_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+27*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_28
+With Cylinder
+     .Reset
+     .Name "pin4_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+28*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_29
+With Cylinder
+     .Reset
+     .Name "pin4_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+29*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_30
+With Cylinder
+     .Reset
+     .Name "pin4_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+30*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_31
+With Cylinder
+     .Reset
+     .Name "pin4_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+31*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_32
+With Cylinder
+     .Reset
+     .Name "pin4_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+32*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_33
+With Cylinder
+     .Reset
+     .Name "pin4_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+33*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_34
+With Cylinder
+     .Reset
+     .Name "pin4_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+34*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_35
+With Cylinder
+     .Reset
+     .Name "pin4_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+35*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_36
+With Cylinder
+     .Reset
+     .Name "pin4_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+36*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_37
+With Cylinder
+     .Reset
+     .Name "pin4_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+37*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_38
+With Cylinder
+     .Reset
+     .Name "pin4_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+38*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_39
+With Cylinder
+     .Reset
+     .Name "pin4_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+39*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_40
+With Cylinder
+     .Reset
+     .Name "pin4_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+40*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_41
+With Cylinder
+     .Reset
+     .Name "pin4_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+41*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_42
+With Cylinder
+     .Reset
+     .Name "pin4_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+42*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_43
+With Cylinder
+     .Reset
+     .Name "pin4_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+43*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_44
+With Cylinder
+     .Reset
+     .Name "pin4_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+44*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_45
+With Cylinder
+     .Reset
+     .Name "pin4_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+45*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_46
+With Cylinder
+     .Reset
+     .Name "pin4_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+46*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_47
+With Cylinder
+     .Reset
+     .Name "pin4_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+47*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_48
+With Cylinder
+     .Reset
+     .Name "pin4_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+48*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_49
+With Cylinder
+     .Reset
+     .Name "pin4_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+49*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_50
+With Cylinder
+     .Reset
+     .Name "pin4_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+50*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_51
+With Cylinder
+     .Reset
+     .Name "pin4_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+51*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_52
+With Cylinder
+     .Reset
+     .Name "pin4_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+52*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_53
+With Cylinder
+     .Reset
+     .Name "pin4_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+53*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_54
+With Cylinder
+     .Reset
+     .Name "pin4_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+54*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_55
+With Cylinder
+     .Reset
+     .Name "pin4_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+55*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_56
+With Cylinder
+     .Reset
+     .Name "pin4_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+56*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_57
+With Cylinder
+     .Reset
+     .Name "pin4_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+57*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_58
+With Cylinder
+     .Reset
+     .Name "pin4_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+58*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_59
+With Cylinder
+     .Reset
+     .Name "pin4_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+59*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_60
+With Cylinder
+     .Reset
+     .Name "pin4_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+60*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_61
+With Cylinder
+     .Reset
+     .Name "pin4_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+61*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_62
+With Cylinder
+     .Reset
+     .Name "pin4_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+62*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_63
+With Cylinder
+     .Reset
+     .Name "pin4_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+63*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_64
+With Cylinder
+     .Reset
+     .Name "pin4_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+64*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_65
+With Cylinder
+     .Reset
+     .Name "pin4_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+65*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_66
+With Cylinder
+     .Reset
+     .Name "pin4_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+66*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_67
+With Cylinder
+     .Reset
+     .Name "pin4_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+67*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_68
+With Cylinder
+     .Reset
+     .Name "pin4_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+68*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_69
+With Cylinder
+     .Reset
+     .Name "pin4_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+69*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_70
+With Cylinder
+     .Reset
+     .Name "pin4_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+70*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_71
+With Cylinder
+     .Reset
+     .Name "pin4_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+71*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_72
+With Cylinder
+     .Reset
+     .Name "pin4_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+72*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_73
+With Cylinder
+     .Reset
+     .Name "pin4_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+73*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_74
+With Cylinder
+     .Reset
+     .Name "pin4_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+74*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_75
+With Cylinder
+     .Reset
+     .Name "pin4_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+75*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_76
+With Cylinder
+     .Reset
+     .Name "pin4_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+76*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_77
+With Cylinder
+     .Reset
+     .Name "pin4_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+77*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:pin4_78
+With Cylinder
+     .Reset
+     .Name "pin4_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpin/2-tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Xcenter "x0pin+78*ppin"
+     .Ycenter "-y1pin-ppin"
+     .Segments "0"
+     .Create
+End With
+
+'## 20 - boolean add shapes: Base:mono, Base:pin (316)
+' boolean add shapes: Base:mono, Base:pin1_00
+Solid.Add "Base:mono", "Base:pin1_00"
+
+' boolean add shapes: Base:mono, Base:pin1_01
+Solid.Add "Base:mono", "Base:pin1_01"
+
+' boolean add shapes: Base:mono, Base:pin1_02
+Solid.Add "Base:mono", "Base:pin1_02"
+
+' boolean add shapes: Base:mono, Base:pin1_03
+Solid.Add "Base:mono", "Base:pin1_03"
+
+' boolean add shapes: Base:mono, Base:pin1_04
+Solid.Add "Base:mono", "Base:pin1_04"
+
+' boolean add shapes: Base:mono, Base:pin1_05
+Solid.Add "Base:mono", "Base:pin1_05"
+
+' boolean add shapes: Base:mono, Base:pin1_06
+Solid.Add "Base:mono", "Base:pin1_06"
+
+' boolean add shapes: Base:mono, Base:pin1_07
+Solid.Add "Base:mono", "Base:pin1_07"
+
+' boolean add shapes: Base:mono, Base:pin1_08
+Solid.Add "Base:mono", "Base:pin1_08"
+
+' boolean add shapes: Base:mono, Base:pin1_09
+Solid.Add "Base:mono", "Base:pin1_09"
+
+' boolean add shapes: Base:mono, Base:pin1_10
+Solid.Add "Base:mono", "Base:pin1_10"
+
+' boolean add shapes: Base:mono, Base:pin1_11
+Solid.Add "Base:mono", "Base:pin1_11"
+
+' boolean add shapes: Base:mono, Base:pin1_12
+Solid.Add "Base:mono", "Base:pin1_12"
+
+' boolean add shapes: Base:mono, Base:pin1_13
+Solid.Add "Base:mono", "Base:pin1_13"
+
+' boolean add shapes: Base:mono, Base:pin1_14
+Solid.Add "Base:mono", "Base:pin1_14"
+
+' boolean add shapes: Base:mono, Base:pin1_15
+Solid.Add "Base:mono", "Base:pin1_15"
+
+' boolean add shapes: Base:mono, Base:pin1_16
+Solid.Add "Base:mono", "Base:pin1_16"
+
+' boolean add shapes: Base:mono, Base:pin1_17
+Solid.Add "Base:mono", "Base:pin1_17"
+
+' boolean add shapes: Base:mono, Base:pin1_18
+Solid.Add "Base:mono", "Base:pin1_18"
+
+' boolean add shapes: Base:mono, Base:pin1_19
+Solid.Add "Base:mono", "Base:pin1_19"
+
+' boolean add shapes: Base:mono, Base:pin1_20
+Solid.Add "Base:mono", "Base:pin1_20"
+
+' boolean add shapes: Base:mono, Base:pin1_21
+Solid.Add "Base:mono", "Base:pin1_21"
+
+' boolean add shapes: Base:mono, Base:pin1_22
+Solid.Add "Base:mono", "Base:pin1_22"
+
+' boolean add shapes: Base:mono, Base:pin1_23
+Solid.Add "Base:mono", "Base:pin1_23"
+
+' boolean add shapes: Base:mono, Base:pin1_24
+Solid.Add "Base:mono", "Base:pin1_24"
+
+' boolean add shapes: Base:mono, Base:pin1_25
+Solid.Add "Base:mono", "Base:pin1_25"
+
+' boolean add shapes: Base:mono, Base:pin1_26
+Solid.Add "Base:mono", "Base:pin1_26"
+
+' boolean add shapes: Base:mono, Base:pin1_27
+Solid.Add "Base:mono", "Base:pin1_27"
+
+' boolean add shapes: Base:mono, Base:pin1_28
+Solid.Add "Base:mono", "Base:pin1_28"
+
+' boolean add shapes: Base:mono, Base:pin1_29
+Solid.Add "Base:mono", "Base:pin1_29"
+
+' boolean add shapes: Base:mono, Base:pin1_30
+Solid.Add "Base:mono", "Base:pin1_30"
+
+' boolean add shapes: Base:mono, Base:pin1_31
+Solid.Add "Base:mono", "Base:pin1_31"
+
+' boolean add shapes: Base:mono, Base:pin1_32
+Solid.Add "Base:mono", "Base:pin1_32"
+
+' boolean add shapes: Base:mono, Base:pin1_33
+Solid.Add "Base:mono", "Base:pin1_33"
+
+' boolean add shapes: Base:mono, Base:pin1_34
+Solid.Add "Base:mono", "Base:pin1_34"
+
+' boolean add shapes: Base:mono, Base:pin1_35
+Solid.Add "Base:mono", "Base:pin1_35"
+
+' boolean add shapes: Base:mono, Base:pin1_36
+Solid.Add "Base:mono", "Base:pin1_36"
+
+' boolean add shapes: Base:mono, Base:pin1_37
+Solid.Add "Base:mono", "Base:pin1_37"
+
+' boolean add shapes: Base:mono, Base:pin1_38
+Solid.Add "Base:mono", "Base:pin1_38"
+
+' boolean add shapes: Base:mono, Base:pin1_39
+Solid.Add "Base:mono", "Base:pin1_39"
+
+' boolean add shapes: Base:mono, Base:pin1_40
+Solid.Add "Base:mono", "Base:pin1_40"
+
+' boolean add shapes: Base:mono, Base:pin1_41
+Solid.Add "Base:mono", "Base:pin1_41"
+
+' boolean add shapes: Base:mono, Base:pin1_42
+Solid.Add "Base:mono", "Base:pin1_42"
+
+' boolean add shapes: Base:mono, Base:pin1_43
+Solid.Add "Base:mono", "Base:pin1_43"
+
+' boolean add shapes: Base:mono, Base:pin1_44
+Solid.Add "Base:mono", "Base:pin1_44"
+
+' boolean add shapes: Base:mono, Base:pin1_45
+Solid.Add "Base:mono", "Base:pin1_45"
+
+' boolean add shapes: Base:mono, Base:pin1_46
+Solid.Add "Base:mono", "Base:pin1_46"
+
+' boolean add shapes: Base:mono, Base:pin1_47
+Solid.Add "Base:mono", "Base:pin1_47"
+
+' boolean add shapes: Base:mono, Base:pin1_48
+Solid.Add "Base:mono", "Base:pin1_48"
+
+' boolean add shapes: Base:mono, Base:pin1_49
+Solid.Add "Base:mono", "Base:pin1_49"
+
+' boolean add shapes: Base:mono, Base:pin1_50
+Solid.Add "Base:mono", "Base:pin1_50"
+
+' boolean add shapes: Base:mono, Base:pin1_51
+Solid.Add "Base:mono", "Base:pin1_51"
+
+' boolean add shapes: Base:mono, Base:pin1_52
+Solid.Add "Base:mono", "Base:pin1_52"
+
+' boolean add shapes: Base:mono, Base:pin1_53
+Solid.Add "Base:mono", "Base:pin1_53"
+
+' boolean add shapes: Base:mono, Base:pin1_54
+Solid.Add "Base:mono", "Base:pin1_54"
+
+' boolean add shapes: Base:mono, Base:pin1_55
+Solid.Add "Base:mono", "Base:pin1_55"
+
+' boolean add shapes: Base:mono, Base:pin1_56
+Solid.Add "Base:mono", "Base:pin1_56"
+
+' boolean add shapes: Base:mono, Base:pin1_57
+Solid.Add "Base:mono", "Base:pin1_57"
+
+' boolean add shapes: Base:mono, Base:pin1_58
+Solid.Add "Base:mono", "Base:pin1_58"
+
+' boolean add shapes: Base:mono, Base:pin1_59
+Solid.Add "Base:mono", "Base:pin1_59"
+
+' boolean add shapes: Base:mono, Base:pin1_60
+Solid.Add "Base:mono", "Base:pin1_60"
+
+' boolean add shapes: Base:mono, Base:pin1_61
+Solid.Add "Base:mono", "Base:pin1_61"
+
+' boolean add shapes: Base:mono, Base:pin1_62
+Solid.Add "Base:mono", "Base:pin1_62"
+
+' boolean add shapes: Base:mono, Base:pin1_63
+Solid.Add "Base:mono", "Base:pin1_63"
+
+' boolean add shapes: Base:mono, Base:pin1_64
+Solid.Add "Base:mono", "Base:pin1_64"
+
+' boolean add shapes: Base:mono, Base:pin1_65
+Solid.Add "Base:mono", "Base:pin1_65"
+
+' boolean add shapes: Base:mono, Base:pin1_66
+Solid.Add "Base:mono", "Base:pin1_66"
+
+' boolean add shapes: Base:mono, Base:pin1_67
+Solid.Add "Base:mono", "Base:pin1_67"
+
+' boolean add shapes: Base:mono, Base:pin1_68
+Solid.Add "Base:mono", "Base:pin1_68"
+
+' boolean add shapes: Base:mono, Base:pin1_69
+Solid.Add "Base:mono", "Base:pin1_69"
+
+' boolean add shapes: Base:mono, Base:pin1_70
+Solid.Add "Base:mono", "Base:pin1_70"
+
+' boolean add shapes: Base:mono, Base:pin1_71
+Solid.Add "Base:mono", "Base:pin1_71"
+
+' boolean add shapes: Base:mono, Base:pin1_72
+Solid.Add "Base:mono", "Base:pin1_72"
+
+' boolean add shapes: Base:mono, Base:pin1_73
+Solid.Add "Base:mono", "Base:pin1_73"
+
+' boolean add shapes: Base:mono, Base:pin1_74
+Solid.Add "Base:mono", "Base:pin1_74"
+
+' boolean add shapes: Base:mono, Base:pin1_75
+Solid.Add "Base:mono", "Base:pin1_75"
+
+' boolean add shapes: Base:mono, Base:pin1_76
+Solid.Add "Base:mono", "Base:pin1_76"
+
+' boolean add shapes: Base:mono, Base:pin1_77
+Solid.Add "Base:mono", "Base:pin1_77"
+
+' boolean add shapes: Base:mono, Base:pin1_78
+Solid.Add "Base:mono", "Base:pin1_78"
+
+' boolean add shapes: Base:mono, Base:pin2_00
+Solid.Add "Base:mono", "Base:pin2_00"
+
+' boolean add shapes: Base:mono, Base:pin2_01
+Solid.Add "Base:mono", "Base:pin2_01"
+
+' boolean add shapes: Base:mono, Base:pin2_02
+Solid.Add "Base:mono", "Base:pin2_02"
+
+' boolean add shapes: Base:mono, Base:pin2_03
+Solid.Add "Base:mono", "Base:pin2_03"
+
+' boolean add shapes: Base:mono, Base:pin2_04
+Solid.Add "Base:mono", "Base:pin2_04"
+
+' boolean add shapes: Base:mono, Base:pin2_05
+Solid.Add "Base:mono", "Base:pin2_05"
+
+' boolean add shapes: Base:mono, Base:pin2_06
+Solid.Add "Base:mono", "Base:pin2_06"
+
+' boolean add shapes: Base:mono, Base:pin2_07
+Solid.Add "Base:mono", "Base:pin2_07"
+
+' boolean add shapes: Base:mono, Base:pin2_08
+Solid.Add "Base:mono", "Base:pin2_08"
+
+' boolean add shapes: Base:mono, Base:pin2_09
+Solid.Add "Base:mono", "Base:pin2_09"
+
+' boolean add shapes: Base:mono, Base:pin2_10
+Solid.Add "Base:mono", "Base:pin2_10"
+
+' boolean add shapes: Base:mono, Base:pin2_11
+Solid.Add "Base:mono", "Base:pin2_11"
+
+' boolean add shapes: Base:mono, Base:pin2_12
+Solid.Add "Base:mono", "Base:pin2_12"
+
+' boolean add shapes: Base:mono, Base:pin2_13
+Solid.Add "Base:mono", "Base:pin2_13"
+
+' boolean add shapes: Base:mono, Base:pin2_14
+Solid.Add "Base:mono", "Base:pin2_14"
+
+' boolean add shapes: Base:mono, Base:pin2_15
+Solid.Add "Base:mono", "Base:pin2_15"
+
+' boolean add shapes: Base:mono, Base:pin2_16
+Solid.Add "Base:mono", "Base:pin2_16"
+
+' boolean add shapes: Base:mono, Base:pin2_17
+Solid.Add "Base:mono", "Base:pin2_17"
+
+' boolean add shapes: Base:mono, Base:pin2_18
+Solid.Add "Base:mono", "Base:pin2_18"
+
+' boolean add shapes: Base:mono, Base:pin2_19
+Solid.Add "Base:mono", "Base:pin2_19"
+
+' boolean add shapes: Base:mono, Base:pin2_20
+Solid.Add "Base:mono", "Base:pin2_20"
+
+' boolean add shapes: Base:mono, Base:pin2_21
+Solid.Add "Base:mono", "Base:pin2_21"
+
+' boolean add shapes: Base:mono, Base:pin2_22
+Solid.Add "Base:mono", "Base:pin2_22"
+
+' boolean add shapes: Base:mono, Base:pin2_23
+Solid.Add "Base:mono", "Base:pin2_23"
+
+' boolean add shapes: Base:mono, Base:pin2_24
+Solid.Add "Base:mono", "Base:pin2_24"
+
+' boolean add shapes: Base:mono, Base:pin2_25
+Solid.Add "Base:mono", "Base:pin2_25"
+
+' boolean add shapes: Base:mono, Base:pin2_26
+Solid.Add "Base:mono", "Base:pin2_26"
+
+' boolean add shapes: Base:mono, Base:pin2_27
+Solid.Add "Base:mono", "Base:pin2_27"
+
+' boolean add shapes: Base:mono, Base:pin2_28
+Solid.Add "Base:mono", "Base:pin2_28"
+
+' boolean add shapes: Base:mono, Base:pin2_29
+Solid.Add "Base:mono", "Base:pin2_29"
+
+' boolean add shapes: Base:mono, Base:pin2_30
+Solid.Add "Base:mono", "Base:pin2_30"
+
+' boolean add shapes: Base:mono, Base:pin2_31
+Solid.Add "Base:mono", "Base:pin2_31"
+
+' boolean add shapes: Base:mono, Base:pin2_32
+Solid.Add "Base:mono", "Base:pin2_32"
+
+' boolean add shapes: Base:mono, Base:pin2_33
+Solid.Add "Base:mono", "Base:pin2_33"
+
+' boolean add shapes: Base:mono, Base:pin2_34
+Solid.Add "Base:mono", "Base:pin2_34"
+
+' boolean add shapes: Base:mono, Base:pin2_35
+Solid.Add "Base:mono", "Base:pin2_35"
+
+' boolean add shapes: Base:mono, Base:pin2_36
+Solid.Add "Base:mono", "Base:pin2_36"
+
+' boolean add shapes: Base:mono, Base:pin2_37
+Solid.Add "Base:mono", "Base:pin2_37"
+
+' boolean add shapes: Base:mono, Base:pin2_38
+Solid.Add "Base:mono", "Base:pin2_38"
+
+' boolean add shapes: Base:mono, Base:pin2_39
+Solid.Add "Base:mono", "Base:pin2_39"
+
+' boolean add shapes: Base:mono, Base:pin2_40
+Solid.Add "Base:mono", "Base:pin2_40"
+
+' boolean add shapes: Base:mono, Base:pin2_41
+Solid.Add "Base:mono", "Base:pin2_41"
+
+' boolean add shapes: Base:mono, Base:pin2_42
+Solid.Add "Base:mono", "Base:pin2_42"
+
+' boolean add shapes: Base:mono, Base:pin2_43
+Solid.Add "Base:mono", "Base:pin2_43"
+
+' boolean add shapes: Base:mono, Base:pin2_44
+Solid.Add "Base:mono", "Base:pin2_44"
+
+' boolean add shapes: Base:mono, Base:pin2_45
+Solid.Add "Base:mono", "Base:pin2_45"
+
+' boolean add shapes: Base:mono, Base:pin2_46
+Solid.Add "Base:mono", "Base:pin2_46"
+
+' boolean add shapes: Base:mono, Base:pin2_47
+Solid.Add "Base:mono", "Base:pin2_47"
+
+' boolean add shapes: Base:mono, Base:pin2_48
+Solid.Add "Base:mono", "Base:pin2_48"
+
+' boolean add shapes: Base:mono, Base:pin2_49
+Solid.Add "Base:mono", "Base:pin2_49"
+
+' boolean add shapes: Base:mono, Base:pin2_50
+Solid.Add "Base:mono", "Base:pin2_50"
+
+' boolean add shapes: Base:mono, Base:pin2_51
+Solid.Add "Base:mono", "Base:pin2_51"
+
+' boolean add shapes: Base:mono, Base:pin2_52
+Solid.Add "Base:mono", "Base:pin2_52"
+
+' boolean add shapes: Base:mono, Base:pin2_53
+Solid.Add "Base:mono", "Base:pin2_53"
+
+' boolean add shapes: Base:mono, Base:pin2_54
+Solid.Add "Base:mono", "Base:pin2_54"
+
+' boolean add shapes: Base:mono, Base:pin2_55
+Solid.Add "Base:mono", "Base:pin2_55"
+
+' boolean add shapes: Base:mono, Base:pin2_56
+Solid.Add "Base:mono", "Base:pin2_56"
+
+' boolean add shapes: Base:mono, Base:pin2_57
+Solid.Add "Base:mono", "Base:pin2_57"
+
+' boolean add shapes: Base:mono, Base:pin2_58
+Solid.Add "Base:mono", "Base:pin2_58"
+
+' boolean add shapes: Base:mono, Base:pin2_59
+Solid.Add "Base:mono", "Base:pin2_59"
+
+' boolean add shapes: Base:mono, Base:pin2_60
+Solid.Add "Base:mono", "Base:pin2_60"
+
+' boolean add shapes: Base:mono, Base:pin2_61
+Solid.Add "Base:mono", "Base:pin2_61"
+
+' boolean add shapes: Base:mono, Base:pin2_62
+Solid.Add "Base:mono", "Base:pin2_62"
+
+' boolean add shapes: Base:mono, Base:pin2_63
+Solid.Add "Base:mono", "Base:pin2_63"
+
+' boolean add shapes: Base:mono, Base:pin2_64
+Solid.Add "Base:mono", "Base:pin2_64"
+
+' boolean add shapes: Base:mono, Base:pin2_65
+Solid.Add "Base:mono", "Base:pin2_65"
+
+' boolean add shapes: Base:mono, Base:pin2_66
+Solid.Add "Base:mono", "Base:pin2_66"
+
+' boolean add shapes: Base:mono, Base:pin2_67
+Solid.Add "Base:mono", "Base:pin2_67"
+
+' boolean add shapes: Base:mono, Base:pin2_68
+Solid.Add "Base:mono", "Base:pin2_68"
+
+' boolean add shapes: Base:mono, Base:pin2_69
+Solid.Add "Base:mono", "Base:pin2_69"
+
+' boolean add shapes: Base:mono, Base:pin2_70
+Solid.Add "Base:mono", "Base:pin2_70"
+
+' boolean add shapes: Base:mono, Base:pin2_71
+Solid.Add "Base:mono", "Base:pin2_71"
+
+' boolean add shapes: Base:mono, Base:pin2_72
+Solid.Add "Base:mono", "Base:pin2_72"
+
+' boolean add shapes: Base:mono, Base:pin2_73
+Solid.Add "Base:mono", "Base:pin2_73"
+
+' boolean add shapes: Base:mono, Base:pin2_74
+Solid.Add "Base:mono", "Base:pin2_74"
+
+' boolean add shapes: Base:mono, Base:pin2_75
+Solid.Add "Base:mono", "Base:pin2_75"
+
+' boolean add shapes: Base:mono, Base:pin2_76
+Solid.Add "Base:mono", "Base:pin2_76"
+
+' boolean add shapes: Base:mono, Base:pin2_77
+Solid.Add "Base:mono", "Base:pin2_77"
+
+' boolean add shapes: Base:mono, Base:pin2_78
+Solid.Add "Base:mono", "Base:pin2_78"
+
+' boolean add shapes: Base:mono, Base:pin3_00
+Solid.Add "Base:mono", "Base:pin3_00"
+
+' boolean add shapes: Base:mono, Base:pin3_01
+Solid.Add "Base:mono", "Base:pin3_01"
+
+' boolean add shapes: Base:mono, Base:pin3_02
+Solid.Add "Base:mono", "Base:pin3_02"
+
+' boolean add shapes: Base:mono, Base:pin3_03
+Solid.Add "Base:mono", "Base:pin3_03"
+
+' boolean add shapes: Base:mono, Base:pin3_04
+Solid.Add "Base:mono", "Base:pin3_04"
+
+' boolean add shapes: Base:mono, Base:pin3_05
+Solid.Add "Base:mono", "Base:pin3_05"
+
+' boolean add shapes: Base:mono, Base:pin3_06
+Solid.Add "Base:mono", "Base:pin3_06"
+
+' boolean add shapes: Base:mono, Base:pin3_07
+Solid.Add "Base:mono", "Base:pin3_07"
+
+' boolean add shapes: Base:mono, Base:pin3_08
+Solid.Add "Base:mono", "Base:pin3_08"
+
+' boolean add shapes: Base:mono, Base:pin3_09
+Solid.Add "Base:mono", "Base:pin3_09"
+
+' boolean add shapes: Base:mono, Base:pin3_10
+Solid.Add "Base:mono", "Base:pin3_10"
+
+' boolean add shapes: Base:mono, Base:pin3_11
+Solid.Add "Base:mono", "Base:pin3_11"
+
+' boolean add shapes: Base:mono, Base:pin3_12
+Solid.Add "Base:mono", "Base:pin3_12"
+
+' boolean add shapes: Base:mono, Base:pin3_13
+Solid.Add "Base:mono", "Base:pin3_13"
+
+' boolean add shapes: Base:mono, Base:pin3_14
+Solid.Add "Base:mono", "Base:pin3_14"
+
+' boolean add shapes: Base:mono, Base:pin3_15
+Solid.Add "Base:mono", "Base:pin3_15"
+
+' boolean add shapes: Base:mono, Base:pin3_16
+Solid.Add "Base:mono", "Base:pin3_16"
+
+' boolean add shapes: Base:mono, Base:pin3_17
+Solid.Add "Base:mono", "Base:pin3_17"
+
+' boolean add shapes: Base:mono, Base:pin3_18
+Solid.Add "Base:mono", "Base:pin3_18"
+
+' boolean add shapes: Base:mono, Base:pin3_19
+Solid.Add "Base:mono", "Base:pin3_19"
+
+' boolean add shapes: Base:mono, Base:pin3_20
+Solid.Add "Base:mono", "Base:pin3_20"
+
+' boolean add shapes: Base:mono, Base:pin3_21
+Solid.Add "Base:mono", "Base:pin3_21"
+
+' boolean add shapes: Base:mono, Base:pin3_22
+Solid.Add "Base:mono", "Base:pin3_22"
+
+' boolean add shapes: Base:mono, Base:pin3_23
+Solid.Add "Base:mono", "Base:pin3_23"
+
+' boolean add shapes: Base:mono, Base:pin3_24
+Solid.Add "Base:mono", "Base:pin3_24"
+
+' boolean add shapes: Base:mono, Base:pin3_25
+Solid.Add "Base:mono", "Base:pin3_25"
+
+' boolean add shapes: Base:mono, Base:pin3_26
+Solid.Add "Base:mono", "Base:pin3_26"
+
+' boolean add shapes: Base:mono, Base:pin3_27
+Solid.Add "Base:mono", "Base:pin3_27"
+
+' boolean add shapes: Base:mono, Base:pin3_28
+Solid.Add "Base:mono", "Base:pin3_28"
+
+' boolean add shapes: Base:mono, Base:pin3_29
+Solid.Add "Base:mono", "Base:pin3_29"
+
+' boolean add shapes: Base:mono, Base:pin3_30
+Solid.Add "Base:mono", "Base:pin3_30"
+
+' boolean add shapes: Base:mono, Base:pin3_31
+Solid.Add "Base:mono", "Base:pin3_31"
+
+' boolean add shapes: Base:mono, Base:pin3_32
+Solid.Add "Base:mono", "Base:pin3_32"
+
+' boolean add shapes: Base:mono, Base:pin3_33
+Solid.Add "Base:mono", "Base:pin3_33"
+
+' boolean add shapes: Base:mono, Base:pin3_34
+Solid.Add "Base:mono", "Base:pin3_34"
+
+' boolean add shapes: Base:mono, Base:pin3_35
+Solid.Add "Base:mono", "Base:pin3_35"
+
+' boolean add shapes: Base:mono, Base:pin3_36
+Solid.Add "Base:mono", "Base:pin3_36"
+
+' boolean add shapes: Base:mono, Base:pin3_37
+Solid.Add "Base:mono", "Base:pin3_37"
+
+' boolean add shapes: Base:mono, Base:pin3_38
+Solid.Add "Base:mono", "Base:pin3_38"
+
+' boolean add shapes: Base:mono, Base:pin3_39
+Solid.Add "Base:mono", "Base:pin3_39"
+
+' boolean add shapes: Base:mono, Base:pin3_40
+Solid.Add "Base:mono", "Base:pin3_40"
+
+' boolean add shapes: Base:mono, Base:pin3_41
+Solid.Add "Base:mono", "Base:pin3_41"
+
+' boolean add shapes: Base:mono, Base:pin3_42
+Solid.Add "Base:mono", "Base:pin3_42"
+
+' boolean add shapes: Base:mono, Base:pin3_43
+Solid.Add "Base:mono", "Base:pin3_43"
+
+' boolean add shapes: Base:mono, Base:pin3_44
+Solid.Add "Base:mono", "Base:pin3_44"
+
+' boolean add shapes: Base:mono, Base:pin3_45
+Solid.Add "Base:mono", "Base:pin3_45"
+
+' boolean add shapes: Base:mono, Base:pin3_46
+Solid.Add "Base:mono", "Base:pin3_46"
+
+' boolean add shapes: Base:mono, Base:pin3_47
+Solid.Add "Base:mono", "Base:pin3_47"
+
+' boolean add shapes: Base:mono, Base:pin3_48
+Solid.Add "Base:mono", "Base:pin3_48"
+
+' boolean add shapes: Base:mono, Base:pin3_49
+Solid.Add "Base:mono", "Base:pin3_49"
+
+' boolean add shapes: Base:mono, Base:pin3_50
+Solid.Add "Base:mono", "Base:pin3_50"
+
+' boolean add shapes: Base:mono, Base:pin3_51
+Solid.Add "Base:mono", "Base:pin3_51"
+
+' boolean add shapes: Base:mono, Base:pin3_52
+Solid.Add "Base:mono", "Base:pin3_52"
+
+' boolean add shapes: Base:mono, Base:pin3_53
+Solid.Add "Base:mono", "Base:pin3_53"
+
+' boolean add shapes: Base:mono, Base:pin3_54
+Solid.Add "Base:mono", "Base:pin3_54"
+
+' boolean add shapes: Base:mono, Base:pin3_55
+Solid.Add "Base:mono", "Base:pin3_55"
+
+' boolean add shapes: Base:mono, Base:pin3_56
+Solid.Add "Base:mono", "Base:pin3_56"
+
+' boolean add shapes: Base:mono, Base:pin3_57
+Solid.Add "Base:mono", "Base:pin3_57"
+
+' boolean add shapes: Base:mono, Base:pin3_58
+Solid.Add "Base:mono", "Base:pin3_58"
+
+' boolean add shapes: Base:mono, Base:pin3_59
+Solid.Add "Base:mono", "Base:pin3_59"
+
+' boolean add shapes: Base:mono, Base:pin3_60
+Solid.Add "Base:mono", "Base:pin3_60"
+
+' boolean add shapes: Base:mono, Base:pin3_61
+Solid.Add "Base:mono", "Base:pin3_61"
+
+' boolean add shapes: Base:mono, Base:pin3_62
+Solid.Add "Base:mono", "Base:pin3_62"
+
+' boolean add shapes: Base:mono, Base:pin3_63
+Solid.Add "Base:mono", "Base:pin3_63"
+
+' boolean add shapes: Base:mono, Base:pin3_64
+Solid.Add "Base:mono", "Base:pin3_64"
+
+' boolean add shapes: Base:mono, Base:pin3_65
+Solid.Add "Base:mono", "Base:pin3_65"
+
+' boolean add shapes: Base:mono, Base:pin3_66
+Solid.Add "Base:mono", "Base:pin3_66"
+
+' boolean add shapes: Base:mono, Base:pin3_67
+Solid.Add "Base:mono", "Base:pin3_67"
+
+' boolean add shapes: Base:mono, Base:pin3_68
+Solid.Add "Base:mono", "Base:pin3_68"
+
+' boolean add shapes: Base:mono, Base:pin3_69
+Solid.Add "Base:mono", "Base:pin3_69"
+
+' boolean add shapes: Base:mono, Base:pin3_70
+Solid.Add "Base:mono", "Base:pin3_70"
+
+' boolean add shapes: Base:mono, Base:pin3_71
+Solid.Add "Base:mono", "Base:pin3_71"
+
+' boolean add shapes: Base:mono, Base:pin3_72
+Solid.Add "Base:mono", "Base:pin3_72"
+
+' boolean add shapes: Base:mono, Base:pin3_73
+Solid.Add "Base:mono", "Base:pin3_73"
+
+' boolean add shapes: Base:mono, Base:pin3_74
+Solid.Add "Base:mono", "Base:pin3_74"
+
+' boolean add shapes: Base:mono, Base:pin3_75
+Solid.Add "Base:mono", "Base:pin3_75"
+
+' boolean add shapes: Base:mono, Base:pin3_76
+Solid.Add "Base:mono", "Base:pin3_76"
+
+' boolean add shapes: Base:mono, Base:pin3_77
+Solid.Add "Base:mono", "Base:pin3_77"
+
+' boolean add shapes: Base:mono, Base:pin3_78
+Solid.Add "Base:mono", "Base:pin3_78"
+
+' boolean add shapes: Base:mono, Base:pin4_00
+Solid.Add "Base:mono", "Base:pin4_00"
+
+' boolean add shapes: Base:mono, Base:pin4_01
+Solid.Add "Base:mono", "Base:pin4_01"
+
+' boolean add shapes: Base:mono, Base:pin4_02
+Solid.Add "Base:mono", "Base:pin4_02"
+
+' boolean add shapes: Base:mono, Base:pin4_03
+Solid.Add "Base:mono", "Base:pin4_03"
+
+' boolean add shapes: Base:mono, Base:pin4_04
+Solid.Add "Base:mono", "Base:pin4_04"
+
+' boolean add shapes: Base:mono, Base:pin4_05
+Solid.Add "Base:mono", "Base:pin4_05"
+
+' boolean add shapes: Base:mono, Base:pin4_06
+Solid.Add "Base:mono", "Base:pin4_06"
+
+' boolean add shapes: Base:mono, Base:pin4_07
+Solid.Add "Base:mono", "Base:pin4_07"
+
+' boolean add shapes: Base:mono, Base:pin4_08
+Solid.Add "Base:mono", "Base:pin4_08"
+
+' boolean add shapes: Base:mono, Base:pin4_09
+Solid.Add "Base:mono", "Base:pin4_09"
+
+' boolean add shapes: Base:mono, Base:pin4_10
+Solid.Add "Base:mono", "Base:pin4_10"
+
+' boolean add shapes: Base:mono, Base:pin4_11
+Solid.Add "Base:mono", "Base:pin4_11"
+
+' boolean add shapes: Base:mono, Base:pin4_12
+Solid.Add "Base:mono", "Base:pin4_12"
+
+' boolean add shapes: Base:mono, Base:pin4_13
+Solid.Add "Base:mono", "Base:pin4_13"
+
+' boolean add shapes: Base:mono, Base:pin4_14
+Solid.Add "Base:mono", "Base:pin4_14"
+
+' boolean add shapes: Base:mono, Base:pin4_15
+Solid.Add "Base:mono", "Base:pin4_15"
+
+' boolean add shapes: Base:mono, Base:pin4_16
+Solid.Add "Base:mono", "Base:pin4_16"
+
+' boolean add shapes: Base:mono, Base:pin4_17
+Solid.Add "Base:mono", "Base:pin4_17"
+
+' boolean add shapes: Base:mono, Base:pin4_18
+Solid.Add "Base:mono", "Base:pin4_18"
+
+' boolean add shapes: Base:mono, Base:pin4_19
+Solid.Add "Base:mono", "Base:pin4_19"
+
+' boolean add shapes: Base:mono, Base:pin4_20
+Solid.Add "Base:mono", "Base:pin4_20"
+
+' boolean add shapes: Base:mono, Base:pin4_21
+Solid.Add "Base:mono", "Base:pin4_21"
+
+' boolean add shapes: Base:mono, Base:pin4_22
+Solid.Add "Base:mono", "Base:pin4_22"
+
+' boolean add shapes: Base:mono, Base:pin4_23
+Solid.Add "Base:mono", "Base:pin4_23"
+
+' boolean add shapes: Base:mono, Base:pin4_24
+Solid.Add "Base:mono", "Base:pin4_24"
+
+' boolean add shapes: Base:mono, Base:pin4_25
+Solid.Add "Base:mono", "Base:pin4_25"
+
+' boolean add shapes: Base:mono, Base:pin4_26
+Solid.Add "Base:mono", "Base:pin4_26"
+
+' boolean add shapes: Base:mono, Base:pin4_27
+Solid.Add "Base:mono", "Base:pin4_27"
+
+' boolean add shapes: Base:mono, Base:pin4_28
+Solid.Add "Base:mono", "Base:pin4_28"
+
+' boolean add shapes: Base:mono, Base:pin4_29
+Solid.Add "Base:mono", "Base:pin4_29"
+
+' boolean add shapes: Base:mono, Base:pin4_30
+Solid.Add "Base:mono", "Base:pin4_30"
+
+' boolean add shapes: Base:mono, Base:pin4_31
+Solid.Add "Base:mono", "Base:pin4_31"
+
+' boolean add shapes: Base:mono, Base:pin4_32
+Solid.Add "Base:mono", "Base:pin4_32"
+
+' boolean add shapes: Base:mono, Base:pin4_33
+Solid.Add "Base:mono", "Base:pin4_33"
+
+' boolean add shapes: Base:mono, Base:pin4_34
+Solid.Add "Base:mono", "Base:pin4_34"
+
+' boolean add shapes: Base:mono, Base:pin4_35
+Solid.Add "Base:mono", "Base:pin4_35"
+
+' boolean add shapes: Base:mono, Base:pin4_36
+Solid.Add "Base:mono", "Base:pin4_36"
+
+' boolean add shapes: Base:mono, Base:pin4_37
+Solid.Add "Base:mono", "Base:pin4_37"
+
+' boolean add shapes: Base:mono, Base:pin4_38
+Solid.Add "Base:mono", "Base:pin4_38"
+
+' boolean add shapes: Base:mono, Base:pin4_39
+Solid.Add "Base:mono", "Base:pin4_39"
+
+' boolean add shapes: Base:mono, Base:pin4_40
+Solid.Add "Base:mono", "Base:pin4_40"
+
+' boolean add shapes: Base:mono, Base:pin4_41
+Solid.Add "Base:mono", "Base:pin4_41"
+
+' boolean add shapes: Base:mono, Base:pin4_42
+Solid.Add "Base:mono", "Base:pin4_42"
+
+' boolean add shapes: Base:mono, Base:pin4_43
+Solid.Add "Base:mono", "Base:pin4_43"
+
+' boolean add shapes: Base:mono, Base:pin4_44
+Solid.Add "Base:mono", "Base:pin4_44"
+
+' boolean add shapes: Base:mono, Base:pin4_45
+Solid.Add "Base:mono", "Base:pin4_45"
+
+' boolean add shapes: Base:mono, Base:pin4_46
+Solid.Add "Base:mono", "Base:pin4_46"
+
+' boolean add shapes: Base:mono, Base:pin4_47
+Solid.Add "Base:mono", "Base:pin4_47"
+
+' boolean add shapes: Base:mono, Base:pin4_48
+Solid.Add "Base:mono", "Base:pin4_48"
+
+' boolean add shapes: Base:mono, Base:pin4_49
+Solid.Add "Base:mono", "Base:pin4_49"
+
+' boolean add shapes: Base:mono, Base:pin4_50
+Solid.Add "Base:mono", "Base:pin4_50"
+
+' boolean add shapes: Base:mono, Base:pin4_51
+Solid.Add "Base:mono", "Base:pin4_51"
+
+' boolean add shapes: Base:mono, Base:pin4_52
+Solid.Add "Base:mono", "Base:pin4_52"
+
+' boolean add shapes: Base:mono, Base:pin4_53
+Solid.Add "Base:mono", "Base:pin4_53"
+
+' boolean add shapes: Base:mono, Base:pin4_54
+Solid.Add "Base:mono", "Base:pin4_54"
+
+' boolean add shapes: Base:mono, Base:pin4_55
+Solid.Add "Base:mono", "Base:pin4_55"
+
+' boolean add shapes: Base:mono, Base:pin4_56
+Solid.Add "Base:mono", "Base:pin4_56"
+
+' boolean add shapes: Base:mono, Base:pin4_57
+Solid.Add "Base:mono", "Base:pin4_57"
+
+' boolean add shapes: Base:mono, Base:pin4_58
+Solid.Add "Base:mono", "Base:pin4_58"
+
+' boolean add shapes: Base:mono, Base:pin4_59
+Solid.Add "Base:mono", "Base:pin4_59"
+
+' boolean add shapes: Base:mono, Base:pin4_60
+Solid.Add "Base:mono", "Base:pin4_60"
+
+' boolean add shapes: Base:mono, Base:pin4_61
+Solid.Add "Base:mono", "Base:pin4_61"
+
+' boolean add shapes: Base:mono, Base:pin4_62
+Solid.Add "Base:mono", "Base:pin4_62"
+
+' boolean add shapes: Base:mono, Base:pin4_63
+Solid.Add "Base:mono", "Base:pin4_63"
+
+' boolean add shapes: Base:mono, Base:pin4_64
+Solid.Add "Base:mono", "Base:pin4_64"
+
+' boolean add shapes: Base:mono, Base:pin4_65
+Solid.Add "Base:mono", "Base:pin4_65"
+
+' boolean add shapes: Base:mono, Base:pin4_66
+Solid.Add "Base:mono", "Base:pin4_66"
+
+' boolean add shapes: Base:mono, Base:pin4_67
+Solid.Add "Base:mono", "Base:pin4_67"
+
+' boolean add shapes: Base:mono, Base:pin4_68
+Solid.Add "Base:mono", "Base:pin4_68"
+
+' boolean add shapes: Base:mono, Base:pin4_69
+Solid.Add "Base:mono", "Base:pin4_69"
+
+' boolean add shapes: Base:mono, Base:pin4_70
+Solid.Add "Base:mono", "Base:pin4_70"
+
+' boolean add shapes: Base:mono, Base:pin4_71
+Solid.Add "Base:mono", "Base:pin4_71"
+
+' boolean add shapes: Base:mono, Base:pin4_72
+Solid.Add "Base:mono", "Base:pin4_72"
+
+' boolean add shapes: Base:mono, Base:pin4_73
+Solid.Add "Base:mono", "Base:pin4_73"
+
+' boolean add shapes: Base:mono, Base:pin4_74
+Solid.Add "Base:mono", "Base:pin4_74"
+
+' boolean add shapes: Base:mono, Base:pin4_75
+Solid.Add "Base:mono", "Base:pin4_75"
+
+' boolean add shapes: Base:mono, Base:pin4_76
+Solid.Add "Base:mono", "Base:pin4_76"
+
+' boolean add shapes: Base:mono, Base:pin4_77
+Solid.Add "Base:mono", "Base:pin4_77"
+
+' boolean add shapes: Base:mono, Base:pin4_78
+Solid.Add "Base:mono", "Base:pin4_78"
+
+'## 21 - define cylinders: Base:taladros de brida (16)
+' define cylinder: Base:cbTL
+With Cylinder
+     .Reset
+     .Name "cbTL"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dcb/2+tpl"
@@ -343,10 +6277,26 @@ With Cylinder
      .Create
 End With
 
-'## 25 - define cylinder: Base:cbB
+' define cylinder: Base:cbTR
 With Cylinder
      .Reset
-     .Name "cbB"
+     .Name "cbTR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcb", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:cbBL
+With Cylinder
+     .Reset
+     .Name "cbBL"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dcb/2+tpl"
@@ -359,13 +6309,26 @@ With Cylinder
      .Create
 End With
 
-'## 26 - boolean add shapes: Base:fl, Base:cbB
-Solid.Add "Base:fl", "Base:cbB"
-
-'## 27 - define cylinder: Base:tpT
+' define cylinder: Base:cbBR
 With Cylinder
      .Reset
-     .Name "tpT"
+     .Name "cbBR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcb", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpTL
+With Cylinder
+     .Reset
+     .Name "tpTL"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dtap/2+tpl"
@@ -378,13 +6341,26 @@ With Cylinder
      .Create
 End With
 
-'## 28 - boolean add shapes: Base:fl, Base:tpT
-Solid.Add "Base:fl", "Base:tpT"
-
-'## 29 - define cylinder: Base:tpB
+' define cylinder: Base:tpTR
 With Cylinder
      .Reset
-     .Name "tpB"
+     .Name "tpTR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dtap/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-ltap", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpBL
+With Cylinder
+     .Reset
+     .Name "tpBL"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dtap/2+tpl"
@@ -397,13 +6373,26 @@ With Cylinder
      .Create
 End With
 
-'## 30 - boolean add shapes: Base:fl, Base:tpB
-Solid.Add "Base:fl", "Base:tpB"
-
-'## 31 - define cylinder: Base:al1
+' define cylinder: Base:tpBR
 With Cylinder
      .Reset
-     .Name "al1"
+     .Name "tpBR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dtap/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-ltap", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al1L
+With Cylinder
+     .Reset
+     .Name "al1L"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dpst/2+tpl"
@@ -416,13 +6405,26 @@ With Cylinder
      .Create
 End With
 
-'## 32 - boolean add shapes: Base:fl, Base:al1
-Solid.Add "Base:fl", "Base:al1"
-
-'## 33 - define cylinder: Base:al2
+' define cylinder: Base:al1R
 With Cylinder
      .Reset
-     .Name "al2"
+     .Name "al1R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpst/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(chir*r45)"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al2L
+With Cylinder
+     .Reset
+     .Name "al2L"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dpst/2+tpl"
@@ -435,13 +6437,26 @@ With Cylinder
      .Create
 End With
 
-'## 34 - boolean add shapes: Base:fl, Base:al2
-Solid.Add "Base:fl", "Base:al2"
-
-'## 35 - define cylinder: Base:al3
+' define cylinder: Base:al2R
 With Cylinder
      .Reset
-     .Name "al3"
+     .Name "al2R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dpst/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(-chir*r45)"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al3L
+With Cylinder
+     .Reset
+     .Name "al3L"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dprc/2+tpl"
@@ -454,13 +6469,26 @@ With Cylinder
      .Create
 End With
 
-'## 36 - boolean add shapes: Base:fl, Base:al3
-Solid.Add "Base:fl", "Base:al3"
-
-'## 37 - define cylinder: Base:al4
+' define cylinder: Base:al3R
 With Cylinder
      .Reset
-     .Name "al4"
+     .Name "al3R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(-chir*r45)"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al4L
+With Cylinder
+     .Reset
+     .Name "al4L"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dprc/2+tpl"
@@ -473,33 +6501,76 @@ With Cylinder
      .Create
 End With
 
-'## 38 - boolean add shapes: Base:fl, Base:al4
-Solid.Add "Base:fl", "Base:al4"
-
-'## 39 - transform: rotate Base:fl
-With Transform
-     .Reset
-     .Name "Base:fl"
-     .Origin "Free"
-     .Center "0", "0", "0"
-     .Angle "0", "0", "180"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "1"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Rotate"
-End With
-
-'## 40 - boolean subtract shapes: Base:mono, Base:fl
-Solid.Subtract "Base:mono", "Base:fl"
-
-'## 41 - define cylinder: Base:m3
+' define cylinder: Base:al4R
 With Cylinder
      .Reset
-     .Name "m3"
+     .Name "al4R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(chir*r45)"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+'## 22 - boolean subtract shapes: Base:mono, taladros de brida
+' boolean subtract shapes: Base:mono, Base:cbTL
+Solid.Subtract "Base:mono", "Base:cbTL"
+
+' boolean subtract shapes: Base:mono, Base:cbTR
+Solid.Subtract "Base:mono", "Base:cbTR"
+
+' boolean subtract shapes: Base:mono, Base:cbBL
+Solid.Subtract "Base:mono", "Base:cbBL"
+
+' boolean subtract shapes: Base:mono, Base:cbBR
+Solid.Subtract "Base:mono", "Base:cbBR"
+
+' boolean subtract shapes: Base:mono, Base:tpTL
+Solid.Subtract "Base:mono", "Base:tpTL"
+
+' boolean subtract shapes: Base:mono, Base:tpTR
+Solid.Subtract "Base:mono", "Base:tpTR"
+
+' boolean subtract shapes: Base:mono, Base:tpBL
+Solid.Subtract "Base:mono", "Base:tpBL"
+
+' boolean subtract shapes: Base:mono, Base:tpBR
+Solid.Subtract "Base:mono", "Base:tpBR"
+
+' boolean subtract shapes: Base:mono, Base:al1L
+Solid.Subtract "Base:mono", "Base:al1L"
+
+' boolean subtract shapes: Base:mono, Base:al1R
+Solid.Subtract "Base:mono", "Base:al1R"
+
+' boolean subtract shapes: Base:mono, Base:al2L
+Solid.Subtract "Base:mono", "Base:al2L"
+
+' boolean subtract shapes: Base:mono, Base:al2R
+Solid.Subtract "Base:mono", "Base:al2R"
+
+' boolean subtract shapes: Base:mono, Base:al3L
+Solid.Subtract "Base:mono", "Base:al3L"
+
+' boolean subtract shapes: Base:mono, Base:al3R
+Solid.Subtract "Base:mono", "Base:al3R"
+
+' boolean subtract shapes: Base:mono, Base:al4L
+Solid.Subtract "Base:mono", "Base:al4L"
+
+' boolean subtract shapes: Base:mono, Base:al4R
+Solid.Subtract "Base:mono", "Base:al4R"
+
+'## 23 - define cylinders: Base:pasantes M3 (10) y centrado A/B (2)
+' define cylinder: Base:m3_a0
+With Cylinder
+     .Reset
+     .Name "m3_a0"
      .Component "Base"
      .Material "Ni_plated"
      .OuterRadius "dm3/2+tpl"
@@ -512,44 +6583,220 @@ With Cylinder
      .Create
 End With
 
-'## 42 - transform: mirror Base:m3
-With Transform
+' define cylinder: Base:m3_a1
+With Cylinder
      .Reset
-     .Name "Base:m3"
-     .Origin "Free"
-     .Center "0", "0", "0"
-     .PlaneNormal "0", "1", "0"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "1"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Mirror"
+     .Name "m3_a1"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xm3"
+     .Ycenter "ym3"
+     .Segments "0"
+     .Create
 End With
 
-'## 43 - transform: translate Base:m3
-With Transform
+' define cylinder: Base:m3_a2
+With Cylinder
      .Reset
-     .Name "Base:m3"
-     .Vector "xm3", "0", "0"
-     .UsePickedPoints "False"
-     .InvertPickedPoints "False"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "4"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Translate"
+     .Name "m3_a2"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xm3"
+     .Ycenter "ym3"
+     .Segments "0"
+     .Create
 End With
 
-'## 44 - boolean subtract shapes: Base:mono, Base:m3
-Solid.Subtract "Base:mono", "Base:m3"
+' define cylinder: Base:m3_a3
+With Cylinder
+     .Reset
+     .Name "m3_a3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xm3"
+     .Ycenter "ym3"
+     .Segments "0"
+     .Create
+End With
 
-'## 45 - transform: translate Base:mono
+' define cylinder: Base:m3_a4
+With Cylinder
+     .Reset
+     .Name "m3_a4"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xm3"
+     .Ycenter "ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:m3_b0
+With Cylinder
+     .Reset
+     .Name "m3_b0"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-2*xm3"
+     .Ycenter "-ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:m3_b1
+With Cylinder
+     .Reset
+     .Name "m3_b1"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xm3"
+     .Ycenter "-ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:m3_b2
+With Cylinder
+     .Reset
+     .Name "m3_b2"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xm3"
+     .Ycenter "-ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:m3_b3
+With Cylinder
+     .Reset
+     .Name "m3_b3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xm3"
+     .Ycenter "-ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:m3_b4
+With Cylinder
+     .Reset
+     .Name "m3_b4"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dm3/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xm3"
+     .Ycenter "-ym3"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:abA
+With Cylinder
+     .Reset
+     .Name "abA"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dab/2"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-xab"
+     .Ycenter "yab"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:abB
+With Cylinder
+     .Reset
+     .Name "abB"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dab/2"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "xab"
+     .Ycenter "-yab"
+     .Segments "0"
+     .Create
+End With
+
+'## 24 - boolean subtract shapes: Base:mono, pasantes
+' boolean subtract shapes: Base:mono, Base:m3_a0
+Solid.Subtract "Base:mono", "Base:m3_a0"
+
+' boolean subtract shapes: Base:mono, Base:m3_a1
+Solid.Subtract "Base:mono", "Base:m3_a1"
+
+' boolean subtract shapes: Base:mono, Base:m3_a2
+Solid.Subtract "Base:mono", "Base:m3_a2"
+
+' boolean subtract shapes: Base:mono, Base:m3_a3
+Solid.Subtract "Base:mono", "Base:m3_a3"
+
+' boolean subtract shapes: Base:mono, Base:m3_a4
+Solid.Subtract "Base:mono", "Base:m3_a4"
+
+' boolean subtract shapes: Base:mono, Base:m3_b0
+Solid.Subtract "Base:mono", "Base:m3_b0"
+
+' boolean subtract shapes: Base:mono, Base:m3_b1
+Solid.Subtract "Base:mono", "Base:m3_b1"
+
+' boolean subtract shapes: Base:mono, Base:m3_b2
+Solid.Subtract "Base:mono", "Base:m3_b2"
+
+' boolean subtract shapes: Base:mono, Base:m3_b3
+Solid.Subtract "Base:mono", "Base:m3_b3"
+
+' boolean subtract shapes: Base:mono, Base:m3_b4
+Solid.Subtract "Base:mono", "Base:m3_b4"
+
+' boolean subtract shapes: Base:mono, Base:abA
+Solid.Subtract "Base:mono", "Base:abA"
+
+' boolean subtract shapes: Base:mono, Base:abB
+Solid.Subtract "Base:mono", "Base:abB"
+
+'## 25 - transform: translate Base:mono
 With Transform
      .Reset
      .Name "Base:mono"
@@ -566,7 +6813,7 @@ With Transform
      .Transform "Shape", "Translate"
 End With
 
-'## 46 - define brick: Base:cutB
+'## 26 - define brick: Base:cutB
 With Brick
      .Reset
      .Name "cutB"
@@ -578,7 +6825,7 @@ With Brick
      .Create
 End With
 
-'## 47 - define brick: Tapa:cutT
+'## 27 - define brick: Tapa:cutT
 With Brick
      .Reset
      .Name "cutT"
@@ -590,123 +6837,31 @@ With Brick
      .Create
 End With
 
-'## 48 - boolean intersect shapes: Base:mono, Base:cutB
+'## 28 - boolean intersect shapes: Base:mono, Base:cutB
 With Solid
      .Version 10
      .Intersect "Base:mono", "Base:cutB"
      .Version 1
 End With
 
-'## 49 - boolean intersect shapes: Tapa:mono, Tapa:cutT
+'## 29 - boolean intersect shapes: Tapa:mono, Tapa:cutT
 With Solid
      .Version 10
      .Intersect "Tapa:mono", "Tapa:cutT"
      .Version 1
 End With
 
-'## 50 - rename block: Base:mono to: Base:base
+'## 30 - rename block: Base:mono to: Base:base
 Solid.Rename "Base:mono", "base"
 
-'## 51 - rename block: Tapa:mono to: Tapa:tapa
+'## 31 - rename block: Tapa:mono to: Tapa:tapa
 Solid.Rename "Tapa:mono", "tapa"
 
-'## 52 - define cylinder: Base:pA
+'## 32 - define cylinders: Tapa:hex (10)
+' define cylinder: Tapa:hex_a0
 With Cylinder
      .Reset
-     .Name "pA"
-     .Component "Base"
-     .Material "Ni_plated"
-     .OuterRadius "dpress/2"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "zpart-lab", "zpart+0.1"
-     .Xcenter "-xab"
-     .Ycenter "yab"
-     .Segments "0"
-     .Create
-End With
-
-'## 53 - define cylinder: Base:pB
-With Cylinder
-     .Reset
-     .Name "pB"
-     .Component "Base"
-     .Material "Ni_plated"
-     .OuterRadius "dpress/2"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "zpart-lab", "zpart+0.1"
-     .Xcenter "xab"
-     .Ycenter "-yab"
-     .Segments "0"
-     .Create
-End With
-
-'## 54 - boolean add shapes: Base:pA, Base:pB
-Solid.Add "Base:pA", "Base:pB"
-
-'## 55 - boolean subtract shapes: Base:base, Base:pA
-Solid.Subtract "Base:base", "Base:pA"
-
-'## 56 - define cylinder: Tapa:hA
-With Cylinder
-     .Reset
-     .Name "hA"
-     .Component "Tapa"
-     .Material "Ni_plated"
-     .OuterRadius "dslip/2+tpl"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "zpart-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "-xab"
-     .Ycenter "yab"
-     .Segments "0"
-     .Create
-End With
-
-'## 57 - define cylinder: Tapa:hB
-With Cylinder
-     .Reset
-     .Name "hB"
-     .Component "Tapa"
-     .Material "Ni_plated"
-     .OuterRadius "dslip/2+tpl"
-     .InnerRadius "0.0"
-     .Axis "z"
-     .Zrange "zpart-0.1", "(zpart+Hhalf)+0.1"
-     .Xcenter "xab-(-0.911179)*slotL/2"
-     .Ycenter "-yab-(0.412011)*slotL/2"
-     .Segments "0"
-     .Create
-End With
-
-'## 58 - transform: translate Tapa:hB
-With Transform
-     .Reset
-     .Name "Tapa:hB"
-     .Vector "(-0.911179)*slotL/2", "(0.412011)*slotL/2", "0"
-     .UsePickedPoints "False"
-     .InvertPickedPoints "False"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "2"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Translate"
-End With
-
-'## 59 - boolean add shapes: Tapa:hA, Tapa:hB
-Solid.Add "Tapa:hA", "Tapa:hB"
-
-'## 60 - boolean subtract shapes: Tapa:tapa, Tapa:hA
-Solid.Subtract "Tapa:tapa", "Tapa:hA"
-
-'## 61 - define cylinder: Tapa:hex
-With Cylinder
-     .Reset
-     .Name "hex"
+     .Name "hex_a0"
      .Component "Tapa"
      .Material "Ni_plated"
      .OuterRadius "(hexS/2+tpl)/0.8660254"
@@ -719,44 +6874,182 @@ With Cylinder
      .Create
 End With
 
-'## 62 - transform: mirror Tapa:hex
-With Transform
+' define cylinder: Tapa:hex_a1
+With Cylinder
      .Reset
-     .Name "Tapa:hex"
-     .Origin "Free"
-     .Center "0", "0", "0"
-     .PlaneNormal "0", "1", "0"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "1"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Mirror"
+     .Name "hex_a1"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xm3"
+     .Ycenter "ym3"
+     .Segments "6"
+     .Create
 End With
 
-'## 63 - transform: translate Tapa:hex
-With Transform
+' define cylinder: Tapa:hex_a2
+With Cylinder
      .Reset
-     .Name "Tapa:hex"
-     .Vector "xm3", "0", "0"
-     .UsePickedPoints "False"
-     .InvertPickedPoints "False"
-     .MultipleObjects "True"
-     .GroupObjects "True"
-     .Repetitions "4"
-     .MultipleSelection "False"
-     .Destination ""
-     .Material ""
-     .AutoDestination "True"
-     .Transform "Shape", "Translate"
+     .Name "hex_a2"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xm3"
+     .Ycenter "ym3"
+     .Segments "6"
+     .Create
 End With
 
-'## 64 - boolean subtract shapes: Tapa:tapa, Tapa:hex
-Solid.Subtract "Tapa:tapa", "Tapa:hex"
+' define cylinder: Tapa:hex_a3
+With Cylinder
+     .Reset
+     .Name "hex_a3"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xm3"
+     .Ycenter "ym3"
+     .Segments "6"
+     .Create
+End With
 
-'## 65 - define port: 1
+' define cylinder: Tapa:hex_a4
+With Cylinder
+     .Reset
+     .Name "hex_a4"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xm3"
+     .Ycenter "ym3"
+     .Segments "6"
+     .Create
+End With
+
+' define cylinder: Tapa:hex_b0
+With Cylinder
+     .Reset
+     .Name "hex_b0"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "-2*xm3"
+     .Ycenter "-ym3"
+     .Segments "6"
+     .Create
+End With
+
+' define cylinder: Tapa:hex_b1
+With Cylinder
+     .Reset
+     .Name "hex_b1"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xm3"
+     .Ycenter "-ym3"
+     .Segments "6"
+     .Create
+End With
+
+' define cylinder: Tapa:hex_b2
+With Cylinder
+     .Reset
+     .Name "hex_b2"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xm3"
+     .Ycenter "-ym3"
+     .Segments "6"
+     .Create
+End With
+
+' define cylinder: Tapa:hex_b3
+With Cylinder
+     .Reset
+     .Name "hex_b3"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xm3"
+     .Ycenter "-ym3"
+     .Segments "6"
+     .Create
+End With
+
+' define cylinder: Tapa:hex_b4
+With Cylinder
+     .Reset
+     .Name "hex_b4"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .OuterRadius "(hexS/2+tpl)/0.8660254"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart+Hhalf)-hexH", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xm3"
+     .Ycenter "-ym3"
+     .Segments "6"
+     .Create
+End With
+
+'## 33 - boolean subtract shapes: Tapa:tapa, hex
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a0
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a0"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a1
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a1"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a2
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a2"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a3
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a3"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a4
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a4"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b0
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b0"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b1
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b1"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b2
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b2"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b3
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b3"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b4
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b4"
+
+'## 34 - define port: 1
 With Port
      .Reset
      .PortNumber "1"
@@ -783,7 +7076,7 @@ With Port
      .Create
 End With
 
-'## 66 - define port: 2
+'## 35 - define port: 2
 With Port
      .Reset
      .PortNumber "2"
@@ -810,7 +7103,7 @@ With Port
      .Create
 End With
 
-'## 67 - define time domain solver parameters
+'## 36 - define time domain solver parameters
 Mesh.SetCreator "High Frequency"
 With Solver
      .Method "Hexahedral"

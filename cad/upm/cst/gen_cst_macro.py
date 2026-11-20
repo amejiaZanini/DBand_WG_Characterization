@@ -13,6 +13,7 @@ Marco de referencia (centrado):
 Todo es paramétrico y no hay ninguna selección a mano (picks), así que el
 historial se puede reconstruir (Rebuild) sin errores al cambiar parámetros.
 """
+from contextlib import contextmanager
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -55,18 +56,11 @@ PARAMS = [
     ("hexH", "2.6", "profundidad del alojamiento de tuerca"),
     ("xab", "17.25", "pasadores de centrado A/B: |x|"),
     ("yab", "7.8", "pasadores de centrado A/B: |y|"),
-    ("dpress", "2.95", "agujero en la base para pasador Ø3 a presión"),
-    ("dslip", "3.05", "agujero/ranura en la tapa para pasador Ø3 (deslizante)"),
-    ("lab", "5", "profundidad del pasador en la base"),
-    ("slotL", "0.3", "alargamiento de la ranura B (en dirección A-B)"),
+    ("dab", "2.8", "agujero de centrado A/B pasante (mismo en base y tapa); escariar a 3.0 H7 con las dos mitades montadas"),
 ]
 
-# Dirección unitaria B -> A para la ranura B (A = (-xab, yab), B = (xab, -yab)).
-_ax, _ay = -2 * 17.25, 2 * 7.8
-_n = (_ax ** 2 + _ay ** 2) ** 0.5
-UX, UY = f"{_ax / _n:.6f}", f"{_ay / _n:.6f}"
-
-XDF = "(-Lwg/2+tboss)"          # cara del disco (izquierda)
+XDF = "(-Lwg/2+tboss)"          # cara del disco izquierdo
+XDFR = "(Lwg/2-tboss)"          # cara del disco derecho
 ZBOT = "(zpart-Hhalf)"
 ZTOP = "(zpart+Hhalf)"
 
@@ -78,8 +72,24 @@ def q(*vals):
     return ", ".join(f'"{v}"' for v in vals)
 
 
+_group = None                   # entrada del historial abierta con group()
+
+
 def add(caption, lines):
-    blocks.append((caption, lines))
+    if _group is not None:
+        _group.extend(["", f"' {caption}", *lines])
+    else:
+        blocks.append((caption, lines))
+
+
+@contextmanager
+def group(caption):
+    """Mete varios comandos en UNA entrada del historial (p. ej. los 316 pines)."""
+    global _group
+    _group = []
+    yield
+    blocks.append((caption, _group[1:]))
+    _group = None
 
 
 def brick(comp, name, xr, yr, zr):
@@ -117,20 +127,6 @@ def translate(shape, vec, reps="1", unite=True, dest=""):
     OPS.append(("translate", shape, vec, reps, unite, dest))
     _transform(shape, "Translate", [f"     .Vector {q(*vec)}", '     .UsePickedPoints "False"',
                                     '     .InvertPickedPoints "False"'], reps, True, unite, dest)
-
-
-def mirror_y(shape):
-    """Copia simétrica respecto al plano y = 0 y la une al original."""
-    OPS.append(("mirror_y", shape))
-    _transform(shape, "Mirror", ['     .Origin "Free"', '     .Center "0", "0", "0"',
-                                 '     .PlaneNormal "0", "1", "0"'])
-
-
-def rotate_z180(shape):
-    """Copia girada 180° alrededor del eje z (NO espejo: la brida es quiral) y unida."""
-    OPS.append(("rotate_z180", shape))
-    _transform(shape, "Rotate", ['     .Origin "Free"', '     .Center "0", "0", "0"',
-                                 '     .Angle "0", "0", "180"'])
 
 
 def boolean(op, a, b):
@@ -238,33 +234,48 @@ boolean("Subtract", "Base:mono", "Base:cav")
 brick("Base", "chan", ("-Lwg/2-0.1", "Lwg/2+0.1"), ("-aWR/2-tpl", "aWR/2+tpl"), ("-bWR/2", "bWR/2"))
 boolean("Subtract", "Base:mono", "Base:chan")
 
-# ── 7. Pines: 1 pin -> 2 (fila exterior) -> 4 (espejo) -> 316 (79 en x) ────
-cyl("Base", "pins", "z", "dpin/2-tpl", ("-bWR/2-0.01", "-bWR/2+hpin"), "x0pin", "y1pin")
-translate("Base:pins", ("0", "ppin", "0"))
-mirror_y("Base:pins")
-translate("Base:pins", ("ppin", "0", "0"), reps="78")
-boolean("Add", "Base:mono", "Base:pins")
+# ── 7. Pines: 316 cilindros explícitos (4 filas x 79) unidos al cuerpo ─────
+ROWS = ("y1pin", "y1pin+ppin", "-y1pin", "-y1pin-ppin")
+PINS = [(f"pin{r + 1}_{k:02d}", f"x0pin+{k}*ppin", y) for r, y in enumerate(ROWS) for k in range(79)]
+with group("define cylinders: Base:pin (316)"):
+    for name, xc, yc in PINS:
+        cyl("Base", name, "z", "dpin/2-tpl", ("-bWR/2-0.01", "-bWR/2+hpin"), xc, yc)
+with group("boolean add shapes: Base:mono, Base:pin (316)"):
+    for name, _, _ in PINS:
+        boolean("Add", "Base:mono", f"Base:{name}")
 
-# ── 8. Taladros de la brida izquierda, copia girada 180° a la derecha ───────
-cyl("Base", "fl", "x", "dcb/2+tpl", (f"{XDF}-0.1", f"{XDF}+lcb"), "0", "BCfl/2")
-tools = [("cbB", "dcb/2+tpl", f"{XDF}+lcb", "0", "-BCfl/2"),
-         ("tpT", "dtap/2+tpl", f"{XDF}+ltap", "0", "BCfl/2"),
-         ("tpB", "dtap/2+tpl", f"{XDF}+ltap", "0", "-BCfl/2"),
-         ("al1", "dpst/2+tpl", f"{XDF}+lal", "chir*r45", "r45"),
-         ("al2", "dpst/2+tpl", f"{XDF}+lal", "-chir*r45", "-r45"),
-         ("al3", "dprc/2+tpl", f"{XDF}+lal", "-chir*r45", "r45"),
-         ("al4", "dprc/2+tpl", f"{XDF}+lal", "chir*r45", "-r45")]
-for name, r, x1, yc, zc in tools:
-    cyl("Base", name, "x", r, (f"{XDF}-0.1", x1), yc, zc)
-    boolean("Add", "Base:fl", f"Base:{name}")
-rotate_z180("Base:fl")
-boolean("Subtract", "Base:mono", "Base:fl")
+# ── 8. Taladros de brida: izquierda y derecha (= izquierda girada 180° en z) ─
+FL = [("cbT", "dcb/2+tpl", "lcb", "0", "BCfl/2"),
+      ("cbB", "dcb/2+tpl", "lcb", "0", "-BCfl/2"),
+      ("tpT", "dtap/2+tpl", "ltap", "0", "BCfl/2"),
+      ("tpB", "dtap/2+tpl", "ltap", "0", "-BCfl/2"),
+      ("al1", "dpst/2+tpl", "lal", "chir*r45", "r45"),
+      ("al2", "dpst/2+tpl", "lal", "-chir*r45", "-r45"),
+      ("al3", "dprc/2+tpl", "lal", "-chir*r45", "r45"),
+      ("al4", "dprc/2+tpl", "lal", "chir*r45", "-r45")]
+FLT = []
+for name, r, depth, yc, zc in FL:
+    FLT.append((f"{name}L", r, (f"{XDF}-0.1", f"{XDF}+{depth}"), yc, zc))
+    FLT.append((f"{name}R", r, (f"{XDFR}-{depth}", f"{XDFR}+0.1"), f"-({yc})", zc))   # giro 180°: y -> -y
+with group("define cylinders: Base:taladros de brida (16)"):
+    for name, r, xr, yc, zc in FLT:
+        cyl("Base", name, "x", r, xr, yc, zc)
+with group("boolean subtract shapes: Base:mono, taladros de brida"):
+    for name, *_ in FLT:
+        boolean("Subtract", "Base:mono", f"Base:{name}")
 
-# ── 9. Agujeros pasantes M3 (10) ────────────────────────────────────────────
-cyl("Base", "m3", "z", "dm3/2+tpl", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), "-2*xm3", "ym3")
-mirror_y("Base:m3")
-translate("Base:m3", ("xm3", "0", "0"), reps="4")
-boolean("Subtract", "Base:mono", "Base:m3")
+# ── 9. Pasantes que atraviesan las DOS mitades a la vez (antes de partir) ───
+#    M3 (10) y centrado A/B: un solo cilindro por agujero -> idéntico y concéntrico en base y tapa.
+M3 = [(f"m3_{'ab'[s]}{k}", f"{k - 2}*xm3", "ym3" if s == 0 else "-ym3") for s in (0, 1) for k in range(5)]
+AB = [("abA", "-xab", "yab"), ("abB", "xab", "-yab")]
+with group("define cylinders: Base:pasantes M3 (10) y centrado A/B (2)"):
+    for name, xc, yc in M3:
+        cyl("Base", name, "z", "dm3/2+tpl", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), xc, yc)
+    for name, xc, yc in AB:
+        cyl("Base", name, "z", "dab/2", (f"{ZBOT}-0.1", f"{ZTOP}+0.1"), xc, yc)
+with group("boolean subtract shapes: Base:mono, pasantes"):
+    for name, *_ in M3 + AB:
+        boolean("Subtract", "Base:mono", f"Base:{name}")
 
 # ── 10. Partir: cada mitad (y cada media brida) en su componente ────────────
 translate("Base:mono", ("0", "0", "0"), unite=False, dest="Tapa")
@@ -275,24 +286,14 @@ intersect("Tapa:mono", "Tapa:cutT")
 rename("Base:mono", "base")
 rename("Tapa:mono", "tapa")
 
-# ── 11. Base: agujeros ciegos para los pasadores A y B (a presión) ──────────
-cyl("Base", "pA", "z", "dpress/2", ("zpart-lab", "zpart+0.1"), "-xab", "yab")
-cyl("Base", "pB", "z", "dpress/2", ("zpart-lab", "zpart+0.1"), "xab", "-yab")
-boolean("Add", "Base:pA", "Base:pB")
-boolean("Subtract", "Base:base", "Base:pA")
-
-# ── 12. Tapa: A redondo, B ranura (hacia A), alojamientos de tuerca ─────────
-cyl("Tapa", "hA", "z", "dslip/2+tpl", ("zpart-0.1", f"{ZTOP}+0.1"), "-xab", "yab")
-cyl("Tapa", "hB", "z", "dslip/2+tpl", ("zpart-0.1", f"{ZTOP}+0.1"),
-    f"xab-({UX})*slotL/2", f"-yab-({UY})*slotL/2")
-translate("Tapa:hB", (f"({UX})*slotL/2", f"({UY})*slotL/2", "0"), reps="2")
-boolean("Add", "Tapa:hA", "Tapa:hB")
-boolean("Subtract", "Tapa:tapa", "Tapa:hA")
-cyl("Tapa", "hex", "z", "(hexS/2+tpl)/0.8660254", (f"{ZTOP}-hexH", f"{ZTOP}+0.1"),
-    "-2*xm3", "ym3", seg="6")
-mirror_y("Tapa:hex")
-translate("Tapa:hex", ("xm3", "0", "0"), reps="4")
-boolean("Subtract", "Tapa:tapa", "Tapa:hex")
+# ── 11-12. Tapa: alojamientos hexagonales de tuerca M3 (10) ─────────────────
+HEX = [(f"hex_{'ab'[s]}{k}", f"{k - 2}*xm3", "ym3" if s == 0 else "-ym3") for s in (0, 1) for k in range(5)]
+with group("define cylinders: Tapa:hex (10)"):
+    for name, xc, yc in HEX:
+        cyl("Tapa", name, "z", "(hexS/2+tpl)/0.8660254", (f"{ZTOP}-hexH", f"{ZTOP}+0.1"), xc, yc, seg="6")
+with group("boolean subtract shapes: Tapa:tapa, hex"):
+    for name, *_ in HEX:
+        boolean("Subtract", "Tapa:tapa", f"Tapa:{name}")
 
 # ── 13. Puertos en las caras del resalte (sin picks) ────────────────────────
 for num, sx, ori in (("1", "-", "xmin"), ("2", "", "xmax")):
