@@ -13,10 +13,18 @@ Marco de referencia (centrado):
 Todo es paramétrico y no hay ninguna selección a mano (picks), así que el
 historial se puede reconstruir (Rebuild) sin errores al cambiar parámetros.
 """
+import os
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# Forma de los pines: "round" (cilíndricos, por defecto) o "rect" (rectangulares).
+#   python gen_cst_macro.py rect   ->  UPM_v2_rect_macro.bas / UPM_v2_rect_history.txt
+PIN_SHAPE = (sys.argv[1] if __name__ == "__main__" and len(sys.argv) > 1
+             else os.environ.get("UPM_PINS", "round"))
+assert PIN_SHAPE in ("round", "rect"), PIN_SHAPE
+SUFFIX = "" if PIN_SHAPE == "round" else "_rect"
 MAT = "Ni_plated"
 
 # (nombre, valor, descripción)
@@ -29,10 +37,13 @@ PARAMS = [
     ("zpart", "bWR/2", "plano de partición = techo de la cavidad (tapa plana)"),
     ("Lcav", "63", "largo de la cámara de pines"),
     ("Wcav", "9.997", "ancho de la cámara de pines"),
-    ("dpin", "0.4", "diámetro nominal del pin"),
+    *([("dpin", "0.4", "diámetro nominal del pin")] if PIN_SHAPE == "round" else
+      [("wpx", "0.4", "lado del pin en x (dirección de la guía)"),
+       ("wpy", "0.4", "lado del pin en y (perpendicular a la guía)")]),
     ("hpin", "0.77", "altura del pin (gap 0.05 hasta la tapa)"),
     ("ppin", "0.8", "periodo de pines"),
-    ("y1pin", "aWR/2+dpin/2", "fila interior (centrada respecto a la boca)"),
+    ("y1pin", "aWR/2+dpin/2" if PIN_SHAPE == "round" else "aWR/2+wpy/2",
+     "fila interior: la cara del pin queda alineada con la pared del canal"),
     ("x0pin", "-Lcav/2+0.3", "x del primer pin"),
     ("tpl", "0", "espesor de chapado: 0 para simular, 0.005 para fabricar"),
     ("tboss", "0.508", "espesor del resalte de la brida"),
@@ -253,9 +264,15 @@ boolean("Subtract", "Base:mono", "Base:chan")
 # ── 7. Pines: 316 cilindros explícitos (4 filas x 79) unidos al cuerpo ─────
 ROWS = ("y1pin", "y1pin+ppin", "-y1pin", "-y1pin-ppin")
 PINS = [(f"pin{r + 1}_{k:02d}", f"x0pin+{k}*ppin", y) for r, y in enumerate(ROWS) for k in range(79)]
-with group("define cylinders: Base:pin (316)"):
-    for name, xc, yc in PINS:
-        cyl("Base", name, "z", "dpin/2-tpl", ("-bWR/2-0.01", "-bWR/2+hpin"), xc, yc)
+if PIN_SHAPE == "round":
+    with group("define cylinders: Base:pin (316)"):
+        for name, xc, yc in PINS:
+            cyl("Base", name, "z", "dpin/2-tpl", ("-bWR/2-0.01", "-bWR/2+hpin"), xc, yc)
+else:
+    with group("define bricks: Base:pin rectangulares (316)"):
+        for name, xc, yc in PINS:
+            brick("Base", name, (f"{xc}-(wpx/2-tpl)", f"{xc}+(wpx/2-tpl)"),
+                  (f"{yc}-(wpy/2-tpl)", f"{yc}+(wpy/2-tpl)"), ("-bWR/2-0.01", "-bWR/2+hpin"))
 with group("boolean add shapes: Base:mono, Base:pin (316)"):
     for name, _, _ in PINS:
         boolean("Add", "Base:mono", f"Base:{name}")
@@ -378,9 +395,9 @@ def main():
         bas.append("")
     bas += ['    MsgBox "UPM v2: ' + str(len(blocks)) + ' pasos añadidos al historial.", vbInformation', "End Sub", ""]
 
-    (HERE / "UPM_v2_macro.bas").write_text("\r\n".join(bas), encoding="cp1252")
-    (HERE / "UPM_v2_history.txt").write_text("\r\n".join(hist) + "\r\n", encoding="cp1252")
-    print(f"{len(blocks)} bloques -> UPM_v2_macro.bas, UPM_v2_history.txt")
+    (HERE / f"UPM_v2{SUFFIX}_macro.bas").write_text("\r\n".join(bas), encoding="cp1252")
+    (HERE / f"UPM_v2{SUFFIX}_history.txt").write_text("\r\n".join(hist) + "\r\n", encoding="cp1252")
+    print(f"{len(blocks)} bloques -> UPM_v2{SUFFIX}_macro.bas, UPM_v2{SUFFIX}_history.txt")
 
 
 if __name__ == "__main__":

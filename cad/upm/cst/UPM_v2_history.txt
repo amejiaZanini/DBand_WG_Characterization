@@ -11,7 +11,7 @@
 '   dpin    = 0.4            ' diámetro nominal del pin
 '   hpin    = 0.77           ' altura del pin (gap 0.05 hasta la tapa)
 '   ppin    = 0.8            ' periodo de pines
-'   y1pin   = aWR/2+dpin/2   ' fila interior (centrada respecto a la boca)
+'   y1pin   = aWR/2+dpin/2   ' fila interior: la cara del pin queda alineada con la pared del canal
 '   x0pin   = -Lcav/2+0.3    ' x del primer pin
 '   tpl     = 0              ' espesor de chapado: 0 para simular, 0.005 para fabricar
 '   tboss   = 0.508          ' espesor del resalte de la brida

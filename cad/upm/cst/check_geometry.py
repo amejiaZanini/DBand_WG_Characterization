@@ -2,9 +2,10 @@
 para comprobar el modelo antes de abrir CST: piezas finales, número de pines,
 interferencias y cortes. Genera UPM_v2_check.png.
 
-Uso:  python check_geometry.py [tpl]      (requiere manifold3d, numpy y matplotlib)
+Uso:  python check_geometry.py [rect] [tpl]      (requiere manifold3d, numpy y matplotlib)
 """
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -16,6 +17,10 @@ from matplotlib.patches import Polygon as MPoly
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from manifold3d import CrossSection, Manifold
 
+ARGS = sys.argv[1:]
+if "rect" in ARGS:                          # python check_geometry.py rect [tpl]
+    os.environ["UPM_PINS"] = "rect"
+    ARGS.remove("rect")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_cst_macro as G  # noqa: E402
 
@@ -23,8 +28,8 @@ SEG = 96
 P = {}
 for n, v, _ in G.PARAMS:
     P[n] = eval(v, {}, P)
-if len(sys.argv) > 1:
-    P["tpl"] = float(sys.argv[1])
+if ARGS:
+    P["tpl"] = float(ARGS[0])
     for n, v, _ in G.PARAMS:            # re-evaluar dependientes
         if n != "tpl":
             P[n] = eval(v, {}, P)
@@ -89,7 +94,8 @@ for nm, m in (("base", base), ("tapa", tapa)):
 print(f"  interferencia base∩tapa = {(base ^ tapa).volume():.2e} mm3")
 
 polys0 = base.slice(0.0).to_polygons()
-apin = math.pi * (P["dpin"] / 2 - P["tpl"]) ** 2
+apin = (math.pi * (P["dpin"] / 2 - P["tpl"]) ** 2 if G.PIN_SHAPE == "round"
+        else (P["wpx"] - 2 * P["tpl"]) * (P["wpy"] - 2 * P["tpl"]))
 npins = sum(abs(abs(0.5 * np.sum(p[:, 0] * np.roll(p[:, 1], -1) - np.roll(p[:, 0], -1) * p[:, 1])) - apin) < 0.1 * apin
             for p in polys0)
 print(f"  pines en el corte z=0: {npins}")
@@ -182,7 +188,7 @@ ax.set_title("Corte ZY a 0.5 mm de la cara del disco (brida izquierda)", fontsiz
 ax.set_xlim(-21, 21); ax.set_ylim(-11, 11); ax.set_aspect("equal"); ax.tick_params(labelsize=8)
 
 fig.tight_layout()
-out = Path(__file__).resolve().parent / "UPM_v2_check.png"
+out = Path(__file__).resolve().parent / f"UPM_v2{G.SUFFIX}_check.png"
 fig.savefig(out, dpi=110, facecolor="white")
 print(out)
 
@@ -291,6 +297,6 @@ for ax, ((x0, y0), n) in zip(axs[1:], names.items()):
             f"desvío {1000 * math.hypot(xt - xb, yt - yb):.2f} µm", transform=ax.transAxes, ha="center",
             fontsize=10, bbox=dict(fc="white", ec="0.7"))
 fig.tight_layout()
-out2 = Path(__file__).resolve().parent / "UPM_v2_alineacion.png"
+out2 = Path(__file__).resolve().parent / f"UPM_v2{G.SUFFIX}_alineacion.png"
 fig.savefig(out2, dpi=110, facecolor="white")
 print(out2)
