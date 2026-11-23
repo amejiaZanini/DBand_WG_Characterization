@@ -1,0 +1,6353 @@
+' UPM v3 - historial generado por gen_cst_macro.py (no editar a mano)
+' Parámetros:
+'   Lwg     = 68.24          ' longitud boca a boca (cara del resalte a cara del resalte)
+'   Wbody   = 40             ' ancho del cuerpo en y (las dos mitades iguales)
+'   aWR     = 1.651          ' ancho de la boca WR-6.5
+'   bWR     = 0.82           ' alto de la boca y de la cámara de pines
+'   zpart   = bWR/2          ' plano de partición = techo de la cavidad (tapa plana)
+'   Lcav    = 63             ' largo de la cámara de pines
+'   Wcav    = 9.997          ' ancho de la cámara de pines
+'   wpx     = 0.4            ' lado del pin en x (dirección de la guía)
+'   wpy     = 0.4            ' lado del pin en y (perpendicular a la guía)
+'   hpin    = 0.77           ' altura del pin (gap 0.05 hasta la tapa)
+'   ppin    = 0.8            ' periodo de pines
+'   y1pin   = aWR/2+wpy/2    ' fila interior: la cara del pin queda alineada con la pared del canal
+'   x0pin   = -Lcav/2+0.3    ' x del primer pin
+'   tpl     = 0              ' espesor de chapado: 0 para simular, 0.005 para fabricar
+'   tboss   = 0.508          ' espesor del resalte de la brida
+'   Rboss   = 4.7625         ' radio del resalte
+'   tdisc   = 7.112          ' espesor del disco de brida (dentro de Lwg)
+'   Rdisc   = 9.525          ' radio del disco de brida
+'   Hhalf   = Rdisc+zpart    ' espesor de cada mitad: cubre el disco -> caras exteriores planas
+'   BCfl    = 14.2875        ' diámetro del círculo de tornillos de la brida
+'   r45     = 5.051394       ' BCfl/2 * cos(45)
+'   dcl     = 3.0            ' paso libre del tornillo 4-40 de la brida
+'   lcl     = 8              ' profundidad del paso libre desde la cara del disco
+'   xn0     = 3.4            ' inicio de la ranura de la tuerca 4-40 desde la cara del disco
+'   nT      = 2.6            ' espesor de la ranura (tuerca 4-40: 2.38)
+'   nW      = 6.55           ' ancho de la ranura (tuerca 4-40: 6.35 entrecaras)
+'   nR      = 3.77           ' semialtura de la ranura bajo el eje del tornillo (semidiagonal 3.67 + 0.1)
+'   dcb     = 3.556          ' avellanado de los 4-40
+'   lcb     = 1.016          ' profundidad del avellanado
+'   dprc    = 1.638          ' 4 agujeros a 45° para los pasadores 1/16 in del extensor (valen en cualquier diagonal)
+'   lal     = 3              ' profundidad de los agujeros de alineación de brida
+'   xsc     = 7.25           ' paso de los tornillos de cierre en x (9 por fila, hasta las bocas)
+'   ysc     = 7.75           ' filas de tornillos en y = ±ysc (pared de 1.3 mm a la cavidad)
+'   dsc     = 2.9            ' agujero pasante M2.5 (ISO 273 medio)
+'   hexS    = 5.2            ' entrecaras del alojamiento de tuerca M2.5 (tuerca S5 + 0.2)
+'   hexH    = 2.3            ' profundidad del alojamiento de tuerca (tuerca m = 2.0 + 0.3)
+'   xab     = 17.25          ' pasadores de centrado A/B: |x|
+'   yab     = 14.5           ' pasadores de centrado A/B: |y|
+'   dab     = 2.8            ' agujero de centrado A/B pasante (mismo en base y tapa); escariar a 3.0 H7 con las dos mitades montadas
+
+'## 01 - use template: WG6_Pins (UPM v3)
+With Units
+     .SetUnit "Length", "mm"
+     .SetUnit "Frequency", "GHz"
+     .SetUnit "Voltage", "V"
+     .SetUnit "Resistance", "Ohm"
+     .SetUnit "Inductance", "nH"
+     .SetUnit "Temperature",  "degC"
+     .SetUnit "Time", "ns"
+     .SetUnit "Current", "A"
+     .SetUnit "Conductance", "S"
+     .SetUnit "Capacitance", "pF"
+End With
+ThermalSolver.AmbientTemperature "0"
+Solver.FrequencyRange "110", "170"
+Plot.DrawBox True
+With Background
+     .Type "Normal"
+     .Epsilon "1.0"
+     .Mu "1.0"
+     .XminSpace "0.0"
+     .XmaxSpace "0.0"
+     .YminSpace "0.0"
+     .YmaxSpace "0.0"
+     .ZminSpace "0.0"
+     .ZmaxSpace "0.0"
+End With
+With Boundary
+     .Xmin "expanded open"
+     .Xmax "expanded open"
+     .Ymin "expanded open"
+     .Ymax "expanded open"
+     .Zmin "expanded open"
+     .Zmax "expanded open"
+     .Xsymmetry "none"
+     .Ysymmetry "none"
+     .Zsymmetry "none"
+End With
+FDSolver.ExtrudeOpenBC "True"
+Mesh.FPBAAvoidNonRegUnite "True"
+Mesh.ConsiderSpaceForLowerMeshLimit "False"
+Mesh.MinimumStepNumber "5"
+With MeshSettings
+     .SetMeshType "Hex"
+     .Set "RatioLimitGeometry", "20"
+End With
+With MeshSettings
+     .SetMeshType "HexTLM"
+     .Set "RatioLimitGeometry", "20"
+End With
+PostProcess1D.ActivateOperation "vswr", "true"
+PostProcess1D.ActivateOperation "yz-matrices", "true"
+With MeshSettings
+     .SetMeshType "Hex"
+     .Set "Version", 1%
+End With
+With Mesh
+     .MeshType "PBA"
+End With
+ChangeSolverType("HF Time Domain")
+
+'## 02 - define material: Ni_plated
+With Material
+     .Reset
+     .Name "Ni_plated"
+     .Folder ""
+     .FrqType "all"
+     .Type "Lossy metal"
+     .SetMaterialUnit "GHz", "mm"
+     .Mu "1"
+     .Kappa "1.44e7"
+     .Colour "0", "0.501961", "0.25098"
+     .Wireframe "False"
+     .Transparency "0"
+     .Create
+End With
+
+'## 03 - define material: Cu_plated
+With Material
+     .Reset
+     .Name "Cu_plated"
+     .Folder ""
+     .FrqType "all"
+     .Type "Lossy metal"
+     .SetMaterialUnit "GHz", "mm"
+     .Mu "1"
+     .Kappa "5.8e7"
+     .Colour "1", "0.52", "0.2"
+     .Wireframe "False"
+     .Transparency "0"
+     .Create
+End With
+
+'## 04 - new component: Base
+Component.New "Base"
+
+'## 05 - new component: Tapa
+Component.New "Tapa"
+
+'## 06 - define brick: Base:mono
+With Brick
+     .Reset
+     .Name "mono"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "-Lwg/2+tboss", "Lwg/2-tboss"
+     .Yrange "-Wbody/2", "Wbody/2"
+     .Zrange "(zpart-Hhalf)", "(zpart+Hhalf)"
+     .Create
+End With
+
+'## 07 - define cylinder: Base:discL
+With Cylinder
+     .Reset
+     .Name "discL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "Rdisc"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)", "(-Lwg/2+tboss)+tdisc"
+     .Ycenter "0"
+     .Zcenter "0"
+     .Segments "0"
+     .Create
+End With
+
+'## 08 - define cylinder: Base:discR
+With Cylinder
+     .Reset
+     .Name "discR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "Rdisc"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "Lwg/2-tboss-tdisc", "Lwg/2-tboss"
+     .Ycenter "0"
+     .Zcenter "0"
+     .Segments "0"
+     .Create
+End With
+
+'## 09 - define cylinder: Base:bossL
+With Cylinder
+     .Reset
+     .Name "bossL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "Rboss"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "-Lwg/2", "(-Lwg/2+tboss)"
+     .Ycenter "0"
+     .Zcenter "0"
+     .Segments "0"
+     .Create
+End With
+
+'## 10 - define cylinder: Base:bossR
+With Cylinder
+     .Reset
+     .Name "bossR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "Rboss"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "Lwg/2-tboss", "Lwg/2"
+     .Ycenter "0"
+     .Zcenter "0"
+     .Segments "0"
+     .Create
+End With
+
+'## 11 - boolean add shapes: Base:mono, Base:discL
+Solid.Add "Base:mono", "Base:discL"
+
+'## 12 - boolean add shapes: Base:mono, Base:discR
+Solid.Add "Base:mono", "Base:discR"
+
+'## 13 - boolean add shapes: Base:mono, Base:bossL
+Solid.Add "Base:mono", "Base:bossL"
+
+'## 14 - boolean add shapes: Base:mono, Base:bossR
+Solid.Add "Base:mono", "Base:bossR"
+
+'## 15 - define brick: Base:cav
+With Brick
+     .Reset
+     .Name "cav"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "-Lcav/2", "Lcav/2"
+     .Yrange "-Wcav/2-tpl", "Wcav/2+tpl"
+     .Zrange "-bWR/2", "bWR/2"
+     .Create
+End With
+
+'## 16 - boolean subtract shapes: Base:mono, Base:cav
+Solid.Subtract "Base:mono", "Base:cav"
+
+'## 17 - define brick: Base:chan
+With Brick
+     .Reset
+     .Name "chan"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "-Lwg/2-0.1", "Lwg/2+0.1"
+     .Yrange "-aWR/2-tpl", "aWR/2+tpl"
+     .Zrange "-bWR/2", "bWR/2"
+     .Create
+End With
+
+'## 18 - boolean subtract shapes: Base:mono, Base:chan
+Solid.Subtract "Base:mono", "Base:chan"
+
+'## 19 - define bricks: Base:pin rectangulares (316)
+' define brick: Base:pin1_00
+With Brick
+     .Reset
+     .Name "pin1_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+0*ppin-(wpx/2-tpl)", "x0pin+0*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_01
+With Brick
+     .Reset
+     .Name "pin1_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+1*ppin-(wpx/2-tpl)", "x0pin+1*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_02
+With Brick
+     .Reset
+     .Name "pin1_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+2*ppin-(wpx/2-tpl)", "x0pin+2*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_03
+With Brick
+     .Reset
+     .Name "pin1_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+3*ppin-(wpx/2-tpl)", "x0pin+3*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_04
+With Brick
+     .Reset
+     .Name "pin1_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+4*ppin-(wpx/2-tpl)", "x0pin+4*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_05
+With Brick
+     .Reset
+     .Name "pin1_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+5*ppin-(wpx/2-tpl)", "x0pin+5*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_06
+With Brick
+     .Reset
+     .Name "pin1_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+6*ppin-(wpx/2-tpl)", "x0pin+6*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_07
+With Brick
+     .Reset
+     .Name "pin1_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+7*ppin-(wpx/2-tpl)", "x0pin+7*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_08
+With Brick
+     .Reset
+     .Name "pin1_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+8*ppin-(wpx/2-tpl)", "x0pin+8*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_09
+With Brick
+     .Reset
+     .Name "pin1_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+9*ppin-(wpx/2-tpl)", "x0pin+9*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_10
+With Brick
+     .Reset
+     .Name "pin1_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+10*ppin-(wpx/2-tpl)", "x0pin+10*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_11
+With Brick
+     .Reset
+     .Name "pin1_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+11*ppin-(wpx/2-tpl)", "x0pin+11*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_12
+With Brick
+     .Reset
+     .Name "pin1_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+12*ppin-(wpx/2-tpl)", "x0pin+12*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_13
+With Brick
+     .Reset
+     .Name "pin1_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+13*ppin-(wpx/2-tpl)", "x0pin+13*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_14
+With Brick
+     .Reset
+     .Name "pin1_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+14*ppin-(wpx/2-tpl)", "x0pin+14*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_15
+With Brick
+     .Reset
+     .Name "pin1_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+15*ppin-(wpx/2-tpl)", "x0pin+15*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_16
+With Brick
+     .Reset
+     .Name "pin1_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+16*ppin-(wpx/2-tpl)", "x0pin+16*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_17
+With Brick
+     .Reset
+     .Name "pin1_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+17*ppin-(wpx/2-tpl)", "x0pin+17*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_18
+With Brick
+     .Reset
+     .Name "pin1_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+18*ppin-(wpx/2-tpl)", "x0pin+18*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_19
+With Brick
+     .Reset
+     .Name "pin1_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+19*ppin-(wpx/2-tpl)", "x0pin+19*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_20
+With Brick
+     .Reset
+     .Name "pin1_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+20*ppin-(wpx/2-tpl)", "x0pin+20*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_21
+With Brick
+     .Reset
+     .Name "pin1_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+21*ppin-(wpx/2-tpl)", "x0pin+21*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_22
+With Brick
+     .Reset
+     .Name "pin1_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+22*ppin-(wpx/2-tpl)", "x0pin+22*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_23
+With Brick
+     .Reset
+     .Name "pin1_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+23*ppin-(wpx/2-tpl)", "x0pin+23*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_24
+With Brick
+     .Reset
+     .Name "pin1_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+24*ppin-(wpx/2-tpl)", "x0pin+24*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_25
+With Brick
+     .Reset
+     .Name "pin1_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+25*ppin-(wpx/2-tpl)", "x0pin+25*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_26
+With Brick
+     .Reset
+     .Name "pin1_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+26*ppin-(wpx/2-tpl)", "x0pin+26*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_27
+With Brick
+     .Reset
+     .Name "pin1_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+27*ppin-(wpx/2-tpl)", "x0pin+27*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_28
+With Brick
+     .Reset
+     .Name "pin1_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+28*ppin-(wpx/2-tpl)", "x0pin+28*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_29
+With Brick
+     .Reset
+     .Name "pin1_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+29*ppin-(wpx/2-tpl)", "x0pin+29*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_30
+With Brick
+     .Reset
+     .Name "pin1_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+30*ppin-(wpx/2-tpl)", "x0pin+30*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_31
+With Brick
+     .Reset
+     .Name "pin1_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+31*ppin-(wpx/2-tpl)", "x0pin+31*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_32
+With Brick
+     .Reset
+     .Name "pin1_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+32*ppin-(wpx/2-tpl)", "x0pin+32*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_33
+With Brick
+     .Reset
+     .Name "pin1_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+33*ppin-(wpx/2-tpl)", "x0pin+33*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_34
+With Brick
+     .Reset
+     .Name "pin1_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+34*ppin-(wpx/2-tpl)", "x0pin+34*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_35
+With Brick
+     .Reset
+     .Name "pin1_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+35*ppin-(wpx/2-tpl)", "x0pin+35*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_36
+With Brick
+     .Reset
+     .Name "pin1_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+36*ppin-(wpx/2-tpl)", "x0pin+36*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_37
+With Brick
+     .Reset
+     .Name "pin1_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+37*ppin-(wpx/2-tpl)", "x0pin+37*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_38
+With Brick
+     .Reset
+     .Name "pin1_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+38*ppin-(wpx/2-tpl)", "x0pin+38*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_39
+With Brick
+     .Reset
+     .Name "pin1_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+39*ppin-(wpx/2-tpl)", "x0pin+39*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_40
+With Brick
+     .Reset
+     .Name "pin1_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+40*ppin-(wpx/2-tpl)", "x0pin+40*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_41
+With Brick
+     .Reset
+     .Name "pin1_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+41*ppin-(wpx/2-tpl)", "x0pin+41*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_42
+With Brick
+     .Reset
+     .Name "pin1_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+42*ppin-(wpx/2-tpl)", "x0pin+42*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_43
+With Brick
+     .Reset
+     .Name "pin1_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+43*ppin-(wpx/2-tpl)", "x0pin+43*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_44
+With Brick
+     .Reset
+     .Name "pin1_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+44*ppin-(wpx/2-tpl)", "x0pin+44*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_45
+With Brick
+     .Reset
+     .Name "pin1_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+45*ppin-(wpx/2-tpl)", "x0pin+45*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_46
+With Brick
+     .Reset
+     .Name "pin1_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+46*ppin-(wpx/2-tpl)", "x0pin+46*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_47
+With Brick
+     .Reset
+     .Name "pin1_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+47*ppin-(wpx/2-tpl)", "x0pin+47*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_48
+With Brick
+     .Reset
+     .Name "pin1_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+48*ppin-(wpx/2-tpl)", "x0pin+48*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_49
+With Brick
+     .Reset
+     .Name "pin1_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+49*ppin-(wpx/2-tpl)", "x0pin+49*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_50
+With Brick
+     .Reset
+     .Name "pin1_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+50*ppin-(wpx/2-tpl)", "x0pin+50*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_51
+With Brick
+     .Reset
+     .Name "pin1_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+51*ppin-(wpx/2-tpl)", "x0pin+51*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_52
+With Brick
+     .Reset
+     .Name "pin1_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+52*ppin-(wpx/2-tpl)", "x0pin+52*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_53
+With Brick
+     .Reset
+     .Name "pin1_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+53*ppin-(wpx/2-tpl)", "x0pin+53*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_54
+With Brick
+     .Reset
+     .Name "pin1_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+54*ppin-(wpx/2-tpl)", "x0pin+54*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_55
+With Brick
+     .Reset
+     .Name "pin1_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+55*ppin-(wpx/2-tpl)", "x0pin+55*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_56
+With Brick
+     .Reset
+     .Name "pin1_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+56*ppin-(wpx/2-tpl)", "x0pin+56*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_57
+With Brick
+     .Reset
+     .Name "pin1_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+57*ppin-(wpx/2-tpl)", "x0pin+57*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_58
+With Brick
+     .Reset
+     .Name "pin1_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+58*ppin-(wpx/2-tpl)", "x0pin+58*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_59
+With Brick
+     .Reset
+     .Name "pin1_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+59*ppin-(wpx/2-tpl)", "x0pin+59*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_60
+With Brick
+     .Reset
+     .Name "pin1_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+60*ppin-(wpx/2-tpl)", "x0pin+60*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_61
+With Brick
+     .Reset
+     .Name "pin1_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+61*ppin-(wpx/2-tpl)", "x0pin+61*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_62
+With Brick
+     .Reset
+     .Name "pin1_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+62*ppin-(wpx/2-tpl)", "x0pin+62*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_63
+With Brick
+     .Reset
+     .Name "pin1_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+63*ppin-(wpx/2-tpl)", "x0pin+63*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_64
+With Brick
+     .Reset
+     .Name "pin1_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+64*ppin-(wpx/2-tpl)", "x0pin+64*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_65
+With Brick
+     .Reset
+     .Name "pin1_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+65*ppin-(wpx/2-tpl)", "x0pin+65*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_66
+With Brick
+     .Reset
+     .Name "pin1_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+66*ppin-(wpx/2-tpl)", "x0pin+66*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_67
+With Brick
+     .Reset
+     .Name "pin1_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+67*ppin-(wpx/2-tpl)", "x0pin+67*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_68
+With Brick
+     .Reset
+     .Name "pin1_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+68*ppin-(wpx/2-tpl)", "x0pin+68*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_69
+With Brick
+     .Reset
+     .Name "pin1_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+69*ppin-(wpx/2-tpl)", "x0pin+69*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_70
+With Brick
+     .Reset
+     .Name "pin1_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+70*ppin-(wpx/2-tpl)", "x0pin+70*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_71
+With Brick
+     .Reset
+     .Name "pin1_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+71*ppin-(wpx/2-tpl)", "x0pin+71*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_72
+With Brick
+     .Reset
+     .Name "pin1_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+72*ppin-(wpx/2-tpl)", "x0pin+72*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_73
+With Brick
+     .Reset
+     .Name "pin1_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+73*ppin-(wpx/2-tpl)", "x0pin+73*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_74
+With Brick
+     .Reset
+     .Name "pin1_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+74*ppin-(wpx/2-tpl)", "x0pin+74*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_75
+With Brick
+     .Reset
+     .Name "pin1_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+75*ppin-(wpx/2-tpl)", "x0pin+75*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_76
+With Brick
+     .Reset
+     .Name "pin1_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+76*ppin-(wpx/2-tpl)", "x0pin+76*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_77
+With Brick
+     .Reset
+     .Name "pin1_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+77*ppin-(wpx/2-tpl)", "x0pin+77*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin1_78
+With Brick
+     .Reset
+     .Name "pin1_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+78*ppin-(wpx/2-tpl)", "x0pin+78*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin-(wpy/2-tpl)", "y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_00
+With Brick
+     .Reset
+     .Name "pin2_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+0*ppin-(wpx/2-tpl)", "x0pin+0*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_01
+With Brick
+     .Reset
+     .Name "pin2_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+1*ppin-(wpx/2-tpl)", "x0pin+1*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_02
+With Brick
+     .Reset
+     .Name "pin2_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+2*ppin-(wpx/2-tpl)", "x0pin+2*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_03
+With Brick
+     .Reset
+     .Name "pin2_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+3*ppin-(wpx/2-tpl)", "x0pin+3*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_04
+With Brick
+     .Reset
+     .Name "pin2_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+4*ppin-(wpx/2-tpl)", "x0pin+4*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_05
+With Brick
+     .Reset
+     .Name "pin2_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+5*ppin-(wpx/2-tpl)", "x0pin+5*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_06
+With Brick
+     .Reset
+     .Name "pin2_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+6*ppin-(wpx/2-tpl)", "x0pin+6*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_07
+With Brick
+     .Reset
+     .Name "pin2_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+7*ppin-(wpx/2-tpl)", "x0pin+7*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_08
+With Brick
+     .Reset
+     .Name "pin2_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+8*ppin-(wpx/2-tpl)", "x0pin+8*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_09
+With Brick
+     .Reset
+     .Name "pin2_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+9*ppin-(wpx/2-tpl)", "x0pin+9*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_10
+With Brick
+     .Reset
+     .Name "pin2_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+10*ppin-(wpx/2-tpl)", "x0pin+10*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_11
+With Brick
+     .Reset
+     .Name "pin2_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+11*ppin-(wpx/2-tpl)", "x0pin+11*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_12
+With Brick
+     .Reset
+     .Name "pin2_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+12*ppin-(wpx/2-tpl)", "x0pin+12*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_13
+With Brick
+     .Reset
+     .Name "pin2_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+13*ppin-(wpx/2-tpl)", "x0pin+13*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_14
+With Brick
+     .Reset
+     .Name "pin2_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+14*ppin-(wpx/2-tpl)", "x0pin+14*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_15
+With Brick
+     .Reset
+     .Name "pin2_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+15*ppin-(wpx/2-tpl)", "x0pin+15*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_16
+With Brick
+     .Reset
+     .Name "pin2_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+16*ppin-(wpx/2-tpl)", "x0pin+16*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_17
+With Brick
+     .Reset
+     .Name "pin2_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+17*ppin-(wpx/2-tpl)", "x0pin+17*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_18
+With Brick
+     .Reset
+     .Name "pin2_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+18*ppin-(wpx/2-tpl)", "x0pin+18*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_19
+With Brick
+     .Reset
+     .Name "pin2_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+19*ppin-(wpx/2-tpl)", "x0pin+19*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_20
+With Brick
+     .Reset
+     .Name "pin2_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+20*ppin-(wpx/2-tpl)", "x0pin+20*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_21
+With Brick
+     .Reset
+     .Name "pin2_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+21*ppin-(wpx/2-tpl)", "x0pin+21*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_22
+With Brick
+     .Reset
+     .Name "pin2_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+22*ppin-(wpx/2-tpl)", "x0pin+22*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_23
+With Brick
+     .Reset
+     .Name "pin2_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+23*ppin-(wpx/2-tpl)", "x0pin+23*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_24
+With Brick
+     .Reset
+     .Name "pin2_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+24*ppin-(wpx/2-tpl)", "x0pin+24*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_25
+With Brick
+     .Reset
+     .Name "pin2_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+25*ppin-(wpx/2-tpl)", "x0pin+25*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_26
+With Brick
+     .Reset
+     .Name "pin2_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+26*ppin-(wpx/2-tpl)", "x0pin+26*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_27
+With Brick
+     .Reset
+     .Name "pin2_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+27*ppin-(wpx/2-tpl)", "x0pin+27*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_28
+With Brick
+     .Reset
+     .Name "pin2_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+28*ppin-(wpx/2-tpl)", "x0pin+28*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_29
+With Brick
+     .Reset
+     .Name "pin2_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+29*ppin-(wpx/2-tpl)", "x0pin+29*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_30
+With Brick
+     .Reset
+     .Name "pin2_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+30*ppin-(wpx/2-tpl)", "x0pin+30*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_31
+With Brick
+     .Reset
+     .Name "pin2_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+31*ppin-(wpx/2-tpl)", "x0pin+31*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_32
+With Brick
+     .Reset
+     .Name "pin2_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+32*ppin-(wpx/2-tpl)", "x0pin+32*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_33
+With Brick
+     .Reset
+     .Name "pin2_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+33*ppin-(wpx/2-tpl)", "x0pin+33*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_34
+With Brick
+     .Reset
+     .Name "pin2_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+34*ppin-(wpx/2-tpl)", "x0pin+34*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_35
+With Brick
+     .Reset
+     .Name "pin2_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+35*ppin-(wpx/2-tpl)", "x0pin+35*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_36
+With Brick
+     .Reset
+     .Name "pin2_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+36*ppin-(wpx/2-tpl)", "x0pin+36*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_37
+With Brick
+     .Reset
+     .Name "pin2_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+37*ppin-(wpx/2-tpl)", "x0pin+37*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_38
+With Brick
+     .Reset
+     .Name "pin2_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+38*ppin-(wpx/2-tpl)", "x0pin+38*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_39
+With Brick
+     .Reset
+     .Name "pin2_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+39*ppin-(wpx/2-tpl)", "x0pin+39*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_40
+With Brick
+     .Reset
+     .Name "pin2_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+40*ppin-(wpx/2-tpl)", "x0pin+40*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_41
+With Brick
+     .Reset
+     .Name "pin2_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+41*ppin-(wpx/2-tpl)", "x0pin+41*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_42
+With Brick
+     .Reset
+     .Name "pin2_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+42*ppin-(wpx/2-tpl)", "x0pin+42*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_43
+With Brick
+     .Reset
+     .Name "pin2_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+43*ppin-(wpx/2-tpl)", "x0pin+43*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_44
+With Brick
+     .Reset
+     .Name "pin2_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+44*ppin-(wpx/2-tpl)", "x0pin+44*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_45
+With Brick
+     .Reset
+     .Name "pin2_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+45*ppin-(wpx/2-tpl)", "x0pin+45*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_46
+With Brick
+     .Reset
+     .Name "pin2_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+46*ppin-(wpx/2-tpl)", "x0pin+46*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_47
+With Brick
+     .Reset
+     .Name "pin2_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+47*ppin-(wpx/2-tpl)", "x0pin+47*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_48
+With Brick
+     .Reset
+     .Name "pin2_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+48*ppin-(wpx/2-tpl)", "x0pin+48*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_49
+With Brick
+     .Reset
+     .Name "pin2_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+49*ppin-(wpx/2-tpl)", "x0pin+49*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_50
+With Brick
+     .Reset
+     .Name "pin2_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+50*ppin-(wpx/2-tpl)", "x0pin+50*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_51
+With Brick
+     .Reset
+     .Name "pin2_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+51*ppin-(wpx/2-tpl)", "x0pin+51*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_52
+With Brick
+     .Reset
+     .Name "pin2_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+52*ppin-(wpx/2-tpl)", "x0pin+52*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_53
+With Brick
+     .Reset
+     .Name "pin2_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+53*ppin-(wpx/2-tpl)", "x0pin+53*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_54
+With Brick
+     .Reset
+     .Name "pin2_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+54*ppin-(wpx/2-tpl)", "x0pin+54*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_55
+With Brick
+     .Reset
+     .Name "pin2_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+55*ppin-(wpx/2-tpl)", "x0pin+55*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_56
+With Brick
+     .Reset
+     .Name "pin2_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+56*ppin-(wpx/2-tpl)", "x0pin+56*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_57
+With Brick
+     .Reset
+     .Name "pin2_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+57*ppin-(wpx/2-tpl)", "x0pin+57*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_58
+With Brick
+     .Reset
+     .Name "pin2_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+58*ppin-(wpx/2-tpl)", "x0pin+58*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_59
+With Brick
+     .Reset
+     .Name "pin2_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+59*ppin-(wpx/2-tpl)", "x0pin+59*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_60
+With Brick
+     .Reset
+     .Name "pin2_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+60*ppin-(wpx/2-tpl)", "x0pin+60*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_61
+With Brick
+     .Reset
+     .Name "pin2_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+61*ppin-(wpx/2-tpl)", "x0pin+61*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_62
+With Brick
+     .Reset
+     .Name "pin2_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+62*ppin-(wpx/2-tpl)", "x0pin+62*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_63
+With Brick
+     .Reset
+     .Name "pin2_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+63*ppin-(wpx/2-tpl)", "x0pin+63*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_64
+With Brick
+     .Reset
+     .Name "pin2_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+64*ppin-(wpx/2-tpl)", "x0pin+64*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_65
+With Brick
+     .Reset
+     .Name "pin2_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+65*ppin-(wpx/2-tpl)", "x0pin+65*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_66
+With Brick
+     .Reset
+     .Name "pin2_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+66*ppin-(wpx/2-tpl)", "x0pin+66*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_67
+With Brick
+     .Reset
+     .Name "pin2_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+67*ppin-(wpx/2-tpl)", "x0pin+67*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_68
+With Brick
+     .Reset
+     .Name "pin2_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+68*ppin-(wpx/2-tpl)", "x0pin+68*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_69
+With Brick
+     .Reset
+     .Name "pin2_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+69*ppin-(wpx/2-tpl)", "x0pin+69*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_70
+With Brick
+     .Reset
+     .Name "pin2_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+70*ppin-(wpx/2-tpl)", "x0pin+70*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_71
+With Brick
+     .Reset
+     .Name "pin2_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+71*ppin-(wpx/2-tpl)", "x0pin+71*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_72
+With Brick
+     .Reset
+     .Name "pin2_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+72*ppin-(wpx/2-tpl)", "x0pin+72*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_73
+With Brick
+     .Reset
+     .Name "pin2_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+73*ppin-(wpx/2-tpl)", "x0pin+73*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_74
+With Brick
+     .Reset
+     .Name "pin2_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+74*ppin-(wpx/2-tpl)", "x0pin+74*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_75
+With Brick
+     .Reset
+     .Name "pin2_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+75*ppin-(wpx/2-tpl)", "x0pin+75*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_76
+With Brick
+     .Reset
+     .Name "pin2_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+76*ppin-(wpx/2-tpl)", "x0pin+76*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_77
+With Brick
+     .Reset
+     .Name "pin2_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+77*ppin-(wpx/2-tpl)", "x0pin+77*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin2_78
+With Brick
+     .Reset
+     .Name "pin2_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+78*ppin-(wpx/2-tpl)", "x0pin+78*ppin+(wpx/2-tpl)"
+     .Yrange "y1pin+ppin-(wpy/2-tpl)", "y1pin+ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_00
+With Brick
+     .Reset
+     .Name "pin3_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+0*ppin-(wpx/2-tpl)", "x0pin+0*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_01
+With Brick
+     .Reset
+     .Name "pin3_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+1*ppin-(wpx/2-tpl)", "x0pin+1*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_02
+With Brick
+     .Reset
+     .Name "pin3_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+2*ppin-(wpx/2-tpl)", "x0pin+2*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_03
+With Brick
+     .Reset
+     .Name "pin3_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+3*ppin-(wpx/2-tpl)", "x0pin+3*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_04
+With Brick
+     .Reset
+     .Name "pin3_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+4*ppin-(wpx/2-tpl)", "x0pin+4*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_05
+With Brick
+     .Reset
+     .Name "pin3_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+5*ppin-(wpx/2-tpl)", "x0pin+5*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_06
+With Brick
+     .Reset
+     .Name "pin3_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+6*ppin-(wpx/2-tpl)", "x0pin+6*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_07
+With Brick
+     .Reset
+     .Name "pin3_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+7*ppin-(wpx/2-tpl)", "x0pin+7*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_08
+With Brick
+     .Reset
+     .Name "pin3_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+8*ppin-(wpx/2-tpl)", "x0pin+8*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_09
+With Brick
+     .Reset
+     .Name "pin3_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+9*ppin-(wpx/2-tpl)", "x0pin+9*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_10
+With Brick
+     .Reset
+     .Name "pin3_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+10*ppin-(wpx/2-tpl)", "x0pin+10*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_11
+With Brick
+     .Reset
+     .Name "pin3_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+11*ppin-(wpx/2-tpl)", "x0pin+11*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_12
+With Brick
+     .Reset
+     .Name "pin3_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+12*ppin-(wpx/2-tpl)", "x0pin+12*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_13
+With Brick
+     .Reset
+     .Name "pin3_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+13*ppin-(wpx/2-tpl)", "x0pin+13*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_14
+With Brick
+     .Reset
+     .Name "pin3_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+14*ppin-(wpx/2-tpl)", "x0pin+14*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_15
+With Brick
+     .Reset
+     .Name "pin3_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+15*ppin-(wpx/2-tpl)", "x0pin+15*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_16
+With Brick
+     .Reset
+     .Name "pin3_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+16*ppin-(wpx/2-tpl)", "x0pin+16*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_17
+With Brick
+     .Reset
+     .Name "pin3_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+17*ppin-(wpx/2-tpl)", "x0pin+17*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_18
+With Brick
+     .Reset
+     .Name "pin3_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+18*ppin-(wpx/2-tpl)", "x0pin+18*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_19
+With Brick
+     .Reset
+     .Name "pin3_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+19*ppin-(wpx/2-tpl)", "x0pin+19*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_20
+With Brick
+     .Reset
+     .Name "pin3_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+20*ppin-(wpx/2-tpl)", "x0pin+20*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_21
+With Brick
+     .Reset
+     .Name "pin3_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+21*ppin-(wpx/2-tpl)", "x0pin+21*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_22
+With Brick
+     .Reset
+     .Name "pin3_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+22*ppin-(wpx/2-tpl)", "x0pin+22*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_23
+With Brick
+     .Reset
+     .Name "pin3_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+23*ppin-(wpx/2-tpl)", "x0pin+23*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_24
+With Brick
+     .Reset
+     .Name "pin3_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+24*ppin-(wpx/2-tpl)", "x0pin+24*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_25
+With Brick
+     .Reset
+     .Name "pin3_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+25*ppin-(wpx/2-tpl)", "x0pin+25*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_26
+With Brick
+     .Reset
+     .Name "pin3_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+26*ppin-(wpx/2-tpl)", "x0pin+26*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_27
+With Brick
+     .Reset
+     .Name "pin3_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+27*ppin-(wpx/2-tpl)", "x0pin+27*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_28
+With Brick
+     .Reset
+     .Name "pin3_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+28*ppin-(wpx/2-tpl)", "x0pin+28*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_29
+With Brick
+     .Reset
+     .Name "pin3_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+29*ppin-(wpx/2-tpl)", "x0pin+29*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_30
+With Brick
+     .Reset
+     .Name "pin3_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+30*ppin-(wpx/2-tpl)", "x0pin+30*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_31
+With Brick
+     .Reset
+     .Name "pin3_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+31*ppin-(wpx/2-tpl)", "x0pin+31*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_32
+With Brick
+     .Reset
+     .Name "pin3_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+32*ppin-(wpx/2-tpl)", "x0pin+32*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_33
+With Brick
+     .Reset
+     .Name "pin3_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+33*ppin-(wpx/2-tpl)", "x0pin+33*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_34
+With Brick
+     .Reset
+     .Name "pin3_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+34*ppin-(wpx/2-tpl)", "x0pin+34*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_35
+With Brick
+     .Reset
+     .Name "pin3_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+35*ppin-(wpx/2-tpl)", "x0pin+35*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_36
+With Brick
+     .Reset
+     .Name "pin3_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+36*ppin-(wpx/2-tpl)", "x0pin+36*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_37
+With Brick
+     .Reset
+     .Name "pin3_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+37*ppin-(wpx/2-tpl)", "x0pin+37*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_38
+With Brick
+     .Reset
+     .Name "pin3_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+38*ppin-(wpx/2-tpl)", "x0pin+38*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_39
+With Brick
+     .Reset
+     .Name "pin3_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+39*ppin-(wpx/2-tpl)", "x0pin+39*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_40
+With Brick
+     .Reset
+     .Name "pin3_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+40*ppin-(wpx/2-tpl)", "x0pin+40*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_41
+With Brick
+     .Reset
+     .Name "pin3_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+41*ppin-(wpx/2-tpl)", "x0pin+41*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_42
+With Brick
+     .Reset
+     .Name "pin3_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+42*ppin-(wpx/2-tpl)", "x0pin+42*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_43
+With Brick
+     .Reset
+     .Name "pin3_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+43*ppin-(wpx/2-tpl)", "x0pin+43*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_44
+With Brick
+     .Reset
+     .Name "pin3_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+44*ppin-(wpx/2-tpl)", "x0pin+44*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_45
+With Brick
+     .Reset
+     .Name "pin3_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+45*ppin-(wpx/2-tpl)", "x0pin+45*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_46
+With Brick
+     .Reset
+     .Name "pin3_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+46*ppin-(wpx/2-tpl)", "x0pin+46*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_47
+With Brick
+     .Reset
+     .Name "pin3_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+47*ppin-(wpx/2-tpl)", "x0pin+47*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_48
+With Brick
+     .Reset
+     .Name "pin3_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+48*ppin-(wpx/2-tpl)", "x0pin+48*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_49
+With Brick
+     .Reset
+     .Name "pin3_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+49*ppin-(wpx/2-tpl)", "x0pin+49*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_50
+With Brick
+     .Reset
+     .Name "pin3_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+50*ppin-(wpx/2-tpl)", "x0pin+50*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_51
+With Brick
+     .Reset
+     .Name "pin3_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+51*ppin-(wpx/2-tpl)", "x0pin+51*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_52
+With Brick
+     .Reset
+     .Name "pin3_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+52*ppin-(wpx/2-tpl)", "x0pin+52*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_53
+With Brick
+     .Reset
+     .Name "pin3_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+53*ppin-(wpx/2-tpl)", "x0pin+53*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_54
+With Brick
+     .Reset
+     .Name "pin3_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+54*ppin-(wpx/2-tpl)", "x0pin+54*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_55
+With Brick
+     .Reset
+     .Name "pin3_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+55*ppin-(wpx/2-tpl)", "x0pin+55*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_56
+With Brick
+     .Reset
+     .Name "pin3_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+56*ppin-(wpx/2-tpl)", "x0pin+56*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_57
+With Brick
+     .Reset
+     .Name "pin3_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+57*ppin-(wpx/2-tpl)", "x0pin+57*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_58
+With Brick
+     .Reset
+     .Name "pin3_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+58*ppin-(wpx/2-tpl)", "x0pin+58*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_59
+With Brick
+     .Reset
+     .Name "pin3_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+59*ppin-(wpx/2-tpl)", "x0pin+59*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_60
+With Brick
+     .Reset
+     .Name "pin3_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+60*ppin-(wpx/2-tpl)", "x0pin+60*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_61
+With Brick
+     .Reset
+     .Name "pin3_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+61*ppin-(wpx/2-tpl)", "x0pin+61*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_62
+With Brick
+     .Reset
+     .Name "pin3_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+62*ppin-(wpx/2-tpl)", "x0pin+62*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_63
+With Brick
+     .Reset
+     .Name "pin3_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+63*ppin-(wpx/2-tpl)", "x0pin+63*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_64
+With Brick
+     .Reset
+     .Name "pin3_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+64*ppin-(wpx/2-tpl)", "x0pin+64*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_65
+With Brick
+     .Reset
+     .Name "pin3_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+65*ppin-(wpx/2-tpl)", "x0pin+65*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_66
+With Brick
+     .Reset
+     .Name "pin3_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+66*ppin-(wpx/2-tpl)", "x0pin+66*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_67
+With Brick
+     .Reset
+     .Name "pin3_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+67*ppin-(wpx/2-tpl)", "x0pin+67*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_68
+With Brick
+     .Reset
+     .Name "pin3_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+68*ppin-(wpx/2-tpl)", "x0pin+68*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_69
+With Brick
+     .Reset
+     .Name "pin3_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+69*ppin-(wpx/2-tpl)", "x0pin+69*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_70
+With Brick
+     .Reset
+     .Name "pin3_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+70*ppin-(wpx/2-tpl)", "x0pin+70*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_71
+With Brick
+     .Reset
+     .Name "pin3_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+71*ppin-(wpx/2-tpl)", "x0pin+71*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_72
+With Brick
+     .Reset
+     .Name "pin3_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+72*ppin-(wpx/2-tpl)", "x0pin+72*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_73
+With Brick
+     .Reset
+     .Name "pin3_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+73*ppin-(wpx/2-tpl)", "x0pin+73*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_74
+With Brick
+     .Reset
+     .Name "pin3_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+74*ppin-(wpx/2-tpl)", "x0pin+74*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_75
+With Brick
+     .Reset
+     .Name "pin3_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+75*ppin-(wpx/2-tpl)", "x0pin+75*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_76
+With Brick
+     .Reset
+     .Name "pin3_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+76*ppin-(wpx/2-tpl)", "x0pin+76*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_77
+With Brick
+     .Reset
+     .Name "pin3_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+77*ppin-(wpx/2-tpl)", "x0pin+77*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin3_78
+With Brick
+     .Reset
+     .Name "pin3_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+78*ppin-(wpx/2-tpl)", "x0pin+78*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-(wpy/2-tpl)", "-y1pin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_00
+With Brick
+     .Reset
+     .Name "pin4_00"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+0*ppin-(wpx/2-tpl)", "x0pin+0*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_01
+With Brick
+     .Reset
+     .Name "pin4_01"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+1*ppin-(wpx/2-tpl)", "x0pin+1*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_02
+With Brick
+     .Reset
+     .Name "pin4_02"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+2*ppin-(wpx/2-tpl)", "x0pin+2*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_03
+With Brick
+     .Reset
+     .Name "pin4_03"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+3*ppin-(wpx/2-tpl)", "x0pin+3*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_04
+With Brick
+     .Reset
+     .Name "pin4_04"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+4*ppin-(wpx/2-tpl)", "x0pin+4*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_05
+With Brick
+     .Reset
+     .Name "pin4_05"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+5*ppin-(wpx/2-tpl)", "x0pin+5*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_06
+With Brick
+     .Reset
+     .Name "pin4_06"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+6*ppin-(wpx/2-tpl)", "x0pin+6*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_07
+With Brick
+     .Reset
+     .Name "pin4_07"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+7*ppin-(wpx/2-tpl)", "x0pin+7*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_08
+With Brick
+     .Reset
+     .Name "pin4_08"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+8*ppin-(wpx/2-tpl)", "x0pin+8*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_09
+With Brick
+     .Reset
+     .Name "pin4_09"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+9*ppin-(wpx/2-tpl)", "x0pin+9*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_10
+With Brick
+     .Reset
+     .Name "pin4_10"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+10*ppin-(wpx/2-tpl)", "x0pin+10*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_11
+With Brick
+     .Reset
+     .Name "pin4_11"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+11*ppin-(wpx/2-tpl)", "x0pin+11*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_12
+With Brick
+     .Reset
+     .Name "pin4_12"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+12*ppin-(wpx/2-tpl)", "x0pin+12*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_13
+With Brick
+     .Reset
+     .Name "pin4_13"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+13*ppin-(wpx/2-tpl)", "x0pin+13*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_14
+With Brick
+     .Reset
+     .Name "pin4_14"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+14*ppin-(wpx/2-tpl)", "x0pin+14*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_15
+With Brick
+     .Reset
+     .Name "pin4_15"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+15*ppin-(wpx/2-tpl)", "x0pin+15*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_16
+With Brick
+     .Reset
+     .Name "pin4_16"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+16*ppin-(wpx/2-tpl)", "x0pin+16*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_17
+With Brick
+     .Reset
+     .Name "pin4_17"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+17*ppin-(wpx/2-tpl)", "x0pin+17*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_18
+With Brick
+     .Reset
+     .Name "pin4_18"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+18*ppin-(wpx/2-tpl)", "x0pin+18*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_19
+With Brick
+     .Reset
+     .Name "pin4_19"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+19*ppin-(wpx/2-tpl)", "x0pin+19*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_20
+With Brick
+     .Reset
+     .Name "pin4_20"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+20*ppin-(wpx/2-tpl)", "x0pin+20*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_21
+With Brick
+     .Reset
+     .Name "pin4_21"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+21*ppin-(wpx/2-tpl)", "x0pin+21*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_22
+With Brick
+     .Reset
+     .Name "pin4_22"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+22*ppin-(wpx/2-tpl)", "x0pin+22*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_23
+With Brick
+     .Reset
+     .Name "pin4_23"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+23*ppin-(wpx/2-tpl)", "x0pin+23*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_24
+With Brick
+     .Reset
+     .Name "pin4_24"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+24*ppin-(wpx/2-tpl)", "x0pin+24*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_25
+With Brick
+     .Reset
+     .Name "pin4_25"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+25*ppin-(wpx/2-tpl)", "x0pin+25*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_26
+With Brick
+     .Reset
+     .Name "pin4_26"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+26*ppin-(wpx/2-tpl)", "x0pin+26*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_27
+With Brick
+     .Reset
+     .Name "pin4_27"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+27*ppin-(wpx/2-tpl)", "x0pin+27*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_28
+With Brick
+     .Reset
+     .Name "pin4_28"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+28*ppin-(wpx/2-tpl)", "x0pin+28*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_29
+With Brick
+     .Reset
+     .Name "pin4_29"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+29*ppin-(wpx/2-tpl)", "x0pin+29*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_30
+With Brick
+     .Reset
+     .Name "pin4_30"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+30*ppin-(wpx/2-tpl)", "x0pin+30*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_31
+With Brick
+     .Reset
+     .Name "pin4_31"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+31*ppin-(wpx/2-tpl)", "x0pin+31*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_32
+With Brick
+     .Reset
+     .Name "pin4_32"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+32*ppin-(wpx/2-tpl)", "x0pin+32*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_33
+With Brick
+     .Reset
+     .Name "pin4_33"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+33*ppin-(wpx/2-tpl)", "x0pin+33*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_34
+With Brick
+     .Reset
+     .Name "pin4_34"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+34*ppin-(wpx/2-tpl)", "x0pin+34*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_35
+With Brick
+     .Reset
+     .Name "pin4_35"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+35*ppin-(wpx/2-tpl)", "x0pin+35*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_36
+With Brick
+     .Reset
+     .Name "pin4_36"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+36*ppin-(wpx/2-tpl)", "x0pin+36*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_37
+With Brick
+     .Reset
+     .Name "pin4_37"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+37*ppin-(wpx/2-tpl)", "x0pin+37*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_38
+With Brick
+     .Reset
+     .Name "pin4_38"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+38*ppin-(wpx/2-tpl)", "x0pin+38*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_39
+With Brick
+     .Reset
+     .Name "pin4_39"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+39*ppin-(wpx/2-tpl)", "x0pin+39*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_40
+With Brick
+     .Reset
+     .Name "pin4_40"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+40*ppin-(wpx/2-tpl)", "x0pin+40*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_41
+With Brick
+     .Reset
+     .Name "pin4_41"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+41*ppin-(wpx/2-tpl)", "x0pin+41*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_42
+With Brick
+     .Reset
+     .Name "pin4_42"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+42*ppin-(wpx/2-tpl)", "x0pin+42*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_43
+With Brick
+     .Reset
+     .Name "pin4_43"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+43*ppin-(wpx/2-tpl)", "x0pin+43*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_44
+With Brick
+     .Reset
+     .Name "pin4_44"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+44*ppin-(wpx/2-tpl)", "x0pin+44*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_45
+With Brick
+     .Reset
+     .Name "pin4_45"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+45*ppin-(wpx/2-tpl)", "x0pin+45*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_46
+With Brick
+     .Reset
+     .Name "pin4_46"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+46*ppin-(wpx/2-tpl)", "x0pin+46*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_47
+With Brick
+     .Reset
+     .Name "pin4_47"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+47*ppin-(wpx/2-tpl)", "x0pin+47*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_48
+With Brick
+     .Reset
+     .Name "pin4_48"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+48*ppin-(wpx/2-tpl)", "x0pin+48*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_49
+With Brick
+     .Reset
+     .Name "pin4_49"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+49*ppin-(wpx/2-tpl)", "x0pin+49*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_50
+With Brick
+     .Reset
+     .Name "pin4_50"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+50*ppin-(wpx/2-tpl)", "x0pin+50*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_51
+With Brick
+     .Reset
+     .Name "pin4_51"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+51*ppin-(wpx/2-tpl)", "x0pin+51*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_52
+With Brick
+     .Reset
+     .Name "pin4_52"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+52*ppin-(wpx/2-tpl)", "x0pin+52*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_53
+With Brick
+     .Reset
+     .Name "pin4_53"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+53*ppin-(wpx/2-tpl)", "x0pin+53*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_54
+With Brick
+     .Reset
+     .Name "pin4_54"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+54*ppin-(wpx/2-tpl)", "x0pin+54*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_55
+With Brick
+     .Reset
+     .Name "pin4_55"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+55*ppin-(wpx/2-tpl)", "x0pin+55*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_56
+With Brick
+     .Reset
+     .Name "pin4_56"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+56*ppin-(wpx/2-tpl)", "x0pin+56*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_57
+With Brick
+     .Reset
+     .Name "pin4_57"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+57*ppin-(wpx/2-tpl)", "x0pin+57*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_58
+With Brick
+     .Reset
+     .Name "pin4_58"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+58*ppin-(wpx/2-tpl)", "x0pin+58*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_59
+With Brick
+     .Reset
+     .Name "pin4_59"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+59*ppin-(wpx/2-tpl)", "x0pin+59*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_60
+With Brick
+     .Reset
+     .Name "pin4_60"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+60*ppin-(wpx/2-tpl)", "x0pin+60*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_61
+With Brick
+     .Reset
+     .Name "pin4_61"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+61*ppin-(wpx/2-tpl)", "x0pin+61*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_62
+With Brick
+     .Reset
+     .Name "pin4_62"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+62*ppin-(wpx/2-tpl)", "x0pin+62*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_63
+With Brick
+     .Reset
+     .Name "pin4_63"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+63*ppin-(wpx/2-tpl)", "x0pin+63*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_64
+With Brick
+     .Reset
+     .Name "pin4_64"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+64*ppin-(wpx/2-tpl)", "x0pin+64*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_65
+With Brick
+     .Reset
+     .Name "pin4_65"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+65*ppin-(wpx/2-tpl)", "x0pin+65*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_66
+With Brick
+     .Reset
+     .Name "pin4_66"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+66*ppin-(wpx/2-tpl)", "x0pin+66*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_67
+With Brick
+     .Reset
+     .Name "pin4_67"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+67*ppin-(wpx/2-tpl)", "x0pin+67*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_68
+With Brick
+     .Reset
+     .Name "pin4_68"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+68*ppin-(wpx/2-tpl)", "x0pin+68*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_69
+With Brick
+     .Reset
+     .Name "pin4_69"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+69*ppin-(wpx/2-tpl)", "x0pin+69*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_70
+With Brick
+     .Reset
+     .Name "pin4_70"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+70*ppin-(wpx/2-tpl)", "x0pin+70*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_71
+With Brick
+     .Reset
+     .Name "pin4_71"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+71*ppin-(wpx/2-tpl)", "x0pin+71*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_72
+With Brick
+     .Reset
+     .Name "pin4_72"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+72*ppin-(wpx/2-tpl)", "x0pin+72*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_73
+With Brick
+     .Reset
+     .Name "pin4_73"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+73*ppin-(wpx/2-tpl)", "x0pin+73*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_74
+With Brick
+     .Reset
+     .Name "pin4_74"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+74*ppin-(wpx/2-tpl)", "x0pin+74*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_75
+With Brick
+     .Reset
+     .Name "pin4_75"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+75*ppin-(wpx/2-tpl)", "x0pin+75*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_76
+With Brick
+     .Reset
+     .Name "pin4_76"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+76*ppin-(wpx/2-tpl)", "x0pin+76*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_77
+With Brick
+     .Reset
+     .Name "pin4_77"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+77*ppin-(wpx/2-tpl)", "x0pin+77*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+' define brick: Base:pin4_78
+With Brick
+     .Reset
+     .Name "pin4_78"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "x0pin+78*ppin-(wpx/2-tpl)", "x0pin+78*ppin+(wpx/2-tpl)"
+     .Yrange "-y1pin-ppin-(wpy/2-tpl)", "-y1pin-ppin+(wpy/2-tpl)"
+     .Zrange "-bWR/2-0.01", "-bWR/2+hpin"
+     .Create
+End With
+
+'## 20 - boolean add shapes: Base:mono, Base:pin (316)
+' boolean add shapes: Base:mono, Base:pin1_00
+Solid.Add "Base:mono", "Base:pin1_00"
+
+' boolean add shapes: Base:mono, Base:pin1_01
+Solid.Add "Base:mono", "Base:pin1_01"
+
+' boolean add shapes: Base:mono, Base:pin1_02
+Solid.Add "Base:mono", "Base:pin1_02"
+
+' boolean add shapes: Base:mono, Base:pin1_03
+Solid.Add "Base:mono", "Base:pin1_03"
+
+' boolean add shapes: Base:mono, Base:pin1_04
+Solid.Add "Base:mono", "Base:pin1_04"
+
+' boolean add shapes: Base:mono, Base:pin1_05
+Solid.Add "Base:mono", "Base:pin1_05"
+
+' boolean add shapes: Base:mono, Base:pin1_06
+Solid.Add "Base:mono", "Base:pin1_06"
+
+' boolean add shapes: Base:mono, Base:pin1_07
+Solid.Add "Base:mono", "Base:pin1_07"
+
+' boolean add shapes: Base:mono, Base:pin1_08
+Solid.Add "Base:mono", "Base:pin1_08"
+
+' boolean add shapes: Base:mono, Base:pin1_09
+Solid.Add "Base:mono", "Base:pin1_09"
+
+' boolean add shapes: Base:mono, Base:pin1_10
+Solid.Add "Base:mono", "Base:pin1_10"
+
+' boolean add shapes: Base:mono, Base:pin1_11
+Solid.Add "Base:mono", "Base:pin1_11"
+
+' boolean add shapes: Base:mono, Base:pin1_12
+Solid.Add "Base:mono", "Base:pin1_12"
+
+' boolean add shapes: Base:mono, Base:pin1_13
+Solid.Add "Base:mono", "Base:pin1_13"
+
+' boolean add shapes: Base:mono, Base:pin1_14
+Solid.Add "Base:mono", "Base:pin1_14"
+
+' boolean add shapes: Base:mono, Base:pin1_15
+Solid.Add "Base:mono", "Base:pin1_15"
+
+' boolean add shapes: Base:mono, Base:pin1_16
+Solid.Add "Base:mono", "Base:pin1_16"
+
+' boolean add shapes: Base:mono, Base:pin1_17
+Solid.Add "Base:mono", "Base:pin1_17"
+
+' boolean add shapes: Base:mono, Base:pin1_18
+Solid.Add "Base:mono", "Base:pin1_18"
+
+' boolean add shapes: Base:mono, Base:pin1_19
+Solid.Add "Base:mono", "Base:pin1_19"
+
+' boolean add shapes: Base:mono, Base:pin1_20
+Solid.Add "Base:mono", "Base:pin1_20"
+
+' boolean add shapes: Base:mono, Base:pin1_21
+Solid.Add "Base:mono", "Base:pin1_21"
+
+' boolean add shapes: Base:mono, Base:pin1_22
+Solid.Add "Base:mono", "Base:pin1_22"
+
+' boolean add shapes: Base:mono, Base:pin1_23
+Solid.Add "Base:mono", "Base:pin1_23"
+
+' boolean add shapes: Base:mono, Base:pin1_24
+Solid.Add "Base:mono", "Base:pin1_24"
+
+' boolean add shapes: Base:mono, Base:pin1_25
+Solid.Add "Base:mono", "Base:pin1_25"
+
+' boolean add shapes: Base:mono, Base:pin1_26
+Solid.Add "Base:mono", "Base:pin1_26"
+
+' boolean add shapes: Base:mono, Base:pin1_27
+Solid.Add "Base:mono", "Base:pin1_27"
+
+' boolean add shapes: Base:mono, Base:pin1_28
+Solid.Add "Base:mono", "Base:pin1_28"
+
+' boolean add shapes: Base:mono, Base:pin1_29
+Solid.Add "Base:mono", "Base:pin1_29"
+
+' boolean add shapes: Base:mono, Base:pin1_30
+Solid.Add "Base:mono", "Base:pin1_30"
+
+' boolean add shapes: Base:mono, Base:pin1_31
+Solid.Add "Base:mono", "Base:pin1_31"
+
+' boolean add shapes: Base:mono, Base:pin1_32
+Solid.Add "Base:mono", "Base:pin1_32"
+
+' boolean add shapes: Base:mono, Base:pin1_33
+Solid.Add "Base:mono", "Base:pin1_33"
+
+' boolean add shapes: Base:mono, Base:pin1_34
+Solid.Add "Base:mono", "Base:pin1_34"
+
+' boolean add shapes: Base:mono, Base:pin1_35
+Solid.Add "Base:mono", "Base:pin1_35"
+
+' boolean add shapes: Base:mono, Base:pin1_36
+Solid.Add "Base:mono", "Base:pin1_36"
+
+' boolean add shapes: Base:mono, Base:pin1_37
+Solid.Add "Base:mono", "Base:pin1_37"
+
+' boolean add shapes: Base:mono, Base:pin1_38
+Solid.Add "Base:mono", "Base:pin1_38"
+
+' boolean add shapes: Base:mono, Base:pin1_39
+Solid.Add "Base:mono", "Base:pin1_39"
+
+' boolean add shapes: Base:mono, Base:pin1_40
+Solid.Add "Base:mono", "Base:pin1_40"
+
+' boolean add shapes: Base:mono, Base:pin1_41
+Solid.Add "Base:mono", "Base:pin1_41"
+
+' boolean add shapes: Base:mono, Base:pin1_42
+Solid.Add "Base:mono", "Base:pin1_42"
+
+' boolean add shapes: Base:mono, Base:pin1_43
+Solid.Add "Base:mono", "Base:pin1_43"
+
+' boolean add shapes: Base:mono, Base:pin1_44
+Solid.Add "Base:mono", "Base:pin1_44"
+
+' boolean add shapes: Base:mono, Base:pin1_45
+Solid.Add "Base:mono", "Base:pin1_45"
+
+' boolean add shapes: Base:mono, Base:pin1_46
+Solid.Add "Base:mono", "Base:pin1_46"
+
+' boolean add shapes: Base:mono, Base:pin1_47
+Solid.Add "Base:mono", "Base:pin1_47"
+
+' boolean add shapes: Base:mono, Base:pin1_48
+Solid.Add "Base:mono", "Base:pin1_48"
+
+' boolean add shapes: Base:mono, Base:pin1_49
+Solid.Add "Base:mono", "Base:pin1_49"
+
+' boolean add shapes: Base:mono, Base:pin1_50
+Solid.Add "Base:mono", "Base:pin1_50"
+
+' boolean add shapes: Base:mono, Base:pin1_51
+Solid.Add "Base:mono", "Base:pin1_51"
+
+' boolean add shapes: Base:mono, Base:pin1_52
+Solid.Add "Base:mono", "Base:pin1_52"
+
+' boolean add shapes: Base:mono, Base:pin1_53
+Solid.Add "Base:mono", "Base:pin1_53"
+
+' boolean add shapes: Base:mono, Base:pin1_54
+Solid.Add "Base:mono", "Base:pin1_54"
+
+' boolean add shapes: Base:mono, Base:pin1_55
+Solid.Add "Base:mono", "Base:pin1_55"
+
+' boolean add shapes: Base:mono, Base:pin1_56
+Solid.Add "Base:mono", "Base:pin1_56"
+
+' boolean add shapes: Base:mono, Base:pin1_57
+Solid.Add "Base:mono", "Base:pin1_57"
+
+' boolean add shapes: Base:mono, Base:pin1_58
+Solid.Add "Base:mono", "Base:pin1_58"
+
+' boolean add shapes: Base:mono, Base:pin1_59
+Solid.Add "Base:mono", "Base:pin1_59"
+
+' boolean add shapes: Base:mono, Base:pin1_60
+Solid.Add "Base:mono", "Base:pin1_60"
+
+' boolean add shapes: Base:mono, Base:pin1_61
+Solid.Add "Base:mono", "Base:pin1_61"
+
+' boolean add shapes: Base:mono, Base:pin1_62
+Solid.Add "Base:mono", "Base:pin1_62"
+
+' boolean add shapes: Base:mono, Base:pin1_63
+Solid.Add "Base:mono", "Base:pin1_63"
+
+' boolean add shapes: Base:mono, Base:pin1_64
+Solid.Add "Base:mono", "Base:pin1_64"
+
+' boolean add shapes: Base:mono, Base:pin1_65
+Solid.Add "Base:mono", "Base:pin1_65"
+
+' boolean add shapes: Base:mono, Base:pin1_66
+Solid.Add "Base:mono", "Base:pin1_66"
+
+' boolean add shapes: Base:mono, Base:pin1_67
+Solid.Add "Base:mono", "Base:pin1_67"
+
+' boolean add shapes: Base:mono, Base:pin1_68
+Solid.Add "Base:mono", "Base:pin1_68"
+
+' boolean add shapes: Base:mono, Base:pin1_69
+Solid.Add "Base:mono", "Base:pin1_69"
+
+' boolean add shapes: Base:mono, Base:pin1_70
+Solid.Add "Base:mono", "Base:pin1_70"
+
+' boolean add shapes: Base:mono, Base:pin1_71
+Solid.Add "Base:mono", "Base:pin1_71"
+
+' boolean add shapes: Base:mono, Base:pin1_72
+Solid.Add "Base:mono", "Base:pin1_72"
+
+' boolean add shapes: Base:mono, Base:pin1_73
+Solid.Add "Base:mono", "Base:pin1_73"
+
+' boolean add shapes: Base:mono, Base:pin1_74
+Solid.Add "Base:mono", "Base:pin1_74"
+
+' boolean add shapes: Base:mono, Base:pin1_75
+Solid.Add "Base:mono", "Base:pin1_75"
+
+' boolean add shapes: Base:mono, Base:pin1_76
+Solid.Add "Base:mono", "Base:pin1_76"
+
+' boolean add shapes: Base:mono, Base:pin1_77
+Solid.Add "Base:mono", "Base:pin1_77"
+
+' boolean add shapes: Base:mono, Base:pin1_78
+Solid.Add "Base:mono", "Base:pin1_78"
+
+' boolean add shapes: Base:mono, Base:pin2_00
+Solid.Add "Base:mono", "Base:pin2_00"
+
+' boolean add shapes: Base:mono, Base:pin2_01
+Solid.Add "Base:mono", "Base:pin2_01"
+
+' boolean add shapes: Base:mono, Base:pin2_02
+Solid.Add "Base:mono", "Base:pin2_02"
+
+' boolean add shapes: Base:mono, Base:pin2_03
+Solid.Add "Base:mono", "Base:pin2_03"
+
+' boolean add shapes: Base:mono, Base:pin2_04
+Solid.Add "Base:mono", "Base:pin2_04"
+
+' boolean add shapes: Base:mono, Base:pin2_05
+Solid.Add "Base:mono", "Base:pin2_05"
+
+' boolean add shapes: Base:mono, Base:pin2_06
+Solid.Add "Base:mono", "Base:pin2_06"
+
+' boolean add shapes: Base:mono, Base:pin2_07
+Solid.Add "Base:mono", "Base:pin2_07"
+
+' boolean add shapes: Base:mono, Base:pin2_08
+Solid.Add "Base:mono", "Base:pin2_08"
+
+' boolean add shapes: Base:mono, Base:pin2_09
+Solid.Add "Base:mono", "Base:pin2_09"
+
+' boolean add shapes: Base:mono, Base:pin2_10
+Solid.Add "Base:mono", "Base:pin2_10"
+
+' boolean add shapes: Base:mono, Base:pin2_11
+Solid.Add "Base:mono", "Base:pin2_11"
+
+' boolean add shapes: Base:mono, Base:pin2_12
+Solid.Add "Base:mono", "Base:pin2_12"
+
+' boolean add shapes: Base:mono, Base:pin2_13
+Solid.Add "Base:mono", "Base:pin2_13"
+
+' boolean add shapes: Base:mono, Base:pin2_14
+Solid.Add "Base:mono", "Base:pin2_14"
+
+' boolean add shapes: Base:mono, Base:pin2_15
+Solid.Add "Base:mono", "Base:pin2_15"
+
+' boolean add shapes: Base:mono, Base:pin2_16
+Solid.Add "Base:mono", "Base:pin2_16"
+
+' boolean add shapes: Base:mono, Base:pin2_17
+Solid.Add "Base:mono", "Base:pin2_17"
+
+' boolean add shapes: Base:mono, Base:pin2_18
+Solid.Add "Base:mono", "Base:pin2_18"
+
+' boolean add shapes: Base:mono, Base:pin2_19
+Solid.Add "Base:mono", "Base:pin2_19"
+
+' boolean add shapes: Base:mono, Base:pin2_20
+Solid.Add "Base:mono", "Base:pin2_20"
+
+' boolean add shapes: Base:mono, Base:pin2_21
+Solid.Add "Base:mono", "Base:pin2_21"
+
+' boolean add shapes: Base:mono, Base:pin2_22
+Solid.Add "Base:mono", "Base:pin2_22"
+
+' boolean add shapes: Base:mono, Base:pin2_23
+Solid.Add "Base:mono", "Base:pin2_23"
+
+' boolean add shapes: Base:mono, Base:pin2_24
+Solid.Add "Base:mono", "Base:pin2_24"
+
+' boolean add shapes: Base:mono, Base:pin2_25
+Solid.Add "Base:mono", "Base:pin2_25"
+
+' boolean add shapes: Base:mono, Base:pin2_26
+Solid.Add "Base:mono", "Base:pin2_26"
+
+' boolean add shapes: Base:mono, Base:pin2_27
+Solid.Add "Base:mono", "Base:pin2_27"
+
+' boolean add shapes: Base:mono, Base:pin2_28
+Solid.Add "Base:mono", "Base:pin2_28"
+
+' boolean add shapes: Base:mono, Base:pin2_29
+Solid.Add "Base:mono", "Base:pin2_29"
+
+' boolean add shapes: Base:mono, Base:pin2_30
+Solid.Add "Base:mono", "Base:pin2_30"
+
+' boolean add shapes: Base:mono, Base:pin2_31
+Solid.Add "Base:mono", "Base:pin2_31"
+
+' boolean add shapes: Base:mono, Base:pin2_32
+Solid.Add "Base:mono", "Base:pin2_32"
+
+' boolean add shapes: Base:mono, Base:pin2_33
+Solid.Add "Base:mono", "Base:pin2_33"
+
+' boolean add shapes: Base:mono, Base:pin2_34
+Solid.Add "Base:mono", "Base:pin2_34"
+
+' boolean add shapes: Base:mono, Base:pin2_35
+Solid.Add "Base:mono", "Base:pin2_35"
+
+' boolean add shapes: Base:mono, Base:pin2_36
+Solid.Add "Base:mono", "Base:pin2_36"
+
+' boolean add shapes: Base:mono, Base:pin2_37
+Solid.Add "Base:mono", "Base:pin2_37"
+
+' boolean add shapes: Base:mono, Base:pin2_38
+Solid.Add "Base:mono", "Base:pin2_38"
+
+' boolean add shapes: Base:mono, Base:pin2_39
+Solid.Add "Base:mono", "Base:pin2_39"
+
+' boolean add shapes: Base:mono, Base:pin2_40
+Solid.Add "Base:mono", "Base:pin2_40"
+
+' boolean add shapes: Base:mono, Base:pin2_41
+Solid.Add "Base:mono", "Base:pin2_41"
+
+' boolean add shapes: Base:mono, Base:pin2_42
+Solid.Add "Base:mono", "Base:pin2_42"
+
+' boolean add shapes: Base:mono, Base:pin2_43
+Solid.Add "Base:mono", "Base:pin2_43"
+
+' boolean add shapes: Base:mono, Base:pin2_44
+Solid.Add "Base:mono", "Base:pin2_44"
+
+' boolean add shapes: Base:mono, Base:pin2_45
+Solid.Add "Base:mono", "Base:pin2_45"
+
+' boolean add shapes: Base:mono, Base:pin2_46
+Solid.Add "Base:mono", "Base:pin2_46"
+
+' boolean add shapes: Base:mono, Base:pin2_47
+Solid.Add "Base:mono", "Base:pin2_47"
+
+' boolean add shapes: Base:mono, Base:pin2_48
+Solid.Add "Base:mono", "Base:pin2_48"
+
+' boolean add shapes: Base:mono, Base:pin2_49
+Solid.Add "Base:mono", "Base:pin2_49"
+
+' boolean add shapes: Base:mono, Base:pin2_50
+Solid.Add "Base:mono", "Base:pin2_50"
+
+' boolean add shapes: Base:mono, Base:pin2_51
+Solid.Add "Base:mono", "Base:pin2_51"
+
+' boolean add shapes: Base:mono, Base:pin2_52
+Solid.Add "Base:mono", "Base:pin2_52"
+
+' boolean add shapes: Base:mono, Base:pin2_53
+Solid.Add "Base:mono", "Base:pin2_53"
+
+' boolean add shapes: Base:mono, Base:pin2_54
+Solid.Add "Base:mono", "Base:pin2_54"
+
+' boolean add shapes: Base:mono, Base:pin2_55
+Solid.Add "Base:mono", "Base:pin2_55"
+
+' boolean add shapes: Base:mono, Base:pin2_56
+Solid.Add "Base:mono", "Base:pin2_56"
+
+' boolean add shapes: Base:mono, Base:pin2_57
+Solid.Add "Base:mono", "Base:pin2_57"
+
+' boolean add shapes: Base:mono, Base:pin2_58
+Solid.Add "Base:mono", "Base:pin2_58"
+
+' boolean add shapes: Base:mono, Base:pin2_59
+Solid.Add "Base:mono", "Base:pin2_59"
+
+' boolean add shapes: Base:mono, Base:pin2_60
+Solid.Add "Base:mono", "Base:pin2_60"
+
+' boolean add shapes: Base:mono, Base:pin2_61
+Solid.Add "Base:mono", "Base:pin2_61"
+
+' boolean add shapes: Base:mono, Base:pin2_62
+Solid.Add "Base:mono", "Base:pin2_62"
+
+' boolean add shapes: Base:mono, Base:pin2_63
+Solid.Add "Base:mono", "Base:pin2_63"
+
+' boolean add shapes: Base:mono, Base:pin2_64
+Solid.Add "Base:mono", "Base:pin2_64"
+
+' boolean add shapes: Base:mono, Base:pin2_65
+Solid.Add "Base:mono", "Base:pin2_65"
+
+' boolean add shapes: Base:mono, Base:pin2_66
+Solid.Add "Base:mono", "Base:pin2_66"
+
+' boolean add shapes: Base:mono, Base:pin2_67
+Solid.Add "Base:mono", "Base:pin2_67"
+
+' boolean add shapes: Base:mono, Base:pin2_68
+Solid.Add "Base:mono", "Base:pin2_68"
+
+' boolean add shapes: Base:mono, Base:pin2_69
+Solid.Add "Base:mono", "Base:pin2_69"
+
+' boolean add shapes: Base:mono, Base:pin2_70
+Solid.Add "Base:mono", "Base:pin2_70"
+
+' boolean add shapes: Base:mono, Base:pin2_71
+Solid.Add "Base:mono", "Base:pin2_71"
+
+' boolean add shapes: Base:mono, Base:pin2_72
+Solid.Add "Base:mono", "Base:pin2_72"
+
+' boolean add shapes: Base:mono, Base:pin2_73
+Solid.Add "Base:mono", "Base:pin2_73"
+
+' boolean add shapes: Base:mono, Base:pin2_74
+Solid.Add "Base:mono", "Base:pin2_74"
+
+' boolean add shapes: Base:mono, Base:pin2_75
+Solid.Add "Base:mono", "Base:pin2_75"
+
+' boolean add shapes: Base:mono, Base:pin2_76
+Solid.Add "Base:mono", "Base:pin2_76"
+
+' boolean add shapes: Base:mono, Base:pin2_77
+Solid.Add "Base:mono", "Base:pin2_77"
+
+' boolean add shapes: Base:mono, Base:pin2_78
+Solid.Add "Base:mono", "Base:pin2_78"
+
+' boolean add shapes: Base:mono, Base:pin3_00
+Solid.Add "Base:mono", "Base:pin3_00"
+
+' boolean add shapes: Base:mono, Base:pin3_01
+Solid.Add "Base:mono", "Base:pin3_01"
+
+' boolean add shapes: Base:mono, Base:pin3_02
+Solid.Add "Base:mono", "Base:pin3_02"
+
+' boolean add shapes: Base:mono, Base:pin3_03
+Solid.Add "Base:mono", "Base:pin3_03"
+
+' boolean add shapes: Base:mono, Base:pin3_04
+Solid.Add "Base:mono", "Base:pin3_04"
+
+' boolean add shapes: Base:mono, Base:pin3_05
+Solid.Add "Base:mono", "Base:pin3_05"
+
+' boolean add shapes: Base:mono, Base:pin3_06
+Solid.Add "Base:mono", "Base:pin3_06"
+
+' boolean add shapes: Base:mono, Base:pin3_07
+Solid.Add "Base:mono", "Base:pin3_07"
+
+' boolean add shapes: Base:mono, Base:pin3_08
+Solid.Add "Base:mono", "Base:pin3_08"
+
+' boolean add shapes: Base:mono, Base:pin3_09
+Solid.Add "Base:mono", "Base:pin3_09"
+
+' boolean add shapes: Base:mono, Base:pin3_10
+Solid.Add "Base:mono", "Base:pin3_10"
+
+' boolean add shapes: Base:mono, Base:pin3_11
+Solid.Add "Base:mono", "Base:pin3_11"
+
+' boolean add shapes: Base:mono, Base:pin3_12
+Solid.Add "Base:mono", "Base:pin3_12"
+
+' boolean add shapes: Base:mono, Base:pin3_13
+Solid.Add "Base:mono", "Base:pin3_13"
+
+' boolean add shapes: Base:mono, Base:pin3_14
+Solid.Add "Base:mono", "Base:pin3_14"
+
+' boolean add shapes: Base:mono, Base:pin3_15
+Solid.Add "Base:mono", "Base:pin3_15"
+
+' boolean add shapes: Base:mono, Base:pin3_16
+Solid.Add "Base:mono", "Base:pin3_16"
+
+' boolean add shapes: Base:mono, Base:pin3_17
+Solid.Add "Base:mono", "Base:pin3_17"
+
+' boolean add shapes: Base:mono, Base:pin3_18
+Solid.Add "Base:mono", "Base:pin3_18"
+
+' boolean add shapes: Base:mono, Base:pin3_19
+Solid.Add "Base:mono", "Base:pin3_19"
+
+' boolean add shapes: Base:mono, Base:pin3_20
+Solid.Add "Base:mono", "Base:pin3_20"
+
+' boolean add shapes: Base:mono, Base:pin3_21
+Solid.Add "Base:mono", "Base:pin3_21"
+
+' boolean add shapes: Base:mono, Base:pin3_22
+Solid.Add "Base:mono", "Base:pin3_22"
+
+' boolean add shapes: Base:mono, Base:pin3_23
+Solid.Add "Base:mono", "Base:pin3_23"
+
+' boolean add shapes: Base:mono, Base:pin3_24
+Solid.Add "Base:mono", "Base:pin3_24"
+
+' boolean add shapes: Base:mono, Base:pin3_25
+Solid.Add "Base:mono", "Base:pin3_25"
+
+' boolean add shapes: Base:mono, Base:pin3_26
+Solid.Add "Base:mono", "Base:pin3_26"
+
+' boolean add shapes: Base:mono, Base:pin3_27
+Solid.Add "Base:mono", "Base:pin3_27"
+
+' boolean add shapes: Base:mono, Base:pin3_28
+Solid.Add "Base:mono", "Base:pin3_28"
+
+' boolean add shapes: Base:mono, Base:pin3_29
+Solid.Add "Base:mono", "Base:pin3_29"
+
+' boolean add shapes: Base:mono, Base:pin3_30
+Solid.Add "Base:mono", "Base:pin3_30"
+
+' boolean add shapes: Base:mono, Base:pin3_31
+Solid.Add "Base:mono", "Base:pin3_31"
+
+' boolean add shapes: Base:mono, Base:pin3_32
+Solid.Add "Base:mono", "Base:pin3_32"
+
+' boolean add shapes: Base:mono, Base:pin3_33
+Solid.Add "Base:mono", "Base:pin3_33"
+
+' boolean add shapes: Base:mono, Base:pin3_34
+Solid.Add "Base:mono", "Base:pin3_34"
+
+' boolean add shapes: Base:mono, Base:pin3_35
+Solid.Add "Base:mono", "Base:pin3_35"
+
+' boolean add shapes: Base:mono, Base:pin3_36
+Solid.Add "Base:mono", "Base:pin3_36"
+
+' boolean add shapes: Base:mono, Base:pin3_37
+Solid.Add "Base:mono", "Base:pin3_37"
+
+' boolean add shapes: Base:mono, Base:pin3_38
+Solid.Add "Base:mono", "Base:pin3_38"
+
+' boolean add shapes: Base:mono, Base:pin3_39
+Solid.Add "Base:mono", "Base:pin3_39"
+
+' boolean add shapes: Base:mono, Base:pin3_40
+Solid.Add "Base:mono", "Base:pin3_40"
+
+' boolean add shapes: Base:mono, Base:pin3_41
+Solid.Add "Base:mono", "Base:pin3_41"
+
+' boolean add shapes: Base:mono, Base:pin3_42
+Solid.Add "Base:mono", "Base:pin3_42"
+
+' boolean add shapes: Base:mono, Base:pin3_43
+Solid.Add "Base:mono", "Base:pin3_43"
+
+' boolean add shapes: Base:mono, Base:pin3_44
+Solid.Add "Base:mono", "Base:pin3_44"
+
+' boolean add shapes: Base:mono, Base:pin3_45
+Solid.Add "Base:mono", "Base:pin3_45"
+
+' boolean add shapes: Base:mono, Base:pin3_46
+Solid.Add "Base:mono", "Base:pin3_46"
+
+' boolean add shapes: Base:mono, Base:pin3_47
+Solid.Add "Base:mono", "Base:pin3_47"
+
+' boolean add shapes: Base:mono, Base:pin3_48
+Solid.Add "Base:mono", "Base:pin3_48"
+
+' boolean add shapes: Base:mono, Base:pin3_49
+Solid.Add "Base:mono", "Base:pin3_49"
+
+' boolean add shapes: Base:mono, Base:pin3_50
+Solid.Add "Base:mono", "Base:pin3_50"
+
+' boolean add shapes: Base:mono, Base:pin3_51
+Solid.Add "Base:mono", "Base:pin3_51"
+
+' boolean add shapes: Base:mono, Base:pin3_52
+Solid.Add "Base:mono", "Base:pin3_52"
+
+' boolean add shapes: Base:mono, Base:pin3_53
+Solid.Add "Base:mono", "Base:pin3_53"
+
+' boolean add shapes: Base:mono, Base:pin3_54
+Solid.Add "Base:mono", "Base:pin3_54"
+
+' boolean add shapes: Base:mono, Base:pin3_55
+Solid.Add "Base:mono", "Base:pin3_55"
+
+' boolean add shapes: Base:mono, Base:pin3_56
+Solid.Add "Base:mono", "Base:pin3_56"
+
+' boolean add shapes: Base:mono, Base:pin3_57
+Solid.Add "Base:mono", "Base:pin3_57"
+
+' boolean add shapes: Base:mono, Base:pin3_58
+Solid.Add "Base:mono", "Base:pin3_58"
+
+' boolean add shapes: Base:mono, Base:pin3_59
+Solid.Add "Base:mono", "Base:pin3_59"
+
+' boolean add shapes: Base:mono, Base:pin3_60
+Solid.Add "Base:mono", "Base:pin3_60"
+
+' boolean add shapes: Base:mono, Base:pin3_61
+Solid.Add "Base:mono", "Base:pin3_61"
+
+' boolean add shapes: Base:mono, Base:pin3_62
+Solid.Add "Base:mono", "Base:pin3_62"
+
+' boolean add shapes: Base:mono, Base:pin3_63
+Solid.Add "Base:mono", "Base:pin3_63"
+
+' boolean add shapes: Base:mono, Base:pin3_64
+Solid.Add "Base:mono", "Base:pin3_64"
+
+' boolean add shapes: Base:mono, Base:pin3_65
+Solid.Add "Base:mono", "Base:pin3_65"
+
+' boolean add shapes: Base:mono, Base:pin3_66
+Solid.Add "Base:mono", "Base:pin3_66"
+
+' boolean add shapes: Base:mono, Base:pin3_67
+Solid.Add "Base:mono", "Base:pin3_67"
+
+' boolean add shapes: Base:mono, Base:pin3_68
+Solid.Add "Base:mono", "Base:pin3_68"
+
+' boolean add shapes: Base:mono, Base:pin3_69
+Solid.Add "Base:mono", "Base:pin3_69"
+
+' boolean add shapes: Base:mono, Base:pin3_70
+Solid.Add "Base:mono", "Base:pin3_70"
+
+' boolean add shapes: Base:mono, Base:pin3_71
+Solid.Add "Base:mono", "Base:pin3_71"
+
+' boolean add shapes: Base:mono, Base:pin3_72
+Solid.Add "Base:mono", "Base:pin3_72"
+
+' boolean add shapes: Base:mono, Base:pin3_73
+Solid.Add "Base:mono", "Base:pin3_73"
+
+' boolean add shapes: Base:mono, Base:pin3_74
+Solid.Add "Base:mono", "Base:pin3_74"
+
+' boolean add shapes: Base:mono, Base:pin3_75
+Solid.Add "Base:mono", "Base:pin3_75"
+
+' boolean add shapes: Base:mono, Base:pin3_76
+Solid.Add "Base:mono", "Base:pin3_76"
+
+' boolean add shapes: Base:mono, Base:pin3_77
+Solid.Add "Base:mono", "Base:pin3_77"
+
+' boolean add shapes: Base:mono, Base:pin3_78
+Solid.Add "Base:mono", "Base:pin3_78"
+
+' boolean add shapes: Base:mono, Base:pin4_00
+Solid.Add "Base:mono", "Base:pin4_00"
+
+' boolean add shapes: Base:mono, Base:pin4_01
+Solid.Add "Base:mono", "Base:pin4_01"
+
+' boolean add shapes: Base:mono, Base:pin4_02
+Solid.Add "Base:mono", "Base:pin4_02"
+
+' boolean add shapes: Base:mono, Base:pin4_03
+Solid.Add "Base:mono", "Base:pin4_03"
+
+' boolean add shapes: Base:mono, Base:pin4_04
+Solid.Add "Base:mono", "Base:pin4_04"
+
+' boolean add shapes: Base:mono, Base:pin4_05
+Solid.Add "Base:mono", "Base:pin4_05"
+
+' boolean add shapes: Base:mono, Base:pin4_06
+Solid.Add "Base:mono", "Base:pin4_06"
+
+' boolean add shapes: Base:mono, Base:pin4_07
+Solid.Add "Base:mono", "Base:pin4_07"
+
+' boolean add shapes: Base:mono, Base:pin4_08
+Solid.Add "Base:mono", "Base:pin4_08"
+
+' boolean add shapes: Base:mono, Base:pin4_09
+Solid.Add "Base:mono", "Base:pin4_09"
+
+' boolean add shapes: Base:mono, Base:pin4_10
+Solid.Add "Base:mono", "Base:pin4_10"
+
+' boolean add shapes: Base:mono, Base:pin4_11
+Solid.Add "Base:mono", "Base:pin4_11"
+
+' boolean add shapes: Base:mono, Base:pin4_12
+Solid.Add "Base:mono", "Base:pin4_12"
+
+' boolean add shapes: Base:mono, Base:pin4_13
+Solid.Add "Base:mono", "Base:pin4_13"
+
+' boolean add shapes: Base:mono, Base:pin4_14
+Solid.Add "Base:mono", "Base:pin4_14"
+
+' boolean add shapes: Base:mono, Base:pin4_15
+Solid.Add "Base:mono", "Base:pin4_15"
+
+' boolean add shapes: Base:mono, Base:pin4_16
+Solid.Add "Base:mono", "Base:pin4_16"
+
+' boolean add shapes: Base:mono, Base:pin4_17
+Solid.Add "Base:mono", "Base:pin4_17"
+
+' boolean add shapes: Base:mono, Base:pin4_18
+Solid.Add "Base:mono", "Base:pin4_18"
+
+' boolean add shapes: Base:mono, Base:pin4_19
+Solid.Add "Base:mono", "Base:pin4_19"
+
+' boolean add shapes: Base:mono, Base:pin4_20
+Solid.Add "Base:mono", "Base:pin4_20"
+
+' boolean add shapes: Base:mono, Base:pin4_21
+Solid.Add "Base:mono", "Base:pin4_21"
+
+' boolean add shapes: Base:mono, Base:pin4_22
+Solid.Add "Base:mono", "Base:pin4_22"
+
+' boolean add shapes: Base:mono, Base:pin4_23
+Solid.Add "Base:mono", "Base:pin4_23"
+
+' boolean add shapes: Base:mono, Base:pin4_24
+Solid.Add "Base:mono", "Base:pin4_24"
+
+' boolean add shapes: Base:mono, Base:pin4_25
+Solid.Add "Base:mono", "Base:pin4_25"
+
+' boolean add shapes: Base:mono, Base:pin4_26
+Solid.Add "Base:mono", "Base:pin4_26"
+
+' boolean add shapes: Base:mono, Base:pin4_27
+Solid.Add "Base:mono", "Base:pin4_27"
+
+' boolean add shapes: Base:mono, Base:pin4_28
+Solid.Add "Base:mono", "Base:pin4_28"
+
+' boolean add shapes: Base:mono, Base:pin4_29
+Solid.Add "Base:mono", "Base:pin4_29"
+
+' boolean add shapes: Base:mono, Base:pin4_30
+Solid.Add "Base:mono", "Base:pin4_30"
+
+' boolean add shapes: Base:mono, Base:pin4_31
+Solid.Add "Base:mono", "Base:pin4_31"
+
+' boolean add shapes: Base:mono, Base:pin4_32
+Solid.Add "Base:mono", "Base:pin4_32"
+
+' boolean add shapes: Base:mono, Base:pin4_33
+Solid.Add "Base:mono", "Base:pin4_33"
+
+' boolean add shapes: Base:mono, Base:pin4_34
+Solid.Add "Base:mono", "Base:pin4_34"
+
+' boolean add shapes: Base:mono, Base:pin4_35
+Solid.Add "Base:mono", "Base:pin4_35"
+
+' boolean add shapes: Base:mono, Base:pin4_36
+Solid.Add "Base:mono", "Base:pin4_36"
+
+' boolean add shapes: Base:mono, Base:pin4_37
+Solid.Add "Base:mono", "Base:pin4_37"
+
+' boolean add shapes: Base:mono, Base:pin4_38
+Solid.Add "Base:mono", "Base:pin4_38"
+
+' boolean add shapes: Base:mono, Base:pin4_39
+Solid.Add "Base:mono", "Base:pin4_39"
+
+' boolean add shapes: Base:mono, Base:pin4_40
+Solid.Add "Base:mono", "Base:pin4_40"
+
+' boolean add shapes: Base:mono, Base:pin4_41
+Solid.Add "Base:mono", "Base:pin4_41"
+
+' boolean add shapes: Base:mono, Base:pin4_42
+Solid.Add "Base:mono", "Base:pin4_42"
+
+' boolean add shapes: Base:mono, Base:pin4_43
+Solid.Add "Base:mono", "Base:pin4_43"
+
+' boolean add shapes: Base:mono, Base:pin4_44
+Solid.Add "Base:mono", "Base:pin4_44"
+
+' boolean add shapes: Base:mono, Base:pin4_45
+Solid.Add "Base:mono", "Base:pin4_45"
+
+' boolean add shapes: Base:mono, Base:pin4_46
+Solid.Add "Base:mono", "Base:pin4_46"
+
+' boolean add shapes: Base:mono, Base:pin4_47
+Solid.Add "Base:mono", "Base:pin4_47"
+
+' boolean add shapes: Base:mono, Base:pin4_48
+Solid.Add "Base:mono", "Base:pin4_48"
+
+' boolean add shapes: Base:mono, Base:pin4_49
+Solid.Add "Base:mono", "Base:pin4_49"
+
+' boolean add shapes: Base:mono, Base:pin4_50
+Solid.Add "Base:mono", "Base:pin4_50"
+
+' boolean add shapes: Base:mono, Base:pin4_51
+Solid.Add "Base:mono", "Base:pin4_51"
+
+' boolean add shapes: Base:mono, Base:pin4_52
+Solid.Add "Base:mono", "Base:pin4_52"
+
+' boolean add shapes: Base:mono, Base:pin4_53
+Solid.Add "Base:mono", "Base:pin4_53"
+
+' boolean add shapes: Base:mono, Base:pin4_54
+Solid.Add "Base:mono", "Base:pin4_54"
+
+' boolean add shapes: Base:mono, Base:pin4_55
+Solid.Add "Base:mono", "Base:pin4_55"
+
+' boolean add shapes: Base:mono, Base:pin4_56
+Solid.Add "Base:mono", "Base:pin4_56"
+
+' boolean add shapes: Base:mono, Base:pin4_57
+Solid.Add "Base:mono", "Base:pin4_57"
+
+' boolean add shapes: Base:mono, Base:pin4_58
+Solid.Add "Base:mono", "Base:pin4_58"
+
+' boolean add shapes: Base:mono, Base:pin4_59
+Solid.Add "Base:mono", "Base:pin4_59"
+
+' boolean add shapes: Base:mono, Base:pin4_60
+Solid.Add "Base:mono", "Base:pin4_60"
+
+' boolean add shapes: Base:mono, Base:pin4_61
+Solid.Add "Base:mono", "Base:pin4_61"
+
+' boolean add shapes: Base:mono, Base:pin4_62
+Solid.Add "Base:mono", "Base:pin4_62"
+
+' boolean add shapes: Base:mono, Base:pin4_63
+Solid.Add "Base:mono", "Base:pin4_63"
+
+' boolean add shapes: Base:mono, Base:pin4_64
+Solid.Add "Base:mono", "Base:pin4_64"
+
+' boolean add shapes: Base:mono, Base:pin4_65
+Solid.Add "Base:mono", "Base:pin4_65"
+
+' boolean add shapes: Base:mono, Base:pin4_66
+Solid.Add "Base:mono", "Base:pin4_66"
+
+' boolean add shapes: Base:mono, Base:pin4_67
+Solid.Add "Base:mono", "Base:pin4_67"
+
+' boolean add shapes: Base:mono, Base:pin4_68
+Solid.Add "Base:mono", "Base:pin4_68"
+
+' boolean add shapes: Base:mono, Base:pin4_69
+Solid.Add "Base:mono", "Base:pin4_69"
+
+' boolean add shapes: Base:mono, Base:pin4_70
+Solid.Add "Base:mono", "Base:pin4_70"
+
+' boolean add shapes: Base:mono, Base:pin4_71
+Solid.Add "Base:mono", "Base:pin4_71"
+
+' boolean add shapes: Base:mono, Base:pin4_72
+Solid.Add "Base:mono", "Base:pin4_72"
+
+' boolean add shapes: Base:mono, Base:pin4_73
+Solid.Add "Base:mono", "Base:pin4_73"
+
+' boolean add shapes: Base:mono, Base:pin4_74
+Solid.Add "Base:mono", "Base:pin4_74"
+
+' boolean add shapes: Base:mono, Base:pin4_75
+Solid.Add "Base:mono", "Base:pin4_75"
+
+' boolean add shapes: Base:mono, Base:pin4_76
+Solid.Add "Base:mono", "Base:pin4_76"
+
+' boolean add shapes: Base:mono, Base:pin4_77
+Solid.Add "Base:mono", "Base:pin4_77"
+
+' boolean add shapes: Base:mono, Base:pin4_78
+Solid.Add "Base:mono", "Base:pin4_78"
+
+'## 21 - define cylinders: Base:taladros de brida (16)
+' define cylinder: Base:cbTL
+With Cylinder
+     .Reset
+     .Name "cbTL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lcb"
+     .Ycenter "0"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:cbTR
+With Cylinder
+     .Reset
+     .Name "cbTR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcb", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:cbBL
+With Cylinder
+     .Reset
+     .Name "cbBL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lcb"
+     .Ycenter "0"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:cbBR
+With Cylinder
+     .Reset
+     .Name "cbBR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcb/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcb", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpTL
+With Cylinder
+     .Reset
+     .Name "tpTL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcl/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lcl"
+     .Ycenter "0"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpTR
+With Cylinder
+     .Reset
+     .Name "tpTR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcl/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcl", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpBL
+With Cylinder
+     .Reset
+     .Name "tpBL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcl/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lcl"
+     .Ycenter "0"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:tpBR
+With Cylinder
+     .Reset
+     .Name "tpBR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dcl/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lcl", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(0)"
+     .Zcenter "-BCfl/2"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al1L
+With Cylinder
+     .Reset
+     .Name "al1L"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
+     .Ycenter "r45"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al1R
+With Cylinder
+     .Reset
+     .Name "al1R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(r45)"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al2L
+With Cylinder
+     .Reset
+     .Name "al2L"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
+     .Ycenter "-r45"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al2R
+With Cylinder
+     .Reset
+     .Name "al2R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(-r45)"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al3L
+With Cylinder
+     .Reset
+     .Name "al3L"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
+     .Ycenter "-r45"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al3R
+With Cylinder
+     .Reset
+     .Name "al3R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(-r45)"
+     .Zcenter "r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al4L
+With Cylinder
+     .Reset
+     .Name "al4L"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(-Lwg/2+tboss)-0.1", "(-Lwg/2+tboss)+lal"
+     .Ycenter "r45"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:al4R
+With Cylinder
+     .Reset
+     .Name "al4R"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dprc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "x"
+     .Xrange "(Lwg/2-tboss)-lal", "(Lwg/2-tboss)+0.1"
+     .Ycenter "-(r45)"
+     .Zcenter "-r45"
+     .Segments "0"
+     .Create
+End With
+
+'## 22 - boolean subtract shapes: Base:mono, taladros de brida
+' boolean subtract shapes: Base:mono, Base:cbTL
+Solid.Subtract "Base:mono", "Base:cbTL"
+
+' boolean subtract shapes: Base:mono, Base:cbTR
+Solid.Subtract "Base:mono", "Base:cbTR"
+
+' boolean subtract shapes: Base:mono, Base:cbBL
+Solid.Subtract "Base:mono", "Base:cbBL"
+
+' boolean subtract shapes: Base:mono, Base:cbBR
+Solid.Subtract "Base:mono", "Base:cbBR"
+
+' boolean subtract shapes: Base:mono, Base:tpTL
+Solid.Subtract "Base:mono", "Base:tpTL"
+
+' boolean subtract shapes: Base:mono, Base:tpTR
+Solid.Subtract "Base:mono", "Base:tpTR"
+
+' boolean subtract shapes: Base:mono, Base:tpBL
+Solid.Subtract "Base:mono", "Base:tpBL"
+
+' boolean subtract shapes: Base:mono, Base:tpBR
+Solid.Subtract "Base:mono", "Base:tpBR"
+
+' boolean subtract shapes: Base:mono, Base:al1L
+Solid.Subtract "Base:mono", "Base:al1L"
+
+' boolean subtract shapes: Base:mono, Base:al1R
+Solid.Subtract "Base:mono", "Base:al1R"
+
+' boolean subtract shapes: Base:mono, Base:al2L
+Solid.Subtract "Base:mono", "Base:al2L"
+
+' boolean subtract shapes: Base:mono, Base:al2R
+Solid.Subtract "Base:mono", "Base:al2R"
+
+' boolean subtract shapes: Base:mono, Base:al3L
+Solid.Subtract "Base:mono", "Base:al3L"
+
+' boolean subtract shapes: Base:mono, Base:al3R
+Solid.Subtract "Base:mono", "Base:al3R"
+
+' boolean subtract shapes: Base:mono, Base:al4L
+Solid.Subtract "Base:mono", "Base:al4L"
+
+' boolean subtract shapes: Base:mono, Base:al4R
+Solid.Subtract "Base:mono", "Base:al4R"
+
+'## 23 - define cylinders: Base:pasantes M2.5 (18) y centrado A/B (2)
+' define cylinder: Base:sc_a0
+With Cylinder
+     .Reset
+     .Name "sc_a0"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-4*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a1
+With Cylinder
+     .Reset
+     .Name "sc_a1"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-3*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a2
+With Cylinder
+     .Reset
+     .Name "sc_a2"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-2*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a3
+With Cylinder
+     .Reset
+     .Name "sc_a3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a4
+With Cylinder
+     .Reset
+     .Name "sc_a4"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a5
+With Cylinder
+     .Reset
+     .Name "sc_a5"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a6
+With Cylinder
+     .Reset
+     .Name "sc_a6"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a7
+With Cylinder
+     .Reset
+     .Name "sc_a7"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "3*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_a8
+With Cylinder
+     .Reset
+     .Name "sc_a8"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "4*xsc"
+     .Ycenter "ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b0
+With Cylinder
+     .Reset
+     .Name "sc_b0"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-4*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b1
+With Cylinder
+     .Reset
+     .Name "sc_b1"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-3*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b2
+With Cylinder
+     .Reset
+     .Name "sc_b2"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-2*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b3
+With Cylinder
+     .Reset
+     .Name "sc_b3"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-1*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b4
+With Cylinder
+     .Reset
+     .Name "sc_b4"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "0*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b5
+With Cylinder
+     .Reset
+     .Name "sc_b5"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "1*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b6
+With Cylinder
+     .Reset
+     .Name "sc_b6"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "2*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b7
+With Cylinder
+     .Reset
+     .Name "sc_b7"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "3*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:sc_b8
+With Cylinder
+     .Reset
+     .Name "sc_b8"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dsc/2+tpl"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "4*xsc"
+     .Ycenter "-ysc"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:abA
+With Cylinder
+     .Reset
+     .Name "abA"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dab/2"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "-xab"
+     .Ycenter "yab"
+     .Segments "0"
+     .Create
+End With
+
+' define cylinder: Base:abB
+With Cylinder
+     .Reset
+     .Name "abB"
+     .Component "Base"
+     .Material "Ni_plated"
+     .OuterRadius "dab/2"
+     .InnerRadius "0.0"
+     .Axis "z"
+     .Zrange "(zpart-Hhalf)-0.1", "(zpart+Hhalf)+0.1"
+     .Xcenter "xab"
+     .Ycenter "-yab"
+     .Segments "0"
+     .Create
+End With
+
+'## 24 - boolean subtract shapes: Base:mono, pasantes
+' boolean subtract shapes: Base:mono, Base:sc_a0
+Solid.Subtract "Base:mono", "Base:sc_a0"
+
+' boolean subtract shapes: Base:mono, Base:sc_a1
+Solid.Subtract "Base:mono", "Base:sc_a1"
+
+' boolean subtract shapes: Base:mono, Base:sc_a2
+Solid.Subtract "Base:mono", "Base:sc_a2"
+
+' boolean subtract shapes: Base:mono, Base:sc_a3
+Solid.Subtract "Base:mono", "Base:sc_a3"
+
+' boolean subtract shapes: Base:mono, Base:sc_a4
+Solid.Subtract "Base:mono", "Base:sc_a4"
+
+' boolean subtract shapes: Base:mono, Base:sc_a5
+Solid.Subtract "Base:mono", "Base:sc_a5"
+
+' boolean subtract shapes: Base:mono, Base:sc_a6
+Solid.Subtract "Base:mono", "Base:sc_a6"
+
+' boolean subtract shapes: Base:mono, Base:sc_a7
+Solid.Subtract "Base:mono", "Base:sc_a7"
+
+' boolean subtract shapes: Base:mono, Base:sc_a8
+Solid.Subtract "Base:mono", "Base:sc_a8"
+
+' boolean subtract shapes: Base:mono, Base:sc_b0
+Solid.Subtract "Base:mono", "Base:sc_b0"
+
+' boolean subtract shapes: Base:mono, Base:sc_b1
+Solid.Subtract "Base:mono", "Base:sc_b1"
+
+' boolean subtract shapes: Base:mono, Base:sc_b2
+Solid.Subtract "Base:mono", "Base:sc_b2"
+
+' boolean subtract shapes: Base:mono, Base:sc_b3
+Solid.Subtract "Base:mono", "Base:sc_b3"
+
+' boolean subtract shapes: Base:mono, Base:sc_b4
+Solid.Subtract "Base:mono", "Base:sc_b4"
+
+' boolean subtract shapes: Base:mono, Base:sc_b5
+Solid.Subtract "Base:mono", "Base:sc_b5"
+
+' boolean subtract shapes: Base:mono, Base:sc_b6
+Solid.Subtract "Base:mono", "Base:sc_b6"
+
+' boolean subtract shapes: Base:mono, Base:sc_b7
+Solid.Subtract "Base:mono", "Base:sc_b7"
+
+' boolean subtract shapes: Base:mono, Base:sc_b8
+Solid.Subtract "Base:mono", "Base:sc_b8"
+
+' boolean subtract shapes: Base:mono, Base:abA
+Solid.Subtract "Base:mono", "Base:abA"
+
+' boolean subtract shapes: Base:mono, Base:abB
+Solid.Subtract "Base:mono", "Base:abB"
+
+'## 25 - transform: translate Base:mono
+With Transform
+     .Reset
+     .Name "Base:mono"
+     .Vector "0", "0", "0"
+     .UsePickedPoints "False"
+     .InvertPickedPoints "False"
+     .MultipleObjects "True"
+     .GroupObjects "False"
+     .Repetitions "1"
+     .MultipleSelection "False"
+     .Destination "Tapa"
+     .Material ""
+     .AutoDestination "False"
+     .Transform "Shape", "Translate"
+End With
+
+'## 26 - define brick: Base:cutB
+With Brick
+     .Reset
+     .Name "cutB"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "-Lwg/2-1", "Lwg/2+1"
+     .Yrange "-Wbody/2-1", "Wbody/2+1"
+     .Zrange "-Rdisc-1", "zpart"
+     .Create
+End With
+
+'## 27 - define brick: Tapa:cutT
+With Brick
+     .Reset
+     .Name "cutT"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Xrange "-Lwg/2-1", "Lwg/2+1"
+     .Yrange "-Wbody/2-1", "Wbody/2+1"
+     .Zrange "zpart", "Rdisc+1"
+     .Create
+End With
+
+'## 28 - boolean intersect shapes: Base:mono, Base:cutB
+With Solid
+     .Version 10
+     .Intersect "Base:mono", "Base:cutB"
+     .Version 1
+End With
+
+'## 29 - boolean intersect shapes: Tapa:mono, Tapa:cutT
+With Solid
+     .Version 10
+     .Intersect "Tapa:mono", "Tapa:cutT"
+     .Version 1
+End With
+
+'## 30 - rename block: Base:mono to: Base:base
+Solid.Rename "Base:mono", "base"
+
+'## 31 - rename block: Tapa:mono to: Tapa:tapa
+Solid.Rename "Tapa:mono", "tapa"
+
+'## 32 - define brick: Tapa:nutL
+With Brick
+     .Reset
+     .Name "nutL"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Xrange "(-Lwg/2+tboss)+xn0", "(-Lwg/2+tboss)+xn0+nT"
+     .Yrange "-nW/2", "nW/2"
+     .Zrange "BCfl/2-nR", "(zpart+Hhalf)+0.1"
+     .Create
+End With
+
+'## 33 - boolean subtract shapes: Tapa:tapa, Tapa:nutL
+Solid.Subtract "Tapa:tapa", "Tapa:nutL"
+
+'## 34 - define brick: Tapa:nutR
+With Brick
+     .Reset
+     .Name "nutR"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Xrange "(Lwg/2-tboss)-xn0-nT", "(Lwg/2-tboss)-xn0"
+     .Yrange "-nW/2", "nW/2"
+     .Zrange "BCfl/2-nR", "(zpart+Hhalf)+0.1"
+     .Create
+End With
+
+'## 35 - boolean subtract shapes: Tapa:tapa, Tapa:nutR
+Solid.Subtract "Tapa:tapa", "Tapa:nutR"
+
+'## 36 - define brick: Base:nutL
+With Brick
+     .Reset
+     .Name "nutL"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "(-Lwg/2+tboss)+xn0", "(-Lwg/2+tboss)+xn0+nT"
+     .Yrange "-nW/2", "nW/2"
+     .Zrange "(zpart-Hhalf)-0.1", "-BCfl/2+nR"
+     .Create
+End With
+
+'## 37 - boolean subtract shapes: Base:base, Base:nutL
+Solid.Subtract "Base:base", "Base:nutL"
+
+'## 38 - define brick: Base:nutR
+With Brick
+     .Reset
+     .Name "nutR"
+     .Component "Base"
+     .Material "Ni_plated"
+     .Xrange "(Lwg/2-tboss)-xn0-nT", "(Lwg/2-tboss)-xn0"
+     .Yrange "-nW/2", "nW/2"
+     .Zrange "(zpart-Hhalf)-0.1", "-BCfl/2+nR"
+     .Create
+End With
+
+'## 39 - boolean subtract shapes: Base:base, Base:nutR
+Solid.Subtract "Base:base", "Base:nutR"
+
+'## 40 - define extrudes: Tapa:hex (18)
+' define extrude: Tapa:hex_a0
+With Extrude
+     .Reset
+     .Name "hex_a0"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-4*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a1
+With Extrude
+     .Reset
+     .Name "hex_a1"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-3*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a2
+With Extrude
+     .Reset
+     .Name "hex_a2"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-2*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a3
+With Extrude
+     .Reset
+     .Name "hex_a3"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-1*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a4
+With Extrude
+     .Reset
+     .Name "hex_a4"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "0*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a5
+With Extrude
+     .Reset
+     .Name "hex_a5"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "1*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a6
+With Extrude
+     .Reset
+     .Name "hex_a6"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "2*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a7
+With Extrude
+     .Reset
+     .Name "hex_a7"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "3*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_a8
+With Extrude
+     .Reset
+     .Name "hex_a8"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "4*xsc", "ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b0
+With Extrude
+     .Reset
+     .Name "hex_b0"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-4*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b1
+With Extrude
+     .Reset
+     .Name "hex_b1"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-3*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b2
+With Extrude
+     .Reset
+     .Name "hex_b2"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-2*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b3
+With Extrude
+     .Reset
+     .Name "hex_b3"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "-1*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b4
+With Extrude
+     .Reset
+     .Name "hex_b4"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "0*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b5
+With Extrude
+     .Reset
+     .Name "hex_b5"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "1*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b6
+With Extrude
+     .Reset
+     .Name "hex_b6"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "2*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b7
+With Extrude
+     .Reset
+     .Name "hex_b7"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "3*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+' define extrude: Tapa:hex_b8
+With Extrude
+     .Reset
+     .Name "hex_b8"
+     .Component "Tapa"
+     .Material "Ni_plated"
+     .Mode "Pointlist"
+     .Height "hexH+0.1"
+     .Twist "0.0"
+     .Taper "0.0"
+     .Origin "4*xsc", "-ysc", "(zpart+Hhalf)-hexH"
+     .Uvector "1.0", "0.0", "0.0"
+     .Vvector "0.0", "1.0", "0.0"
+     .Point "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "(hexS/2+tpl)*1.1547005"
+     .LineTo "-(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .LineTo "-(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "0", "-(hexS/2+tpl)*1.1547005"
+     .LineTo "(hexS/2+tpl)", "-(hexS/2+tpl)*0.5773503"
+     .LineTo "(hexS/2+tpl)", "(hexS/2+tpl)*0.5773503"
+     .Create
+End With
+
+'## 41 - boolean subtract shapes: Tapa:tapa, hex
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a0
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a0"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a1
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a1"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a2
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a2"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a3
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a3"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a4
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a4"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a5
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a5"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a6
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a6"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a7
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a7"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_a8
+Solid.Subtract "Tapa:tapa", "Tapa:hex_a8"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b0
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b0"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b1
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b1"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b2
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b2"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b3
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b3"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b4
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b4"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b5
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b5"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b6
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b6"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b7
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b7"
+
+' boolean subtract shapes: Tapa:tapa, Tapa:hex_b8
+Solid.Subtract "Tapa:tapa", "Tapa:hex_b8"
+
+'## 42 - define port: 1
+With Port
+     .Reset
+     .PortNumber "1"
+     .Label ""
+     .Folder ""
+     .NumberOfModes "1"
+     .AdjustPolarization "False"
+     .PolarizationAngle "0.0"
+     .ReferencePlaneDistance "0"
+     .TextSize "50"
+     .TextMaxLimit "0"
+     .Coordinates "Free"
+     .Orientation "xmin"
+     .PortOnBound "False"
+     .ClipPickedPortToBound "False"
+     .Xrange "-Lwg/2", "-Lwg/2"
+     .Yrange "-aWR/2-tpl", "aWR/2+tpl"
+     .Zrange "-bWR/2", "bWR/2"
+     .XrangeAdd "0.0", "0.0"
+     .YrangeAdd "0.0", "0.0"
+     .ZrangeAdd "0.0", "0.0"
+     .SingleEnded "False"
+     .WaveguideMonitor "False"
+     .Create
+End With
+
+'## 43 - define port: 2
+With Port
+     .Reset
+     .PortNumber "2"
+     .Label ""
+     .Folder ""
+     .NumberOfModes "1"
+     .AdjustPolarization "False"
+     .PolarizationAngle "0.0"
+     .ReferencePlaneDistance "0"
+     .TextSize "50"
+     .TextMaxLimit "0"
+     .Coordinates "Free"
+     .Orientation "xmax"
+     .PortOnBound "False"
+     .ClipPickedPortToBound "False"
+     .Xrange "Lwg/2", "Lwg/2"
+     .Yrange "-aWR/2-tpl", "aWR/2+tpl"
+     .Zrange "-bWR/2", "bWR/2"
+     .XrangeAdd "0.0", "0.0"
+     .YrangeAdd "0.0", "0.0"
+     .ZrangeAdd "0.0", "0.0"
+     .SingleEnded "False"
+     .WaveguideMonitor "False"
+     .Create
+End With
+
+'## 44 - define time domain solver parameters
+Mesh.SetCreator "High Frequency"
+With Solver
+     .Method "Hexahedral"
+     .CalculationType "TD-S"
+     .StimulationPort "All"
+     .StimulationMode "All"
+     .SteadyStateLimit "-40"
+     .MeshAdaption "False"
+     .AutoNormImpedance "False"
+     .NormingImpedance "50"
+     .CalculateModesOnly "False"
+     .SParaSymmetry "False"
+     .StoreTDResultsInCache  "False"
+     .RunDiscretizerOnly "False"
+     .FullDeembedding "False"
+     .SuperimposePLWExcitation "False"
+     .UseSensitivityAnalysis "False"
+End With

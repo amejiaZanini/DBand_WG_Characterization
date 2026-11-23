@@ -106,7 +106,7 @@ ylim(ax1, [-60 2]);
 grid(ax1,'on'); box(ax1,'on');
 lgd = legend(ax1,'Location','northeast','FontSize',10);
 set(lgd,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-try; lgd.BackgroundAlpha = 0.75; catch; end
+try lgd.BackgroundAlpha = 0.75; catch; end
 saveas(fig1, fullfile(proto_dir, [proto_name '_LossMap_refl.png']));
 
 %% ── 6 · Definir el gate de la EBG ────────────────────────────────────────
@@ -192,7 +192,7 @@ xlim(ax2, [f_s f_stop]);  ylim(ax2, [0 100]);
 grid(ax2,'on'); box(ax2,'on');
 lgd2 = legend(ax2,'Location','east','FontSize',10);
 set(lgd2,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-try; lgd2.BackgroundAlpha = 0.75; catch; end
+try lgd2.BackgroundAlpha = 0.75; catch; end
 saveas(fig2, fullfile(proto_dir, [proto_name '_LossMap_balance.png']));
 
 fprintf('Figuras guardadas en: %s\n', proto_dir);
