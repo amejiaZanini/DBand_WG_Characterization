@@ -492,7 +492,7 @@ function wg_format_ax(ax, freq, ttl, ylbl, ylim_val)
     grid(ax,'on'); box(ax,'on');
     lgd = legend(ax,'Location','southeast','FontSize',9);
     set(lgd,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-    try; lgd.BackgroundAlpha = 0.75; catch; end  % R2018a+
+    try lgd.BackgroundAlpha = 0.75; catch; end  % R2018a+
     hold(ax,'off');
 end
 

@@ -146,7 +146,7 @@ ylim(ax1, [-60 2]);
 grid(ax1,'on'); box(ax1,'on');
 lgd = legend(ax1,'Location','northeast','FontSize',10);
 set(lgd,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-try; lgd.BackgroundAlpha = 0.75; catch; end
+try lgd.BackgroundAlpha = 0.75; catch; end
 saveas(fig1, fullfile(proto_dir, [proto_name '_TDR.png']));
 
 %% ── 5 · Definir el gate (config o interactivo) ───────────────────────────
@@ -198,7 +198,7 @@ xlim(ax2, [f_s f_stop]);
 grid(ax2,'on'); box(ax2,'on');
 lgd2 = legend(ax2,'Location','southeast','FontSize',10);
 set(lgd2,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-try; lgd2.BackgroundAlpha = 0.75; catch; end
+try lgd2.BackgroundAlpha = 0.75; catch; end
 saveas(fig2, fullfile(proto_dir, [proto_name '_S11_gated.png']));
 
 fprintf('Figuras guardadas en: %s\n', proto_dir);

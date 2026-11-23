@@ -162,7 +162,7 @@ ylim(ax1, yl);
 grid(ax1,'on'); box(ax1,'on');
 lgd = legend(ax1, 'Location','east', 'FontSize',10);
 set(lgd,'Box','on','Color',[1 1 1],'EdgeColor',[0.75 0.75 0.75]);
-try; lgd.BackgroundAlpha = 0.75; catch; end
+try lgd.BackgroundAlpha = 0.75; catch; end
 hold(ax1,'off');
 saveas(fig1, fullfile(proto_dir, [proto_name '_PowerBalance.png']));
 
