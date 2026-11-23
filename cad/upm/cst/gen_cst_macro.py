@@ -25,6 +25,13 @@ PIN_SHAPE = (sys.argv[1] if __name__ == "__main__" and len(sys.argv) > 1
              else os.environ.get("UPM_PINS", "round"))
 assert PIN_SHAPE in ("round", "rect"), PIN_SHAPE
 SUFFIX = "" if PIN_SHAPE == "round" else "_rect"
+# Pines "tal como se fabricaron" (metrologia/analizar_metrologia.py -> pins_asbuilt_<muestra>.csv):
+#   python gen_cst_macro.py round|rect <pins_asbuilt.csv>   (o variable de entorno UPM_PINS_CSV)
+# Cada pin toma x, y, d (o lado) y h medidos, sin compensación de chapado; los 'falta' no se crean.
+PINS_CSV = (sys.argv[2] if __name__ == "__main__" and len(sys.argv) > 2
+            else os.environ.get("UPM_PINS_CSV", ""))
+if PINS_CSV:
+    SUFFIX += "_asbuilt_" + Path(PINS_CSV).stem.replace("pins_asbuilt_", "")
 MAT = "Ni_plated"
 
 # (nombre, valor, descripción)
@@ -266,7 +273,20 @@ boolean("Subtract", "Base:mono", "Base:chan")
 # ── 7. Pines: 316 cilindros explícitos (4 filas x 79) unidos al cuerpo ─────
 ROWS = ("y1pin", "y1pin+ppin", "-y1pin", "-y1pin-ppin")
 PINS = [(f"pin{r + 1}_{k:02d}", f"x0pin+{k}*ppin", y) for r, y in enumerate(ROWS) for k in range(79)]
-if PIN_SHAPE == "round":
+if PINS_CSV:
+    import csv
+    with open(PINS_CSV, newline="", encoding="utf-8") as fh:
+        filas_csv = [r for r in csv.DictReader(fh) if r["estado"] != "falta" and float(r["d_mm"]) > 0]
+    PINS = [(r["nombre"], f"{float(r['x_mm']):.5f}", f"{float(r['y_mm']):.5f}") for r in filas_csv]
+    with group(f"define pins as-built: Base:pin ({len(PINS)}, de {Path(PINS_CSV).name})"):
+        for r in filas_csv:
+            x, y, d, h = (float(r[k]) for k in ("x_mm", "y_mm", "d_mm", "h_mm"))
+            zr = ("-bWR/2-0.01", f"-bWR/2+{h:.5f}")
+            if PIN_SHAPE == "round":
+                cyl("Base", r["nombre"], "z", f"{d / 2:.5f}", zr, f"{x:.5f}", f"{y:.5f}")
+            else:
+                brick("Base", r["nombre"], (f"{x - d / 2:.5f}", f"{x + d / 2:.5f}"), (f"{y - d / 2:.5f}", f"{y + d / 2:.5f}"), zr)
+elif PIN_SHAPE == "round":
     with group("define cylinders: Base:pin (316)"):
         for name, xc, yc in PINS:
             cyl("Base", name, "z", "dpin/2-tpl", ("-bWR/2-0.01", "-bWR/2+hpin"), xc, yc)
@@ -275,7 +295,7 @@ else:
         for name, xc, yc in PINS:
             brick("Base", name, (f"{xc}-(wpx/2-tpl)", f"{xc}+(wpx/2-tpl)"),
                   (f"{yc}-(wpy/2-tpl)", f"{yc}+(wpy/2-tpl)"), ("-bWR/2-0.01", "-bWR/2+hpin"))
-with group("boolean add shapes: Base:mono, Base:pin (316)"):
+with group(f"boolean add shapes: Base:mono, Base:pin ({len(PINS)})"):
     for name, _, _ in PINS:
         boolean("Add", "Base:mono", f"Base:{name}")
 
