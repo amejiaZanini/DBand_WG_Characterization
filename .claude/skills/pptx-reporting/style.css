@@ -1,0 +1,69 @@
+/* ============================================================================
+   style.css — Project Results Deck (HTML target), Zanini Auto Group template
+   13.33x7.5 in -> 1280x720 px (96 dpi). 1 in = 96 px; 1 pt = 1.333 px.
+   Assets live in ../assets/ relative to a deck in examples/ (or assets/ at root).
+   ============================================================================ */
+:root{
+  --red:#C00D1E;            /* Zanini red — header bands, cover band, restricted */
+  --dark1:#000; --light1:#FFFFFF; --dark2:#44546A; --light2:#E7E6E6;
+  --accent1:#4472C4; --accent2:#ED7D31; --accent3:#A5A5A5;
+  --accent4:#FFC000; --accent5:#5B9BD5; --accent6:#70AD47;
+  --link:#0563C1; --okfill:#C6EFCE; --oktext:#006100;
+  --font-title:"Calibri Light","Carlito","Segoe UI",sans-serif;
+  --font-body:"Calibri","Carlito","Segoe UI",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#2b2b2b;font-family:var(--font-body);}
+.deck{display:flex;flex-direction:column;align-items:center;gap:18px;padding:18px;}
+.wrap{width:min(1280px,96vw);}
+.slide{position:relative;width:1280px;height:720px;background:var(--light1);overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,0,0,.4);transform-origin:top left;}
+
+/* ---- fixed furniture ---------------------------------------------------- */
+.footer-rule{position:absolute;left:37px;top:658px;width:1207px;height:1px;background:var(--dark2);}
+.logo{position:absolute;left:37px;top:674px;height:28px;}
+.logo img{height:100%;}
+.slide-number{position:absolute;left:496px;top:667px;width:288px;height:38px;
+  display:flex;align-items:center;justify-content:center;font:13px var(--font-body);color:var(--dark2);}
+/* "Confidentiality: Restricted" red pill, flush to the bottom-right corner */
+.restricted{position:absolute;right:0;bottom:0;height:30px;background:var(--red);
+  border-radius:6px 0 0 0;display:flex;align-items:center;gap:6px;padding:0 12px 0 10px;
+  font:700 13px var(--font-body);color:#fff;}
+.restricted .box{border:1px solid #fff;border-radius:3px;padding:1px 7px;}
+
+/* header (content slides): red rounded band left + rule right + section label */
+.header{position:absolute;left:-9px;top:40px;width:445px;height:50px;background:var(--red);border-radius:0 14px 14px 0;}
+.header-rule{position:absolute;left:449px;top:69px;width:782px;height:1px;background:var(--dark2);}
+.slide-title{position:absolute;left:28px;top:49px;font:700 24px var(--font-title);color:#fff;}
+.section-sub{position:absolute;right:40px;top:48px;font:17px var(--font-body);color:var(--dark2);
+  text-decoration:underline;text-underline-offset:3px;}
+
+/* ---- cover -------------------------------------------------------------- */
+.cover-band{position:absolute;left:0;top:0;width:1280px;height:155px;background:var(--red);
+  border-radius:0 0 18px 18px;}
+.cover-title{position:absolute;right:40px;top:26px;font:700 44px var(--font-title);color:#fff;text-align:right;}
+.cover-date{position:absolute;right:40px;top:110px;font:20px var(--font-body);color:#fff;text-align:right;}
+.cover-car{position:absolute;left:50%;top:180px;transform:translateX(-50%);width:1060px;}
+.cover-car img{width:100%;display:block;}
+
+/* ---- results slide (2 columns, figures only) ---------------------------- */
+.col{position:absolute;top:0;width:560px;height:720px;}
+.col.c1{left:34px;}.col.c2{left:666px;}
+.col-file{position:absolute;top:88px;width:560px;text-align:center;font:700 13px var(--font-body);color:var(--dark1);}
+.fig-label{position:absolute;width:258px;text-align:center;font:11px var(--font-body);color:var(--dark2);}
+.fig-cell{position:absolute;width:258px;height:150px;background:var(--light1);border:1px dashed var(--accent3);
+  display:flex;align-items:center;justify-content:center;font:11px var(--font-body);color:var(--accent3);}
+
+/* ---- table slide -------------------------------------------------------- */
+.tbl-title{position:absolute;left:88px;top:235px;font:700 15px var(--font-body);color:var(--dark1);}
+.rtable{position:absolute;left:88px;top:275px;width:1104px;border-collapse:collapse;font:13px var(--font-body);color:var(--dark1);}
+.rtable th,.rtable td{border:1px solid var(--dark1);padding:4px 6px;text-align:center;}
+.rtable th{font-weight:700;background:var(--light2);}
+.rtable td.ok{background:var(--okfill);color:var(--oktext);}
+
+/* ---- thank-you slide ---------------------------------------------------- */
+.ty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:120px;}
+.ty h1{font:700 54px var(--font-title);color:var(--dark1);}
+.ty .lead{margin-top:90px;font:40px var(--font-title);color:var(--dark1);}
+.ty .sub{margin-top:6px;font:18px var(--font-body);color:var(--dark1);}
+.ty img{margin-top:40px;height:150px;}

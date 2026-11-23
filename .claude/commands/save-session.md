@@ -1,5 +1,5 @@
 ---
-description: Save current session state to a dated file in ~/.claude/session-data/ so work can be resumed in a future session with full context.
+description: Save current session state to a dated file in the repo's .claude/session-data/ (committed, so it survives a fresh container) so work can be resumed in a future session with full context.
 ---
 
 # Save Session Command
@@ -26,15 +26,19 @@ Before writing the file, collect:
 
 ### Step 2: Create the sessions folder if it doesn't exist
 
-Create the canonical sessions folder in the user's Claude home directory:
+> **This repo is ephemeral between sessions.** `~/.claude/session-data/` is wiped
+> when a new container starts, so always save into the repo's own folder, which is
+> committed and survives. Use `~/.claude/session-data/` only as a secondary copy.
+
+Create the repo sessions folder (relative to the project root):
 
 ```bash
-mkdir -p ~/.claude/session-data
+mkdir -p .claude/session-data
 ```
 
 ### Step 3: Write the session file
 
-Create `~/.claude/session-data/YYYY-MM-DD-<short-id>-session.tmp`, using today's actual date and a short-id that satisfies the rules enforced by `SESSION_FILENAME_REGEX` in `session-manager.js`:
+Create `.claude/session-data/YYYY-MM-DD-<short-id>-session.md`, using today's actual date and a short-id (lowercase letters, digits and hyphens; 8+ chars to avoid collisions). Use the `.md` extension so GitHub renders it (the `.tmp` extension still works for `~/.claude/session-data/` copies):
 
 - Compatibility characters: letters `a-z` / `A-Z`, digits `0-9`, hyphens `-`, underscores `_`
 - Compatibility minimum length: 1 character
@@ -62,6 +66,16 @@ Does this look accurate? Anything to correct or add before we close?
 ```
 
 Wait for confirmation. Make edits if requested.
+
+### Step 6: Commit the session file
+
+Because the container is ephemeral, the file only survives if it is committed:
+
+```bash
+git add .claude/session-data/ && git commit -m "docs: save session log (<short-id>)" && git push
+```
+
+Then `/resume-session` (no argument) will find it automatically in the next session.
 
 ---
 
@@ -184,83 +198,75 @@ required, services that need to be running, etc. Skip if standard setup.]
 ## Example Output
 
 ```markdown
-# Session: 2024-01-15
+# Session: 2026-05-10
 
-**Started:** ~2pm
-**Last Updated:** 5:30pm
-**Project:** my-app
-**Topic:** Building JWT authentication with httpOnly cookies
+**Started:** ~10am
+**Last Updated:** 1:30pm
+**Project:** my-project
+**Topic:** Add chunk-level retry/backoff to the data export job
 
 ---
 
 ## What We Are Building
 
-User authentication system for the Next.js app. Users register with email/password,
-receive a JWT stored in an httpOnly cookie (not localStorage), and protected routes
-check for a valid token via middleware. The goal is session persistence across browser
-refreshes without exposing the token to JavaScript.
+A retry wrapper around the export job so transient network failures no longer abort
+a whole run. Failed chunks retry with exponential backoff; after N attempts a chunk
+is logged and skipped instead of killing the batch.
 
 ---
 
 ## What WORKED (with evidence)
 
-- **`/api/auth/register` endpoint** — confirmed by: Postman POST returns 200 with user
-  object, row visible in Supabase dashboard, bcrypt hash stored correctly
-- **JWT generation in `lib/auth.ts`** — confirmed by: unit test passes
-  (`npm test -- auth.test.ts`), decoded token at jwt.io shows correct payload
-- **Password hashing** — confirmed by: `bcrypt.compare()` returns true in test
+- **Backoff wrapper around `exportChunk`** — confirmed by: unit test simulates two
+  failures then success, asserts three calls and one returned result
+- **Per-chunk error log** — confirmed by: a failing run leaves a readable summary of
+  which chunks were skipped and why
 
 ---
 
 ## What Did NOT Work (and why)
 
-- **Next-Auth library** — failed because: conflicts with our custom Prisma adapter,
-  threw "Cannot use adapter with credentials provider in this configuration" on every
-  request. Not worth debugging — too opinionated for our setup.
-- **Storing JWT in localStorage** — failed because: SSR renders happen before
-  localStorage is available, caused React hydration mismatch error on every page load.
-  This approach is fundamentally incompatible with Next.js SSR.
+- **Retrying the whole batch on any failure** — failed because: one bad chunk forced
+  a full re-export, so a long run never completed. Moved retries down to the chunk
+  level instead.
 
 ---
 
 ## What Has NOT Been Tried Yet
 
-- Store JWT as httpOnly cookie in the login route response (most likely solution)
-- Use `cookies()` from `next/headers` to read token in server components
-- Write middleware.ts to protect routes by checking cookie existence
+- Make max-attempts and base delay configurable instead of hardcoded
+- Add a counter/metric for skipped chunks
 
 ---
 
 ## Current State of Files
 
-| File                             | Status         | Notes                                           |
-| -------------------------------- | -------------- | ----------------------------------------------- |
-| `app/api/auth/register/route.ts` | PASS: Complete    | Works, tested                                   |
-| `app/api/auth/login/route.ts`    |  In Progress | Token generates but not setting cookie yet      |
-| `lib/auth.ts`                    | PASS: Complete    | JWT helpers, all tested                         |
-| `middleware.ts`                  |  Not Started | Route protection, needs cookie read logic first |
-| `app/login/page.tsx`             |  Not Started | UI not started                                  |
+| File             | Status       | Notes                               |
+| ---------------- | ------------ | ----------------------------------- |
+| `export/retry.*` | In Progress  | backoff works, constants hardcoded  |
+| `export/job.*`   | Complete     | calls the retry wrapper per chunk   |
 
 ---
 
 ## Decisions Made
 
-- **httpOnly cookie over localStorage** — reason: prevents XSS token theft, works with SSR
-- **Custom auth over Next-Auth** — reason: Next-Auth conflicts with our Prisma setup, not worth the fight
+- **Chunk-level retries over batch-level** — reason: isolates failures so one bad
+  chunk can't abort a long run.
 
 ---
 
 ## Blockers & Open Questions
 
-- Does `cookies().set()` work inside a Route Handler or only in Server Actions? Need to verify.
+- Should a chunk that fails every attempt fail the job (non-zero exit) or just be
+  logged and skipped? Needs a product call.
 
 ---
 
 ## Exact Next Step
 
-In `app/api/auth/login/route.ts`, after generating the JWT, set it as an httpOnly
-cookie using `cookies().set('token', jwt, { httpOnly: true, secure: true, sameSite: 'strict' })`.
-Then test with Postman — the response should include a `Set-Cookie` header.
+Extract the max-attempts and base-delay magic numbers into named constants (or
+config), then add a test for the "all attempts fail" path to lock the skip-and-log
+behavior.
 ```
 
 ---

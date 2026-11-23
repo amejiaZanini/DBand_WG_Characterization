@@ -178,74 +178,26 @@ function processUsers(users) {
 }
 ```
 
-### React/Next.js Patterns (HIGH)
+### Framework-specific patterns (HIGH)
 
-When reviewing React/Next.js code, also check:
+This agent is intentionally language-agnostic and does not spell out per-framework
+checklists. When the diff is in a framework you know, apply its usual hygiene, e.g.:
 
-- **Missing dependency arrays** — `useEffect`/`useMemo`/`useCallback` with incomplete deps
-- **State updates in render** — Calling setState during render causes infinite loops
-- **Missing keys in lists** — Using array index as key when items can reorder
-- **Prop drilling** — Props passed through 3+ levels (use context or composition)
-- **Unnecessary re-renders** — Missing memoization for expensive computations
-- **Client/server boundary** — Using `useState`/`useEffect` in Server Components
-- **Missing loading/error states** — Data fetching without fallback UI
-- **Stale closures** — Event handlers capturing stale state values
+- **Frontend (React/Next.js, Vue, Svelte):** effect/memo dependency arrays, stable
+  list keys, state updates during render, client/server boundary, loading/error states.
+- **Backend (Node, Django, Rails, FastAPI, …):** input/schema validation, rate
+  limiting, unbounded or N+1 queries, external-call timeouts, error-message leakage.
 
-```tsx
-// BAD: Missing dependency, stale closure
-useEffect(() => {
-  fetchData(userId);
-}, []); // userId missing from deps
-
-// GOOD: Complete dependencies
-useEffect(() => {
-  fetchData(userId);
-}, [userId]);
-```
-
-```tsx
-// BAD: Using index as key with reorderable list
-{items.map((item, i) => <ListItem key={i} item={item} />)}
-
-// GOOD: Stable unique key
-{items.map(item => <ListItem key={item.id} item={item} />)}
-```
-
-### Node.js/Backend Patterns (HIGH)
-
-When reviewing backend code:
-
-- **Unvalidated input** — Request body/params used without schema validation
-- **Missing rate limiting** — Public endpoints without throttling
-- **Unbounded queries** — `SELECT *` or queries without LIMIT on user-facing endpoints
-- **N+1 queries** — Fetching related data in a loop instead of a join/batch
-- **Missing timeouts** — External HTTP calls without timeout configuration
-- **Error message leakage** — Sending internal error details to clients
-- **Missing CORS configuration** — APIs accessible from unintended origins
-
-```typescript
-// BAD: N+1 query pattern
-const users = await db.query('SELECT * FROM users');
-for (const user of users) {
-  user.posts = await db.query('SELECT * FROM posts WHERE user_id = $1', [user.id]);
-}
-
-// GOOD: Single query with JOIN or batch
-const usersWithPosts = await db.query(`
-  SELECT u.*, json_agg(p.*) as posts
-  FROM users u
-  LEFT JOIN posts p ON p.user_id = u.id
-  GROUP BY u.id
-`);
-```
+Match the project's stack; don't suggest a stack change. If the repo ships a
+language-specific rule (e.g. a MATLAB or Python standards file under
+`.claude/rules/`), defer to it.
 
 ### Performance (MEDIUM)
 
 - **Inefficient algorithms** — O(n^2) when O(n log n) or O(n) is possible
-- **Unnecessary re-renders** — Missing React.memo, useMemo, useCallback
-- **Large bundle sizes** — Importing entire libraries when tree-shakeable alternatives exist
 - **Missing caching** — Repeated expensive computations without memoization
-- **Unoptimized images** — Large images without compression or lazy loading
+- **Unnecessary re-renders / recomputation** — Missing memoization on hot paths
+- **Large temporaries** — Operations that materialize huge intermediate data
 - **Synchronous I/O** — Blocking operations in async contexts
 
 ### Best Practices (LOW)
